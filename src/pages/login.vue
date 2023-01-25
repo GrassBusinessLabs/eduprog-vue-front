@@ -141,6 +141,7 @@ const logIn = async () => {
 </style>
 
 <route lang='yaml'>
-meta:
 layout: blank
+meta:
+  requiresUnAuth: true
 </route>
