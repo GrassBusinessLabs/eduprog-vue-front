@@ -15,6 +15,14 @@ const form = ref({
   email: '',
   password: '',
 })
+ 
+const rulesUser = ref({
+  email : form.email,
+  emailRules: [
+    v => !!v || 'Email is required',
+    v => /.+@.+/.test(v) || 'Email must be valid',
+  ],
+})
 const vuetifyTheme = useTheme()
 const authThemeMask = computed(() => {
   return vuetifyTheme.global.name.value === 'light' ? authV1MaskLight : authV1MaskDark
@@ -68,6 +76,8 @@ const isPasswordVisible = ref(false)
                 v-model="form.email"
                 label="Email"
                 type="email"
+                :rules="rulesUser.emailRules"
+                required
               />
             </VCol>
 
