@@ -1,5 +1,6 @@
 import { postData } from '@/api/api'
 import { defineStore } from 'pinia'
+import router from '../router'
 
 export const useUserStore = defineStore({
   id: 'user',
@@ -24,14 +25,15 @@ export const useUserStore = defineStore({
     },
 
     async login(payload) {
-      console.log(payload)
       const response = await postData('auth/login', payload)
       this.setToken(response.token)
+      router.replace('/')
     },
 
     async signUp(payload) {
       const response = await postData('auth/register', payload)
       this.setToken(response.token)
+      router.replace('/')
     },
 
     async logOut() {

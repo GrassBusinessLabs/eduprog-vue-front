@@ -17,20 +17,27 @@ const form = ref({
 })
  
 const rulesUser = ref({
-  email : form.email,
   emailRules: [
-    v => !!v || 'Email is required',
-    v => /.+@.+/.test(v) || 'Email must be valid',
+    v => !!v || "Пошта обов'язкова",
+    v => /.+@.+/.test(v) || 'Некоректний запис пошти',
   ],
 })
 const vuetifyTheme = useTheme()
 const authThemeMask = computed(() => {
   return vuetifyTheme.global.name.value === 'light' ? authV1MaskLight : authV1MaskDark
 })
+
 const singUp = async () => {
-  await userStore.signUp(form.value)
+  console.log(form.value.email)
+  const newUser = {
+    email: form.value.email.trim(),
+    password: form.value.password.trim(),
+    name: form.value.name.trim(),
+  }
+  await userStore.signUp(newUser)
 }
 const isPasswordVisible = ref(false)
+
 </script>
 
 <template>
@@ -47,18 +54,9 @@ const isPasswordVisible = ref(false)
         </template>
 
         <VCardTitle class="font-weight-semibold text-2xl text-uppercase">
-          Materio
+          Реєстрація
         </VCardTitle>
       </VCardItem>
-
-      <VCardText class="pt-2">
-        <h5 class="text-h5 font-weight-semibold mb-1">
-          Adventure starts here 🚀
-        </h5>
-        <p class="mb-0">
-          Make your app management easy and fun!
-        </p>
-      </VCardText>
 
       <VCardText>
         <VForm @submit.prevent="() => {}">
@@ -67,14 +65,14 @@ const isPasswordVisible = ref(false)
             <VCol cols="12">
               <VTextField
                 v-model="form.name"
-                label="Username"
+                label="Ім'я"
               />
             </VCol>
             <!-- email -->
             <VCol cols="12">
               <VTextField
                 v-model="form.email"
-                label="Email"
+                label="Пошта"
                 type="email"
                 :rules="rulesUser.emailRules"
                 required
@@ -85,18 +83,19 @@ const isPasswordVisible = ref(false)
             <VCol cols="12">
               <VTextField
                 v-model="form.password"
-                label="Password"
+                label="Пароль"
                 :type="isPasswordVisible ? 'text' : 'password'"
                 :append-inner-icon="isPasswordVisible ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
                 @click:append-inner="isPasswordVisible = !isPasswordVisible"
               />
-
+            </VCol>
+            <VCol cols="12">
               <VBtn
                 block
                 type="submit"
                 @click="singUp"
               >
-                Sign up
+                Зареєструватись
               </VBtn>
             </VCol>
 
@@ -105,31 +104,17 @@ const isPasswordVisible = ref(false)
               cols="12"
               class="text-center text-base"
             >
-              <span>Already have an account?</span>
+              <span>Уже є аккаунт?</span>
               <RouterLink
                 class="text-primary ms-2"
                 to="login"
               >
-                Sign in instead
+                Увійдіть
               </RouterLink>
             </VCol>
 
-            <VCol
-              cols="12"
-              class="d-flex align-center"
-            >
-              <VDivider />
-              <span class="mx-4">or</span>
-              <VDivider />
-            </VCol>
 
             <!-- auth providers -->
-            <VCol
-              cols="12"
-              class="text-center"
-            >
-              <AuthProvider />
-            </VCol>
           </VRow>
         </VForm>
       </VCardText>
