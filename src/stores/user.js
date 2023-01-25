@@ -1,5 +1,5 @@
-import { defineStore } from 'pinia'
 import { postData } from '@/api/api'
+import { defineStore } from 'pinia'
 
 export const useUserStore = defineStore({
   id: 'user',
@@ -24,10 +24,8 @@ export const useUserStore = defineStore({
     },
 
     async login(payload) {
-      const response = await postData('auth/login', {
-        email: 'sa@test.com',
-        password: '1234',
-      })
+      console.log(payload)
+      const response = await postData('auth/login', payload)
       this.setToken(response.token)
     },
 

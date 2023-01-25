@@ -12,7 +12,6 @@ const userStore = useUserStore()
 const form = ref({
   email: '',
   password: '',
-  remember: false,
 })
 const vuetifyTheme = useTheme()
 const authThemeMask = computed(() => {
@@ -25,7 +24,7 @@ const authData = computed(() => {
 })
 
 const logIn = async () => {
-  userStore.login({email: '', password: ''})
+  await userStore.login(form.value)
 }
 </script>
 
