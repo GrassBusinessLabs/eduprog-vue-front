@@ -36,9 +36,10 @@ export const useUserStore = defineStore({
       router.replace('/')
     },
 
-    async logOut() {
+    async logout() {
       this.token = null
       localStorage.clear()
+      router.replace('/login')
     },
   },
 })
