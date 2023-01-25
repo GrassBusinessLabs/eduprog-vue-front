@@ -1,4 +1,4 @@
-import { postData } from '@/api/api'
+import { postData } from '@/api/http/apiService'
 import { defineStore } from 'pinia'
 import router from '../router'
 
