@@ -30,11 +30,8 @@ export const useUserStore = defineStore({
     },
 
     async signUp(payload) {
-      try {
-        //
-      } catch (err) {
-        return Promise.reject(err)
-      }
+      const response = await postData('auth/register', payload)
+      this.setToken(response.token)
     },
 
     async logOut() {

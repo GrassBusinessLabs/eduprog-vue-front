@@ -6,17 +6,22 @@ import authV1MaskDark from '@/assets/images/pages/auth-v1-mask-dark.png'
 import authV1MaskLight from '@/assets/images/pages/auth-v1-mask-light.png'
 import authV1Tree2 from '@/assets/images/pages/auth-v1-tree-2.png'
 import authV1Tree from '@/assets/images/pages/auth-v1-tree.png'
+import { useUserStore } from '@/stores/user'
+
+const userStore = useUserStore()
 
 const form = ref({
-  username: '',
+  name: '',
   email: '',
   password: '',
-  privacyPolicies: false,
 })
 const vuetifyTheme = useTheme()
 const authThemeMask = computed(() => {
   return vuetifyTheme.global.name.value === 'light' ? authV1MaskLight : authV1MaskDark
 })
+const singUp = async () => {
+  await userStore.signUp(form.value)
+}
 const isPasswordVisible = ref(false)
 </script>
 
@@ -53,7 +58,7 @@ const isPasswordVisible = ref(false)
             <!-- Username -->
             <VCol cols="12">
               <VTextField
-                v-model="form.username"
+                v-model="form.name"
                 label="Username"
               />
             </VCol>
@@ -75,27 +80,11 @@ const isPasswordVisible = ref(false)
                 :append-inner-icon="isPasswordVisible ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
                 @click:append-inner="isPasswordVisible = !isPasswordVisible"
               />
-              <div class="d-flex align-center mt-1 mb-4">
-                <VCheckbox
-                  id="privacy-policy"
-                  v-model="form.privacyPolicies"
-                  inline
-                />
-                <VLabel
-                  for="privacy-policy"
-                  style="opacity: 1;"
-                >
-                  <span class="me-1">I agree to</span>
-                  <a
-                    href="javascript:void(0)"
-                    class="text-primary"
-                  >privacy policy & terms</a>
-                </VLabel>
-              </div>
 
               <VBtn
                 block
                 type="submit"
+                @click="singUp"
               >
                 Sign up
               </VBtn>
