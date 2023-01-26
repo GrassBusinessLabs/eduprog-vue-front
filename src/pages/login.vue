@@ -94,7 +94,7 @@ const logIn = async () => {
                 block
                 @click='logIn'
               >
-                Login
+                Увійти
               </VBtn>
             </VCol>
 

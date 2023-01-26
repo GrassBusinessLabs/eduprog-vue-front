@@ -28,13 +28,7 @@ const authThemeMask = computed(() => {
 })
 
 const singUp = async () => {
-  console.log(form.value.email)
-  const newUser = {
-    email: form.value.email.trim(),
-    password: form.value.password.trim(),
-    name: form.value.name.trim(),
-  }
-  await userStore.signUp(newUser)
+  await userStore.signUp(form.value)
 }
 const isPasswordVisible = ref(false)
 
@@ -64,14 +58,14 @@ const isPasswordVisible = ref(false)
             <!-- Username -->
             <VCol cols="12">
               <VTextField
-                v-model="form.name"
+                v-model.trim="form.name"
                 label="Ім'я"
               />
             </VCol>
             <!-- email -->
             <VCol cols="12">
               <VTextField
-                v-model="form.email"
+                v-model.trim="form.email"
                 label="Пошта"
                 type="email"
                 :rules="rulesUser.emailRules"
@@ -82,7 +76,7 @@ const isPasswordVisible = ref(false)
             <!-- password -->
             <VCol cols="12">
               <VTextField
-                v-model="form.password"
+                v-model.trim="form.password"
                 label="Пароль"
                 :type="isPasswordVisible ? 'text' : 'password'"
                 :append-inner-icon="isPasswordVisible ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
