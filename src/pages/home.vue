@@ -10,11 +10,11 @@ const eduProgsStore = useEduProgsStore()
 
 //return { eduProgs: useEduProgsStore.getEduProgs }
 
-Date.prototype.format = function (mask, utc) {
-    return dateFormat(this, mask, utc);
-};
+const deleteEduProg =( async(id) => {
+  eduProgsStore.deleteEduProg(id)
+})
 
-onMounted( async() => {
+onMounted( async () => {
     await eduProgsStore.fetchEduProgs()
 })
 
@@ -95,7 +95,7 @@ const eduProgs = computed(() => eduProgsStore.getEduProgs)
                         />
                         </template>
 
-                    <VListItemTitle>Видалити</VListItemTitle>
+                    <VListItemTitle @click="deleteEduProg(item.id)">Видалити</VListItemTitle>
                 </VListItem>
             </VList>
           </VMenu>

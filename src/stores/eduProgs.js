@@ -1,4 +1,4 @@
-import { getData } from '@/api/http/apiService';
+import { deleteData, getData } from '@/api/http/apiService';
 import { defineStore } from 'pinia';
 export const useEduProgsStore = defineStore({
   id: 'eduProgs',
@@ -14,8 +14,11 @@ export const useEduProgsStore = defineStore({
   actions: {
     async fetchEduProgs(){
         const response = await getData('eduprogs');
-        console.log(response.items)
         this.eduProgs = response.items;
+    },
+    async deleteEduProg(payload){
+        await deleteData('/eduprogs/'+payload);
+        this.fetchEduProgs
     },
   },
 })
