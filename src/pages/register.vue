@@ -19,7 +19,13 @@ const form = ref({
 const rulesUser = ref({
   emailRules: [
     v => !!v || "Пошта обов'язкова",
-    v => /.+@.+/.test(v) || 'Некоректний запис пошти',
+    v => /.+@.+\..+/.test(v) || 'Некоректний запис пошти',
+  ],
+  passwordRules: [
+    v => !!v || "Пароль обов'язковий",
+    v => (v && v.length >= 8) || 'Пароль повинен бути не менше 8 символів',
+    v => /[A-Z]/.test(v) || 'Пароль повинен містити хоч одну велику літеру',
+    v => /[0-9]/.test(v) || 'Пароль повинен містити хоч одну цифру',
   ],
 })
 const vuetifyTheme = useTheme()
@@ -80,7 +86,8 @@ const isPasswordVisible = ref(false)
                 label="Пароль"
                 :type="isPasswordVisible ? 'text' : 'password'"
                 :append-inner-icon="isPasswordVisible ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
-                @click:append-inner="isPasswordVisible = !isPasswordVisible"
+                :rules="rulesUser.passwordRules"
+                @click:append-inner="isPasswordVisible = !isPasswordVisible" 
               />
             </VCol>
             <VCol cols="12">
