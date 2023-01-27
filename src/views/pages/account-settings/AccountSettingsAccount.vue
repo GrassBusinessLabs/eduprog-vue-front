@@ -1,54 +1,45 @@
 <script setup>
 import avatar1 from '@/assets/images/avatars/avatar-1.png'
-
-const accountData = {
-  avatarImg: avatar1,
-  firstName: 'john',
-  lastName: 'Doe',
-  email: 'johnDoe@example.com',
-  org: 'ThemeSelection',
-  phone: '+1 (917) 543-9876',
-  address: '123 Main St, New York, NY 10001',
-  state: 'New York',
-  zip: '10001',
-  country: 'USA',
-  language: 'English',
-  timezone: '(GMT-11:00) International Date Line West',
-  currency: 'USD',
-}
+import { useUserStore } from '@/stores/user'
+const userStore = useUserStore()
+onMounted( async () => {
+    await userStore.fetchUserData()
+})
+const userData = computed(() => userStore.getUserData)
+const avatarImg= avatar1;
 const isCurrentPasswordVisible = ref(false)
 const isNewPasswordVisible = ref(false)
 const isConfirmPasswordVisible = ref(false)
-const currentPassword = ref('12345678')
-const newPassword = ref('87654321')
-const confirmPassword = ref('87654321')
+const currentPassword = ref('')
+const newPassword = ref('')
+const confirmPassword = ref('')
 const passwordRequirements = [
   'Мінімум 8 символів - чим більше, тим краще',
   'Принаймні один малий регістр',
   'Принаймні одне число, символ або пробіл',
 ]
-
-const refInputEl = ref()
-const accountDataLocal = ref(structuredClone(accountData))
-const resetForm = () => {
-  accountDataLocal.value = structuredClone(accountData)
-}
-const changeAvatar = file => {
-  const fileReader = new FileReader()
-  const {files} = file.target
-  if (files && files.length) {
-    fileReader.readAsDataURL(files[0])
-    fileReader.onload = () => {
-      if (typeof fileReader.result === 'string')
-        accountDataLocal.value.avatarImg = fileReader.result
-    }
-  }
-}
+const newName = ref('')
+const changeName =( async() => {
+  await userStore.changeUserName(newName.value)
+  await userStore.fetchUserData()
+  newName.value=''
+})
+// const changeAvatar = file => {
+//   const fileReader = new FileReader()
+//   const {files} = file.target
+//   if (files && files.length) {
+//     fileReader.readAsDataURL(files[0])
+//     fileReader.onload = () => {
+//       if (typeof fileReader.result === 'string')
+//         accountDataLocal.value.avatarImg = fileReader.result
+//     }
+//   }
+// }
 
 // reset avatar image
-const resetAvatar = () => {
-  accountDataLocal.value.avatarImg = accountData.avatarImg
-}
+// const resetAvatar = () => {
+//   accountDataLocal.value.avatarImg = accountData.avatarImg
+// }
 </script>
 
 <template>
@@ -61,11 +52,22 @@ const resetAvatar = () => {
             rounded="lg"
             size="100"
             class="me-6"
-            :image="accountDataLocal.avatarImg"
+            :image="avatarImg"
           />
-
+          
+          <v-row>
+            <p class="text-body-1 mb-0">
+              Iм'я: {{ userData.name }}
+            </p>
+          </v-row>
+          <v-row>
+            <p class="text-body-1 mb-0">
+              Пошта: {{ userData.email }}
+            </p>
+          </v-row>
+          
           <!-- 👉 Upload Photo -->
-          <form
+          <!-- <form
             ref="refForm"
             class="d-flex flex-column justify-center gap-5"
           >
@@ -78,7 +80,7 @@ const resetAvatar = () => {
                   icon="mdi-cloud-upload-outline"
                   class="d-sm-none"
                 />
-                <span class="d-none d-sm-block">Загрузити нове фото</span>
+                <span class="d-none d-sm-block">Завантажити нове фото</span>
               </VBtn>
 
               <input
@@ -107,12 +109,15 @@ const resetAvatar = () => {
             <p class="text-body-1 mb-0">
               Дозволено JPG, GIF або PNG. Максимальний розмір 800K
             </p>
-          </form>
+          </form> -->
+
         </VCardText>
 
-        <VDivider />
-
-        <VCardText>
+      </VCard>
+      </VCol>
+      <VCol cols="12">
+        <VCard title="Змінити ім'я">
+        <VCardText >
           <!-- 👉 Form -->
           <VForm class="mt-6">
             <VRow>
@@ -122,8 +127,8 @@ const resetAvatar = () => {
                 cols="12"
               >
                 <VTextField
-                  v-model="accountDataLocal.firstName"
-                  label="Ім'я"
+                  label="Введіть сюди нове ім'я"
+                  v-model="newName"
                 />
               </VCol>
 
@@ -133,16 +138,7 @@ const resetAvatar = () => {
                 cols="12"
                 class="d-flex flex-wrap gap-4"
               >
-                <VBtn>Зберегти зміни</VBtn>
-
-                <VBtn
-                  color="secondary"
-                  variant="tonal"
-                  type="reset"
-                  @click.prevent="resetForm"
-                >
-                  Повернути назад
-                </VBtn>
+                <VBtn @click="changeName">Зберегти зміни</VBtn>
               </VCol>
             </VRow>
           </VForm>
