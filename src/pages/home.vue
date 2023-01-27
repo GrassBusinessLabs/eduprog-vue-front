@@ -22,6 +22,7 @@ const deleteEduProg =( async(id) => {
   await eduProgsStore.deleteEduProg(id)
   await eduProgsStore.fetchEduProgs()
 })
+
 // const props = defineProps({
 //   modelValue: {
 //     type: [Boolean],
@@ -45,11 +46,18 @@ const deleteEduProg =( async(id) => {
 //   currentEduProg = id;
 //   dialog = true;
 // })
-const dialog = ref(false)
 
+
+const dialog = ref(false)
+const dialog2 = ref(false)
 const dialogCheck = function dialogg() {
   dialog.value=true
 }
+const dialogCheck2 = function dialogg() {
+  dialog2.value=true
+}
+
+
 const newOpp= ref({
   name :'',
   education_level :'',
@@ -110,10 +118,6 @@ const newOpp= ref({
                 required
               ></VTextField>
             </VCol>
-              
-              
-              
-              
           </VRow>
         </VContainer>
       </VCardText>
@@ -206,7 +210,7 @@ const newOpp= ref({
                 </template>
                         
 
-                <VListItemTitle>Перейменувати</VListItemTitle>
+                <VListItemTitle @click="dialogCheck2">Перейменувати</VListItemTitle>
               </VListItem>
               <VListItem link>
                 <template #prepend>
@@ -264,4 +268,44 @@ const newOpp= ref({
         </v-card-actions>
       </v-card>
     </v-dialog> -->
+
+
+   
+  <VDialog v-model="dialog2"
+            persistent
+           max-width="600">
+    <VCard>
+      <VCardTitle>Перейменувати ОПП</VCardTitle>
+      <VCardText>
+        <VContainer>
+          <VRow>
+            <VCol
+              cols="12">
+              <VTextField
+                label="Введіть нову назву ОПП"
+                required
+              ></VTextField>
+            </VCol>
+          </VRow>    
+          </VContainer> 
+        
+          <VCardActions>
+               <VSpacer></VSpacer>
+        <VBtn
+          text
+          @click="dialog2 = false"
+        >
+          Відмінити
+        </VBtn>
+        <VBtn
+          text
+          @click="dialog2 = false"
+        >
+          Зберегти
+        </VBtn>
+      </VCardActions>
+      </VCardText>
+    </VCard>
+  </VDialog>
+
 </template>
