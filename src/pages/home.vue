@@ -45,11 +45,102 @@ const deleteEduProg =( async(id) => {
 //   currentEduProg = id;
 //   dialog = true;
 // })
+const dialog = ref(false)
 
+const dialogCheck = function dialogg() {
+  dialog.value=true
+}
+const newOpp= ref({
+  name :'',
+  education_level :'',
+  stage :'',
+  speciality :'',
+  knowledge_field :'',
+})
 
 </script>
 
 <template>
+  <VBtn @click="dialogCheck" dark>
+    Створити ОПП
+  </VBtn>  
+  
+  
+  <VDialog v-model="dialog"
+           persistent
+           max-width="600px">
+    <VCard>
+      <VCardTitle>
+        <span class="text-h5">Створення нової ОПП</span>
+      </VCardTitle>
+      <VCardText>
+        <VContainer>
+          <VRow>
+            <VCol
+              cols="12">
+              <VTextField
+                label="Назва документу "
+                required
+              ></VTextField>
+            </VCol>
+            <VCol
+              cols="12">
+              <VTextField
+                label="Освітній рівень"
+              ></VTextField>
+            </VCol>
+            <VCol
+              cols="12">
+              <VTextField
+                label="Освітній ступінь"
+                required
+              ></VTextField>
+            </VCol>
+            <VCol
+              cols="12">
+              <VTextField
+                label="Спеціальність"
+                required
+              ></VTextField>
+            </VCol>
+            <VCol
+              cols="12">
+              <VTextField
+                label="Галузь знань"
+                required
+              ></VTextField>
+            </VCol>
+              
+              
+              
+              
+          </VRow>
+        </VContainer>
+      </VCardText>
+
+      <VCardActions>
+        <VSpacer></VSpacer>
+        <VBtn
+          color="blue darken-1"
+          text
+          @click="dialog = false"
+        >
+          Закрити
+        </VBtn>
+        <VBtn
+          color="blue darken-1"
+          text
+          @click="dialog = false"
+        >
+          Створити
+        </VBtn>
+      </VCardActions>
+
+    </VCard>
+  
+  </VDialog>
+
+
   <VTable>
     <thead>
       <tr>
@@ -86,7 +177,7 @@ const deleteEduProg =( async(id) => {
           {{ moment(item.updated_date).format('DD.MM.YYYY HH:mm:ss') }}
         </td>
         <td class="text-center">
-        <VMenu
+          <VMenu
             bottom
             left
             activator="parent"
@@ -105,29 +196,29 @@ const deleteEduProg =( async(id) => {
             </template>
 
             <VList>
-                <VListItem link>
-                        <template #prepend>
-                        <VIcon
-                            class="me-2"
-                            icon="mdi-pencil"
-                            size="22"
-                        />
-                        </template>
+              <VListItem link>
+                <template #prepend>
+                  <VIcon
+                    class="me-2"
+                    icon="mdi-pencil"
+                    size="22"
+                  />
+                </template>
                         
 
-                    <VListItemTitle>Перейменувати</VListItemTitle>
-                </VListItem>
-                <VListItem link>
-                    <template #prepend>
-                        <VIcon
-                            class="me-2"
-                            icon="mdi-trash-can"
-                            size="22"
-                        />
-                        </template>
+                <VListItemTitle>Перейменувати</VListItemTitle>
+              </VListItem>
+              <VListItem link>
+                <template #prepend>
+                  <VIcon
+                    class="me-2"
+                    icon="mdi-trash-can"
+                    size="22"
+                  />
+                </template>
 
-                    <VListItemTitle @click="deleteEduProg(item.id)">Видалити</VListItemTitle>
-                </VListItem>
+                <VListItemTitle @click="deleteEduProg(item.id)">Видалити</VListItemTitle>
+              </VListItem>
             </VList>
           </VMenu>
         </td>
