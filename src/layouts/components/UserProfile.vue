@@ -87,7 +87,7 @@ const logout = () => {
               />
             </template>
 
-            <VListItemTitle>Вийти</VListItemTitle>
+            <VListItemTitle @click='logout'>Вийти</VListItemTitle>
           </VListItem>
         </VList>
       </VMenu>
