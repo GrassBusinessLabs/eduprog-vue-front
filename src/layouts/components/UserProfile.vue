@@ -1,5 +1,8 @@
 <script setup>
 import avatar1 from '@/assets/images/avatars/avatar-1.png'
+import { useUserStore } from '@/stores/user'
+
+const userStore = useUserStore()
 
 const avatarBadgeProps = {
   dot: true,
@@ -8,6 +11,10 @@ const avatarBadgeProps = {
   offsetY: 3,
   color: 'success',
   bordered: true,
+}
+
+const logout = () => {
+  userStore.logout()
 }
 </script>
 

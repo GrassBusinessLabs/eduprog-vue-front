@@ -1,4 +1,4 @@
-import { editData, getData, postData } from '@/api/api'
+import { editData, getData, postData } from '@/api/http/apiService'
 import { defineStore } from 'pinia'
 import router from '../router'
 
@@ -42,9 +42,10 @@ export const useUserStore = defineStore({
       router.replace('/')
     },
 
-    async logOut() {
+    async logout() {
       this.token = null
       localStorage.clear()
+      router.replace('/login')
     },
     async changeUserName(enteredName) {
       const newName={
