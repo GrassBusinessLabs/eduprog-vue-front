@@ -5,6 +5,22 @@ const userStore = useUserStore()
 onMounted( async () => {
     await userStore.fetchUserData()
 })
+const changePassword =( async() => {
+  if(
+    confirmPassword.value == newPassword.value 
+    // &&
+    // newPassword.value.length >= 8 &&
+    // newPasswords.matches(".*[a-z]+.*") &&
+    // newPasswords.matches(".*[0-9]+.*")
+  ) {
+    await userStore.changePassword(currentPassword.value, newPassword.value)
+    await userStore.fetchUserData()
+    newPassword.value=''
+    confirmPassword.value=''
+    currentPassword.value=''
+  } else {
+  }
+})
 const userData = computed(() => userStore.getUserData)
 const avatarImg= avatar1;
 const isCurrentPasswordVisible = ref(false)
@@ -225,7 +241,7 @@ const changeName =( async() => {
 
           <!-- 👉 Action Buttons -->
           <VCardText class="d-flex flex-wrap gap-4">
-            <VBtn>Зберегти зміни</VBtn>
+            <VBtn @click="changePassword">Зберегти зміни</VBtn>
 
             <VBtn
               type="reset"

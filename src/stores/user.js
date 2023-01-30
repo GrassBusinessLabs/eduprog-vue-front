@@ -27,8 +27,8 @@ export const useUserStore = defineStore({
 
     async fetchUserData() {
       const response = await getData('users');
-      console.log(response)
       this.setUserData(response)
+      return response
     },
     async login(payload) {
       const response = await postData('auth/login', payload)
@@ -51,6 +51,19 @@ export const useUserStore = defineStore({
         name: enteredName
       }
       const response = await editData('users', newName);
+    },
+    async changePassword(oldPassword, newPassword) {
+      const passwords={
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+      }
+      const userData = await this.fetchUserData();
+      await postData('auth/change-pwd', passwords)
+      const response = await postData('auth/login', {
+        email: userData.email,
+        password: newPassword,
+      })
+      this.setToken(response.token)
     },
   },
 })
