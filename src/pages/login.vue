@@ -140,8 +140,8 @@ const logIn = async () => {
 @use "@core/scss/pages/page-auth.scss";
 </style>
 
-<route lang='yaml'>
-layout: blank
+<route lang="yaml">
 meta:
+  layout: blank
   requiresUnAuth: true
 </route>
