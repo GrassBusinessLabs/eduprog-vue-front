@@ -15,13 +15,29 @@ onMounted( async () => {
     await eduProgsStore.fetchEduProgs()
 })
 
-
+let currentEduProg = null
+let newNameEduProg = ref(null)
 const eduProgs = computed(() => eduProgsStore.getEduProgs)
 
 const deleteEduProg =( async(id) => {
   await eduProgsStore.deleteEduProg(id)
   await eduProgsStore.fetchEduProgs()
 })
+const editNameEduProg =( async() => {
+  currentEduProg.name = newNameEduProg.value
+  await eduProgsStore.editNameEduProg(currentEduProg, currentEduProg.id)
+  newNameEduProg.value=null
+  dialog2.value=false
+})
+const createEduProg =( async() => {
+  await eduProgsStore.createEduProg(newEduProg.value)
+  dialog.value=false
+  await eduProgsStore.fetchEduProgs()
+})
+// const createEduProg =( async() => {
+//   console.log(newEduProg)
+//   await eduProgsStore.createEduProg(newEduProg)
+// })
 
 // const props = defineProps({
 //   modelValue: {
@@ -40,25 +56,18 @@ const deleteEduProg =( async(id) => {
 // })
 
 
-
-// let currentEduProg = null
-// const deleteEduProg =( (id) => {
-//   currentEduProg = id;
-//   dialog = true;
-// })
-
-
 const dialog = ref(false)
 const dialog2 = ref(false)
 const dialogCheck = function dialogg() {
   dialog.value=true
 }
-const dialogCheck2 = function dialogg() {
+const dialogCheck2 = function dialogg(id) {
   dialog2.value=true
+  currentEduProg = id
 }
 
 
-const newOpp= ref({
+const newEduProg = ref({
   name :'',
   education_level :'',
   stage :'',
@@ -69,9 +78,11 @@ const newOpp= ref({
 </script>
 
 <template>
-  <VBtn @click="dialogCheck" dark>
-    Створити ОПП
-  </VBtn>  
+  <VCardText>
+    <VBtn @click="dialogCheck" dark>
+      Створити ОПП
+    </VBtn>  
+  </VCardText>
   
   
   <VDialog v-model="dialog"
@@ -88,6 +99,7 @@ const newOpp= ref({
               cols="12">
               <VTextField
                 label="Назва документу "
+                v-model="newEduProg.name"
                 required
               ></VTextField>
             </VCol>
@@ -95,6 +107,7 @@ const newOpp= ref({
               cols="12">
               <VTextField
                 label="Освітній рівень"
+                v-model="newEduProg.education_level"
               ></VTextField>
             </VCol>
             <VCol
@@ -102,6 +115,7 @@ const newOpp= ref({
               <VTextField
                 label="Освітній ступінь"
                 required
+                v-model="newEduProg.stage"
               ></VTextField>
             </VCol>
             <VCol
@@ -109,6 +123,7 @@ const newOpp= ref({
               <VTextField
                 label="Спеціальність"
                 required
+                v-model="newEduProg.speciality"
               ></VTextField>
             </VCol>
             <VCol
@@ -116,6 +131,7 @@ const newOpp= ref({
               <VTextField
                 label="Галузь знань"
                 required
+                v-model="newEduProg.knowledge_field"
               ></VTextField>
             </VCol>
           </VRow>
@@ -134,7 +150,7 @@ const newOpp= ref({
         <VBtn
           color="blue darken-1"
           text
-          @click="dialog = false"
+          @click="createEduProg"
         >
           Створити
         </VBtn>
@@ -210,7 +226,7 @@ const newOpp= ref({
                 </template>
                         
 
-                <VListItemTitle @click="dialogCheck2">Перейменувати</VListItemTitle>
+                <VListItemTitle @click="dialogCheck2(item)">Перейменувати</VListItemTitle>
               </VListItem>
               <VListItem link>
                 <template #prepend>
@@ -284,6 +300,7 @@ const newOpp= ref({
               <VTextField
                 label="Введіть нову назву ОПП"
                 required
+                v-model="newNameEduProg"
               ></VTextField>
             </VCol>
           </VRow>    
@@ -299,7 +316,7 @@ const newOpp= ref({
         </VBtn>
         <VBtn
           text
-          @click="dialog2 = false"
+          @click="editNameEduProg()"
         >
           Зберегти
         </VBtn>
