@@ -29,11 +29,11 @@ const editNameEduProg =( async() => {
   currentEduProg.name = newNameEduProg.value
   await eduProgsStore.editNameEduProg(currentEduProg, currentEduProg.id)
   newNameEduProg.value=null
-  dialog2.value=false
+  dialogRename.value=false
 })
 const createEduProg =( async() => {
   await eduProgsStore.createEduProg(newEduProg.value)
-  dialog.value=false
+  dialogCreate.value=false
   await eduProgsStore.fetchEduProgs()
 })
 // const createEduProg =( async() => {
@@ -157,7 +157,6 @@ const newEduProg = ref({
           text
           :disabled="!(newEduProg.knowledge_field && newEduProg.speciality && newEduProg.name &&newEduProg.education_level && newEduProg.stage)"
           @click="createEduProg"><!--Need fix, user need to reload page for check new EduProg -->
-        >
           Створити
         </VBtn>
       </VCardActions>
