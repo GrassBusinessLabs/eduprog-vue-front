@@ -14,6 +14,7 @@ const form = ref({
   email: '',
   password: '',
 })
+const isErrorVisible = ref(false)
 const vuetifyTheme = useTheme()
 const authThemeMask = computed(() => {
   return vuetifyTheme.global.name.value === 'light' ? authV1MaskLight : authV1MaskDark
@@ -33,7 +34,11 @@ const authData = computed(() => {
 })
 
 const logIn = async () => {
-  await userStore.login(form.value)
+  try {
+    await userStore.login(form.value)
+  } catch {
+    isErrorVisible.value = true
+  }
 }
 </script>
 
@@ -65,6 +70,7 @@ const logIn = async () => {
                 label='Пошта'
                 type='email'
                 :rules="rulesUser.emailRules"
+                @input='isErrorVisible = false'
               />
             </VCol>
 
@@ -76,6 +82,7 @@ const logIn = async () => {
                 :type="isPasswordVisible ? 'text' : 'password'"
                 :append-inner-icon="isPasswordVisible ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
                 @click:append-inner='isPasswordVisible = !isPasswordVisible'
+                @input='isErrorVisible = false'
               />
 
               <!-- remember me checkbox -->
@@ -87,6 +94,15 @@ const logIn = async () => {
                 >
                   Забули пароль?
                 </a>
+              </div>
+
+              <div class='mt-1 mb-4'>
+                <VAlert 
+                  type="error" 
+                  :class="isErrorVisible ? 'd-flex' : 'd-none'"
+                >
+                  Невірний логін чи пароль
+                </VAlert>
               </div>
 
               <!-- login button -->

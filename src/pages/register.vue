@@ -27,11 +27,56 @@ const authThemeMask = computed(() => {
   return vuetifyTheme.global.name.value === 'light' ? authV1MaskLight : authV1MaskDark
 })
 
-const singUp = async () => {
-  await userStore.signUp(form.value)
+const hideError = async () => {
+  isErrorVisible.value = false
 }
-const isPasswordVisible = ref(false)
 
+const singUp = async () => {
+  const password = form.value.password
+  const name = form.value.name
+  const oneLetterRegex = ".*[a-z].*"
+  const oneDigitRegex = ".*\\d+.*"
+  errors.length = 0
+  if(name.length < 3) {
+    isErrorVisible.value = true
+    errors.push("Надто коротке ім'я")
+  }
+  if(name.match(oneDigitRegex)) {
+    isErrorVisible.value = true
+    errors.push("Ім'я не повинно містити цифр")
+  }
+  if(password.length < 8) {
+    isErrorVisible.value = true
+    errors.push("Мінімальна кількість символів паролю - 8")
+  }
+  if(!password.match(oneLetterRegex)) {
+    isErrorVisible.value = true
+    errors.push("Пароль повинен містити мінімум одну літеру малого регістру")
+  }
+  if(!password.match(oneDigitRegex)) {
+    isErrorVisible.value = true
+    errors.push("Пароль повинен містити мінімум одну цифру")
+  } 
+  if(!isErrorVisible.value) {
+    try {
+      isErrorVisible.value = 
+      await userStore.signUp(form.value)
+    } catch(error) {
+      isErrorVisible.value = true
+      let errorMessage
+      if(error.response.status == 400) {
+        errorMessage = "Користувач з такою поштою уже існує"
+      } else {
+        errorMessage = "Щось пішло не так"
+      }
+      errors.push(errorMessage)
+    }
+  }
+}
+
+const isPasswordVisible = ref(false)
+const isErrorVisible = ref(false)
+const errors = []
 </script>
 
 <template>
@@ -59,6 +104,7 @@ const isPasswordVisible = ref(false)
             <VCol cols="12">
               <VTextField
                 v-model.trim="form.name"
+                @input="isErrorVisible = fasle"
                 label="Ім'я"
               />
             </VCol>
@@ -69,6 +115,7 @@ const isPasswordVisible = ref(false)
                 label="Пошта"
                 type="email"
                 :rules="rulesUser.emailRules"
+                @input="isErrorVisible = fasle"
                 required
               />
             </VCol>
@@ -78,11 +125,29 @@ const isPasswordVisible = ref(false)
               <VTextField
                 v-model.trim="form.password"
                 label="Пароль"
+                @input="isErrorVisible = fasle"
                 :type="isPasswordVisible ? 'text' : 'password'"
                 :append-inner-icon="isPasswordVisible ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
                 @click:append-inner="isPasswordVisible = !isPasswordVisible"
               />
             </VCol>
+
+            <VCol cols="12">
+              <VAlert 
+                type="error" 
+                :class="isErrorVisible ? 'd-flex' : 'd-none'"
+              >
+                <ul 
+                  v-for="error in errors" 
+                  :key="error" 
+                >
+                  <li>
+                    {{ errors.length > 1 ? '•' : ''}} {{error}}
+                  </li>
+                </ul>
+              </VAlert>
+            </VCol>
+
             <VCol cols="12">
               <VBtn
                 block
@@ -92,7 +157,6 @@ const isPasswordVisible = ref(false)
                 Зареєструватись
               </VBtn>
             </VCol>
-
             <!-- login instead -->
             <VCol
               cols="12"
@@ -106,8 +170,6 @@ const isPasswordVisible = ref(false)
                 Увійдіть
               </RouterLink>
             </VCol>
-
-
             <!-- auth providers -->
           </VRow>
         </VForm>
