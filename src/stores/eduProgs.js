@@ -28,5 +28,9 @@ export const useEduProgsStore = defineStore({
     await editData('/eduprogs/'+ id, payload);
     this.fetchEduProgs
     },
+    async findEduProgById(id){
+      const response = await getData('eduprogs/'+id);
+      return response
+  },
   },
 })

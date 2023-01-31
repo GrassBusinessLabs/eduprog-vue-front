@@ -62,3 +62,10 @@
     </VCardActions>
   </VCard>
 </template>
+<script setup>
+const props = defineProps({
+  eduProg: Object
+})
+console.log(props.eduProg)
+</script>
+

@@ -173,7 +173,7 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
             Кредитів:
             <input
               disabled
-              :value="allSubTotal | money"
+              :value="allSubTotal"
             >
           </div>
         </th>
