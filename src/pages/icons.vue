@@ -54,6 +54,7 @@ const iconsList = [
   'mdi-sort-variant',
   'mdi-format-list-bulleted',
   'mdi-format-line-style',
+  'mdi-plus',
 ]
 </script>
 
