@@ -8,10 +8,10 @@ import { useEduProgsStore } from '@/stores/eduProgs.js'
 import { onMounted } from 'vue-demi'
 const eduProgsStore = useEduProgsStore()
 const route = useRoute()
-onMounted(async () => {
-  const eduProg = ref (await eduProgsStore.findEduProgById(route.params.id))
-})
 const activeTab = ref(route.params)
+const eduProg = function() {
+  return eduProgsStore.findEduProgById(route.params.id)
+}
 const tabs = [
   {
     title: 'Загальна Характеристика',
@@ -64,7 +64,9 @@ const tabs = [
     >
       <!-- Account -->
       <VWindowItem value="characteristic">
-        <EditDocumentCharacteristic eduProg="eduProg.value"/>
+        <Suspense>
+          <EditDocumentCharacteristic :edu-prog="eduProg()" />
+        </Suspense>
       </VWindowItem>
 
       <!-- Security -->

@@ -1,4 +1,3 @@
-
 <template>
   <VCard>
     <VCardTitle>
@@ -66,6 +65,6 @@
 const props = defineProps({
   eduProg: Object
 })
-console.log(props.eduProg)
+console.log(await props.eduProg)
 </script>
 
