@@ -166,7 +166,7 @@ const newEduProg = ref({
   </VDialog>
 
 
-  <VTable>
+  <VTable v-if="eduProgs.length>0">
     <thead>
       <tr>
         <th class="text-uppercase">
@@ -250,8 +250,15 @@ const newEduProg = ref({
       </tr>
     </tbody>
   </VTable>
-  
-   
+  <v-alert
+  border="left"
+  text
+  type="info"
+  prominent
+  v-else
+  >
+  Поки що не створено жодної освітньо-професійної програми.
+  </v-alert>
   <VDialog v-model="dialogRename"
             persistent
            max-width="600">
