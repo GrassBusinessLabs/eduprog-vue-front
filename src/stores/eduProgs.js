@@ -1,5 +1,6 @@
 import { deleteData, editData, getData, postData } from '@/api/http/apiService';
 import { defineStore } from 'pinia';
+import router from '../router';
 export const useEduProgsStore = defineStore({
   id: 'eduProgs',
 
@@ -21,12 +22,19 @@ export const useEduProgsStore = defineStore({
         this.fetchEduProgs
     },
     async createEduProg(payload){
-      await postData('/eduprogs/create', payload);
+      const response = await postData('/eduprogs/create', payload);
+      console.log(response)
       this.fetchEduProgs
+      router.replace('/eduprogs/'+response.id)
     },
     async editNameEduProg(payload, id){
     await editData('/eduprogs/'+ id, payload);
     this.fetchEduProgs
     },
+    async findEduProgById(id){
+      const response = await getData('eduprogs/'+id);
+      console.log(response)
+      return response
+  },
   },
 })

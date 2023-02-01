@@ -1,4 +1,3 @@
-
 <template>
   <VCard>
     <VCardText>
@@ -48,3 +47,9 @@
     </VCardText>
   </VCard>
 </template>
+<script setup>
+const props = defineProps(['eduProg']
+)
+console.log(props)
+</script>
+
