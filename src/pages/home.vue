@@ -15,13 +15,31 @@ onMounted( async () => {
     await eduProgsStore.fetchEduProgs()
 })
 
-
+let currentEduProg = null
+let newNameEduProg = ref(null)
 const eduProgs = computed(() => eduProgsStore.getEduProgs)
+
+
 
 const deleteEduProg =( async(id) => {
   await eduProgsStore.deleteEduProg(id)
   await eduProgsStore.fetchEduProgs()
 })
+const editNameEduProg =( async() => {
+  currentEduProg.name = newNameEduProg.value
+  await eduProgsStore.editNameEduProg(currentEduProg, currentEduProg.id)
+  newNameEduProg.value=null
+  dialogRename.value=false
+})
+const createEduProg =( async() => {
+  await eduProgsStore.createEduProg(newEduProg.value)
+  dialogCreate.value=false
+  await eduProgsStore.fetchEduProgs()
+})
+// const createEduProg =( async() => {
+//   console.log(newEduProg)
+//   await eduProgsStore.createEduProg(newEduProg)
+// })
 
 // const props = defineProps({
 //   modelValue: {
@@ -40,25 +58,23 @@ const deleteEduProg =( async(id) => {
 // })
 
 
-
-// let currentEduProg = null
-// const deleteEduProg =( (id) => {
-//   currentEduProg = id;
-//   dialog = true;
-// })
-
-
-const dialog = ref(false)
-const dialog2 = ref(false)
-const dialogCheck = function dialogg() {
-  dialog.value=true
+const dialogCreate = ref(false)
+const dialogRename = ref(false)
+const dialogDelete = ref(false)
+const createEduProgDialog = function dialogg() {
+  dialogCreate.value=true
 }
-const dialogCheck2 = function dialogg() {
-  dialog2.value=true
+const renameEduProgDialog = function dialogg(id) {
+  dialogRename.value=true
+  currentEduProg = id 
+}
+const deleteEduProgDialog= function dialogg(id) {
+  dialogDelete.value=true
+  currentEduProg = id
 }
 
 
-const newOpp= ref({
+const newEduProg = ref({
   name :'',
   education_level :'',
   stage :'',
@@ -69,12 +85,14 @@ const newOpp= ref({
 </script>
 
 <template>
-  <VBtn @click="dialogCheck" dark>
-    Створити ОПП
-  </VBtn>  
+  <VCardText>
+    <VBtn @click="createEduProgDialog" dark>
+      Створити ОПП
+    </VBtn>  
+  </VCardText>
   
   
-  <VDialog v-model="dialog"
+  <VDialog v-model="dialogCreate"
            persistent
            max-width="600px">
     <VCard>
@@ -88,6 +106,7 @@ const newOpp= ref({
               cols="12">
               <VTextField
                 label="Назва документу "
+                v-model="newEduProg.name"
                 required
               ></VTextField>
             </VCol>
@@ -95,6 +114,7 @@ const newOpp= ref({
               cols="12">
               <VTextField
                 label="Освітній рівень"
+                v-model="newEduProg.education_level"
               ></VTextField>
             </VCol>
             <VCol
@@ -102,6 +122,7 @@ const newOpp= ref({
               <VTextField
                 label="Освітній ступінь"
                 required
+                v-model="newEduProg.stage"
               ></VTextField>
             </VCol>
             <VCol
@@ -109,6 +130,7 @@ const newOpp= ref({
               <VTextField
                 label="Спеціальність"
                 required
+                v-model="newEduProg.speciality"
               ></VTextField>
             </VCol>
             <VCol
@@ -116,26 +138,25 @@ const newOpp= ref({
               <VTextField
                 label="Галузь знань"
                 required
+                v-model="newEduProg.knowledge_field"
               ></VTextField>
             </VCol>
           </VRow>
         </VContainer>
       </VCardText>
-
       <VCardActions>
         <VSpacer></VSpacer>
         <VBtn
           color="blue darken-1"
           text
-          @click="dialog = false"
+          @click="dialogCreate = false"
         >
           Закрити
         </VBtn>
         <VBtn
-          color="blue darken-1"
           text
-          @click="dialog = false"
-        >
+          :disabled="!(newEduProg.knowledge_field && newEduProg.speciality && newEduProg.name &&newEduProg.education_level && newEduProg.stage)"
+          @click="createEduProg"><!--Need fix, user need to reload page for check new EduProg -->
           Створити
         </VBtn>
       </VCardActions>
@@ -145,7 +166,7 @@ const newOpp= ref({
   </VDialog>
 
 
-  <VTable>
+  <VTable v-if="eduProgs.length>0">
     <thead>
       <tr>
         <th class="text-uppercase">
@@ -210,7 +231,7 @@ const newOpp= ref({
                 </template>
                         
 
-                <VListItemTitle @click="dialogCheck2">Перейменувати</VListItemTitle>
+                <VListItemTitle @click="renameEduProgDialog(item)">Перейменувати</VListItemTitle>
               </VListItem>
               <VListItem link>
                 <template #prepend>
@@ -221,7 +242,7 @@ const newOpp= ref({
                   />
                 </template>
 
-                <VListItemTitle @click="deleteEduProg(item.id)">Видалити</VListItemTitle>
+                <VListItemTitle @click="deleteEduProgDialog(item)">Видалити</VListItemTitle>
               </VListItem>
             </VList>
           </VMenu>
@@ -229,49 +250,16 @@ const newOpp= ref({
       </tr>
     </tbody>
   </VTable>
-  <!-- <v-dialog
-      v-model:is-open="dialog"
-      persistent
-      max-width="290"
-    >
-      <template v-slot:activator="{ on, attrs }">
-        <v-btn
-          color="primary"
-          dark
-          v-bind="attrs"
-          v-on="on"
-        >
-          Open Dialog
-        </v-btn>
-      </template>
-      <v-card>
-        <v-card-title class="text-h5">
-          Підтверждення видалення
-        </v-card-title>
-        <v-card-text>Let Google help apps determine location. This means sending anonymous location data to Google, even when no apps are running.</v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn
-            color="green darken-1"
-            text
-            @click="dialog = false"
-          >
-            Disagree
-          </v-btn>
-          <v-btn
-            color="green darken-1"
-            text
-            @click="dialog = false"
-          >
-            Agree
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog> -->
-
-
-   
-  <VDialog v-model="dialog2"
+  <v-alert
+  border="left"
+  text
+  type="info"
+  prominent
+  v-else
+  >
+  Поки що не створено жодної освітньо-професійної програми.
+  </v-alert>
+  <VDialog v-model="dialogRename"
             persistent
            max-width="600">
     <VCard>
@@ -284,6 +272,7 @@ const newOpp= ref({
               <VTextField
                 label="Введіть нову назву ОПП"
                 required
+                v-model="newNameEduProg"
               ></VTextField>
             </VCol>
           </VRow>    
@@ -293,13 +282,13 @@ const newOpp= ref({
                <VSpacer></VSpacer>
         <VBtn
           text
-          @click="dialog2 = false"
+          @click="dialogRename = false"
         >
           Відмінити
         </VBtn>
         <VBtn
           text
-          @click="dialog2 = false"
+          @click="editNameEduProg(); dialogRename = false"
         >
           Зберегти
         </VBtn>
@@ -307,5 +296,37 @@ const newOpp= ref({
       </VCardText>
     </VCard>
   </VDialog>
+
+
+  <VDialog  v-model="dialogDelete"
+      max-width="290">
+    <VCard>
+      <VCardTitle>
+        Підтвердіть видалення
+        </VCardTitle>
+      <v-card-text>
+          Ви впевнені  що хочете видалити ОПП: {{ currentEduProg.name }}?
+        </v-card-text>
+
+      <VCardActions>
+        <v-btn
+            color="green darken-1"
+            text
+            @click="dialogDelete = false"
+          >
+            Ні
+          </v-btn>
+
+          <v-btn
+            color="green darken-1"
+            text
+            @click="deleteEduProg(currentEduProg.id); dialogDelete = false"
+          >
+            Так
+          </v-btn>
+     </VCardActions>
+      </VCard>
+    
+    </VDialog>
 
 </template>
