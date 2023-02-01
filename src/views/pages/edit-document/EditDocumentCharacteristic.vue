@@ -1,9 +1,6 @@
 
 <template>
   <VCard>
-    <VCardTitle>
-      <span class="text-h5">Створення нової ОПП</span>
-    </VCardTitle>
     <VCardText>
       <VContainer>
         <VRow>
@@ -49,16 +46,5 @@
         </VRow>
       </VContainer>
     </VCardText>
-
-    <VCardActions>
-      <VSpacer></VSpacer>
-      <VBtn
-        color="blue darken-1"
-        text
-        @click="dialog = false"
-      >
-        Скасувати
-      </VBtn>
-    </VCardActions>
   </VCard>
 </template>

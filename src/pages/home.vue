@@ -21,7 +21,7 @@ const eduProgs = computed(() => eduProgsStore.getEduProgs)
 
 
 
-const deleteEduProg =( async(id) => {
+const deleteEduProg =( async id => {
   await eduProgsStore.deleteEduProg(id)
   await eduProgsStore.fetchEduProgs()
 })
@@ -36,6 +36,7 @@ const createEduProg =( async() => {
   dialogCreate.value=false
   await eduProgsStore.fetchEduProgs()
 })
+
 // const createEduProg =( async() => {
 //   console.log(newEduProg)
 //   await eduProgsStore.createEduProg(newEduProg)
@@ -81,20 +82,24 @@ const newEduProg = ref({
   speciality :'',
   knowledge_field :'',
 })
-
 </script>
 
 <template>
   <VCardText>
-    <VBtn @click="createEduProgDialog" dark>
+    <VBtn
+      dark
+      @click="createEduProgDialog"
+    >
       Створити ОПП
     </VBtn>
   </VCardText>
 
 
-  <VDialog v-model="dialogCreate"
-           persistent
-           max-width="600px">
+  <VDialog
+    v-model="dialogCreate"
+    persistent
+    max-width="600px"
+  >
     <VCard>
       <VCardTitle>
         <span class="text-h5">Створення нової ОПП</span>
@@ -103,49 +108,54 @@ const newEduProg = ref({
         <VContainer>
           <VRow>
             <VCol
-              cols="12">
+              cols="12"
+            >
               <VTextField
-                label="Назва документу "
                 v-model="newEduProg.name"
+                label="Назва документу "
                 required
-              ></VTextField>
+              />
             </VCol>
             <VCol
-              cols="12">
+              cols="12"
+            >
               <VTextField
-                label="Освітній рівень"
                 v-model="newEduProg.education_level"
-              ></VTextField>
+                label="Освітній рівень"
+              />
             </VCol>
             <VCol
-              cols="12">
+              cols="12"
+            >
               <VTextField
+                v-model="newEduProg.stage"
                 label="Освітній ступінь"
                 required
-                v-model="newEduProg.stage"
-              ></VTextField>
+              />
             </VCol>
             <VCol
-              cols="12">
+              cols="12"
+            >
               <VTextField
+                v-model="newEduProg.speciality"
                 label="Спеціальність"
                 required
-                v-model="newEduProg.speciality"
-              ></VTextField>
+              />
             </VCol>
             <VCol
-              cols="12">
+              cols="12"
+            >
               <VTextField
+                v-model="newEduProg.knowledge_field"
                 label="Галузь знань"
                 required
-                v-model="newEduProg.knowledge_field"
-              ></VTextField>
+              />
             </VCol>
           </VRow>
         </VContainer>
       </VCardText>
       <VCardActions>
-        <VSpacer></VSpacer>
+        <VSpacer />
         <VBtn
           color="blue darken-1"
           text
@@ -156,123 +166,128 @@ const newEduProg = ref({
         <VBtn
           text
           :disabled="!(newEduProg.knowledge_field && newEduProg.speciality && newEduProg.name &&newEduProg.education_level && newEduProg.stage)"
-          @click="createEduProg"><!--Need fix, user need to reload page for check new EduProg -->
+          @click="createEduProg"
+        >
+          <!-- Need fix, user need to reload page for check new EduProg -->
           Створити
         </VBtn>
       </VCardActions>
-
     </VCard>
-
   </VDialog>
 
 
   <VTable>
     <thead>
-    <tr>
-      <th class="text-uppercase">
-        Назва
-      </th>
-      <th class="text-center text-uppercase">
-        Спеціальність
-      </th>
-      <th class="text-center text-uppercase">
-        Рівень знань
-      </th>
-      <th class="text-center text-uppercase">
-        Дата редагування
-      </th>
-      <th class="text-center text-uppercase">
-
-      </th>
-    </tr>
+      <tr>
+        <th class="text-uppercase">
+          Назва
+        </th>
+        <th class="text-center text-uppercase">
+          Спеціальність
+        </th>
+        <th class="text-center text-uppercase">
+          Рівень знань
+        </th>
+        <th class="text-center text-uppercase">
+          Дата редагування
+        </th>
+        <th class="text-center text-uppercase" />
+      </tr>
     </thead>
     <tbody>
-    <tr
-      v-for="item in eduProgs"
-      :key="item.id"
-    >
-      <td>{{ item.name }}</td>
-      <td class="text-center">
-        {{ item.speciality }}
-      </td>
-      <td class="text-center">
-        {{ item.education_level }}
-      </td>
-      <td class="text-center">
-        {{ moment(item.updated_date).format('DD.MM.YYYY HH:mm:ss') }}
-      </td>
-      <td class="text-center">
-        <VMenu
-          bottom
-          left
-          activator="parent"
-        >
-          <template v-slot:activator="{ on, attrs }">
-            <VBtn
-              dark
-              icon
-              v-bind="attrs"
-              v-on="on"
-              :shaped="false"
-              size="small"
-            >
-              <VIcon>mdi-dots-horizontal</VIcon>
-            </VBtn>
-          </template>
+      <tr
+        v-for="item in eduProgs"
+        :key="item.id"
+      >
+        <td>{{ item.name }}</td>
+        <td class="text-center">
+          {{ item.speciality }}
+        </td>
+        <td class="text-center">
+          {{ item.education_level }}
+        </td>
+        <td class="text-center">
+          {{ moment(item.updated_date).format('DD.MM.YYYY HH:mm:ss') }}
+        </td>
+        <td class="text-center">
+          <VMenu
+            bottom
+            left
+            activator="parent"
+          >
+            <template #activator="{ on, attrs }">
+              <VBtn
+                dark
+                icon
+                v-bind="attrs"
+                :shaped="false"
+                size="small"
+                v-on="on"
+              >
+                <VIcon>mdi-dots-horizontal</VIcon>
+              </VBtn>
+            </template>
 
-          <VList>
-            <VListItem link>
-              <template #prepend>
-                <VIcon
-                  class="me-2"
-                  icon="mdi-pencil"
-                  size="22"
-                />
-              </template>
+            <VList>
+              <VListItem link>
+                <template #prepend>
+                  <VIcon
+                    class="me-2"
+                    icon="mdi-pencil"
+                    size="22"
+                  />
+                </template>
 
 
-              <VListItemTitle @click="renameEduProgDialog(item)">Перейменувати</VListItemTitle>
-            </VListItem>
-            <VListItem link>
-              <template #prepend>
-                <VIcon
-                  class="me-2"
-                  icon="mdi-trash-can"
-                  size="22"
-                />
-              </template>
+                <VListItemTitle @click="renameEduProgDialog(item)">
+                  Перейменувати
+                </VListItemTitle>
+              </VListItem>
+              <VListItem link>
+                <template #prepend>
+                  <VIcon
+                    class="me-2"
+                    icon="mdi-trash-can"
+                    size="22"
+                  />
+                </template>
 
-              <VListItemTitle @click="deleteEduProgDialog(item)">Видалити</VListItemTitle>
-            </VListItem>
-          </VList>
-        </VMenu>
-      </td>
-    </tr>
+                <VListItemTitle @click="deleteEduProgDialog(item)">
+                  Видалити
+                </VListItemTitle>
+              </VListItem>
+            </VList>
+          </VMenu>
+        </td>
+      </tr>
     </tbody>
   </VTable>
 
 
-  <VDialog v-model="dialogRename"
-           persistent
-           max-width="600">
+  <VDialog
+    v-model="dialogRename"
+    persistent
+    max-width="600"
+  >
     <VCard>
       <VCardTitle>Перейменувати ОПП</VCardTitle>
       <VCardText>
         <VContainer>
           <VRow>
             <VCol
-              cols="12">
+              cols="12"
+            >
               <VTextField
+                v-model="newNameEduProg"
                 label="Введіть нову назву ОПП"
                 required
-                v-model="newNameEduProg"
-              ></VTextField>
+              />
             </VCol>
           </VRow>
         </VContainer>
 
         <VCardActions>
-          <VSpacer></VSpacer>
+          <VSpacer />
           <VBtn
             text
             @click="dialogRename = false"
@@ -291,35 +306,35 @@ const newEduProg = ref({
   </VDialog>
 
 
-  <VDialog  v-model="dialogDelete"
-            max-width="290">
+  <VDialog
+    v-model="dialogDelete"
+    max-width="290"
+  >
     <VCard>
       <VCardTitle>
         Підтвердіть видалення
       </VCardTitle>
-      <v-card-text>
+      <VCardText>
         Ви впевнені  що хочете видалити ОПП: {{ currentEduProg.name }}?
-      </v-card-text>
+      </VCardText>
 
       <VCardActions>
-        <v-btn
+        <VBtn
           color="green darken-1"
           text
           @click="dialogDelete = false"
         >
           Ні
-        </v-btn>
+        </VBtn>
 
-        <v-btn
+        <VBtn
           color="green darken-1"
           text
           @click="deleteEduProg(currentEduProg.id); dialogDelete = false"
         >
           Так
-        </v-btn>
+        </VBtn>
       </VCardActions>
     </VCard>
-
   </VDialog>
-
 </template>

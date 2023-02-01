@@ -8,7 +8,7 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
     <thead class="thead-light">
       <tr>
         <th class="text-center">
-          Назва документу
+         <h3>Основний компонент ОП</h3>
         </th>
       </tr>
     </thead>
@@ -38,25 +38,19 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
         <td>
           <span v-if="editIndex !== index">{{ item.COP }}</span>
           <span v-if="editIndex === index">
-            <input
-              v-model="item.COP"
-            >
+            <input  class="border-solid"     v-model="item.COP">
           </span>
         </td>
         <td>
           <span v-if="editIndex !== index">{{ item.credit_COP }}</span>
           <span v-if="editIndex === index">
-            <input
-              v-model="item.credit_COP"
-            >
+            <input type="number" class="border-solid"    v-model="item.credit_COP">
           </span>
         </td>
         <td>
-          <span v-if="editIndex !== index">{{ item.FC_COP }}</span>
+          <span v-if="editIndex !== index" >{{ item.FC_COP }}</span>
           <span v-if="editIndex === index">
-            <input
-              v-model="item.FC_COP"
-            >
+            <input  class="border-solid"   v-model="item.FC_COP" >
           </span>
         </td>
         <td>
@@ -80,7 +74,7 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
               </template>
 
               <VList>
-                <VListItem link>
+                <VListItem link @click="edit(item, index)" >
                   <template #prepend>
                     <VIcon
                       class="me-2"
@@ -90,11 +84,11 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
                   </template>
 
 
-                  <VListItemTitle @click="edit(item, index)">
-                    Перейменувати
+                  <VListItemTitle>
+                    Редагувати
                   </VListItemTitle>
                 </VListItem>
-                <VListItem link>
+                <VListItem link @click="remove(item, index)" >
                   <template #prepend>
                     <VIcon
                       class="me-2"
@@ -103,7 +97,7 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
                     />
                   </template>
 
-                  <VListItemTitle @click="remove(item, index)">
+                  <VListItemTitle>
                     Видалити
                   </VListItemTitle>
                 </VListItem>
@@ -130,7 +124,7 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
               </template>
 
               <VList>
-                <VListItem link>
+                <VListItem link @click="save(item)" >
                   <template #prepend>
                     <VIcon
                       class="me-2"
@@ -140,11 +134,11 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
                   </template>
 
 
-                  <VListItemTitle @click="save(item)">
+                  <VListItemTitle >
                     Зберегти
                   </VListItemTitle>
                 </VListItem>
-                <VListItem link>
+                <VListItem @click="cancel(item)" link>
                   <template #prepend>
                     <VIcon
                       class="me-2"
@@ -153,7 +147,7 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
                     />
                   </template>
 
-                  <VListItemTitle @click="cancel(item)">
+                  <VListItemTitle >
                     Відмінити
                   </VListItemTitle>
                 </VListItem>
@@ -169,25 +163,34 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
       <tr>
         <th>Загальний обсяг обов’язкових компонентів:</th>
         <th>
-          <div class="input-group-prepend">
-            Кредитів:
-            <input
-              disabled
-              :value="allSubTotal | money"
-            >
-          </div>
+
+            <input class='text-right' disabled :value="allSubTotal ">/180 кредитів
+
         </th>
       </tr>
     </thead>
+  </VTable>
+  <VTable>
+    <thead>
+    <tr>
+      <th style="text-align: center" ><h3>Вибірковий компонент ОП</h3></th>
+    </tr>
+    </thead>
+  </VTable>
+  <VTable>
+    <tbody>
+    <tr>
+      <td style="text-align: center">
+        Вибірковий блок 1( <input class="border-solid" style='width: 15%'> )
+      </td>
+    </tr>
+    </tbody>
   </VTable>
 </template>
 
 <script>
 export default {
-  name: 'Uhuy',
-  filters: {
-    money: value => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(value),
-  },
+
   data() {
     return {
       editIndex: null,
@@ -199,24 +202,16 @@ export default {
   },
   computed: {
     allSubTotal() {
-      let summa = 0
-      for (let item in this.items){
-        summa+= item.credit_COP
-      }
-      
-      return summa
-    },
-    total() {
-      return this.tax
-        ? this.allSubTotal + (this.allSubTotal )
-        : this.allSubTotal
+      return this.items
+        .map(item => Number(this.subtotal(item)))
+        .reduce((a, b) => a + b, 0)
     },
   },
 
   methods: {
     add() {
       this.originalData = null
-      this.items.push({ COP: '', credit_COP: "", FC_COP: ''})
+      this.items.push({ COP: '', credit_COP: "0", FC_COP: ''})
       this.editIndex = this.items.length - 1
     },
     edit(item, index) {
@@ -247,8 +242,10 @@ export default {
 }
 </script>
 
+
 <style>
 input[type="number"] {
   text-align: right;
 }
+
 </style>
