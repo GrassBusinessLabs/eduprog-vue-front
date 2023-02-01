@@ -62,9 +62,8 @@
   </VCard>
 </template>
 <script setup>
-const props = defineProps({
-  eduProg: Object
-})
-console.log(await props.eduProg)
+const props = defineProps(['eduProg']
+)
+console.log(props)
 </script>
 

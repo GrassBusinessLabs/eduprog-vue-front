@@ -6,12 +6,15 @@ import EditDocumentSchema from '@/views/pages/edit-document/EditDocumentSchema.v
 import EditDocumentSequence from '@/views/pages/edit-document/EditDocumentSequence.vue'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 import { onMounted } from 'vue-demi'
+import { onServerPrefetch } from 'vue'
 const eduProgsStore = useEduProgsStore()
 const route = useRoute()
 const activeTab = ref(route.params)
-const eduProg = function() {
-  return eduProgsStore.findEduProgById(route.params.id)
-}
+const eduProgData = ref(null)
+onMounted(async ()=>{
+  eduProgData.value = await eduProgsStore.findEduProgById(route.params.id)
+  console.log(eduProgData.value)
+})
 const tabs = [
   {
     title: 'Загальна Характеристика',
@@ -65,7 +68,7 @@ const tabs = [
       <!-- Account -->
       <VWindowItem value="characteristic">
         <Suspense>
-          <EditDocumentCharacteristic :edu-prog="eduProg()" />
+          <EditDocumentCharacteristic v-if="eduProgData" :edu-prog="eduProgData.value" />
         </Suspense>
       </VWindowItem>
 
