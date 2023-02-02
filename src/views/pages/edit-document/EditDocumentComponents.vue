@@ -25,6 +25,7 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
             icon="mdi-plus"
             size="x-small"
             @click="add"
+            :disabled='isDisabled'
           />
         </th>
       </tr>
@@ -123,8 +124,8 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
                 </VBtn>
               </template>
 
-              <VList>
-                <VListItem link @click="save(item)" >
+              <VList >
+                <VListItem link @click="save(item)" :disabled="!(item.COP && item.FC_COP && item.credit_COP>0 )" >
                   <template #prepend>
                     <VIcon
                       class="me-2"
@@ -198,6 +199,7 @@ export default {
       items: [
         { COP: 'Філософія', credit_COP: "6", FC_COP: 'Залік' },
       ],
+      isDisabled :false
     }
   },
   computed: {
@@ -213,6 +215,7 @@ export default {
       this.originalData = null
       this.items.push({ COP: '', credit_COP: "0", FC_COP: ''})
       this.editIndex = this.items.length - 1
+      this.isDisabled = true
     },
     edit(item, index) {
       this.originalData = Object.assign({}, item)
@@ -223,7 +226,7 @@ export default {
       if (!this.originalData) {
         this.items.splice(this.items.indexOf(item), 1)
         
-        return
+        return this.isDisabled = false
       }
       Object.assign(item, this.originalData)
       this.originalData = null
@@ -234,6 +237,7 @@ export default {
     save(item) {
       this.originalData = null
       this.editIndex = null
+      this.isDisabled = false
     },
     subtotal(item) {
       return (item.credit_COP)
