@@ -229,7 +229,7 @@ const newEduProg = ref({
             </template>
 
             <VList>
-              <VListItem link>
+              <VListItem link @click="renameEduProgDialog(item)">
                 <template #prepend>
                   <VIcon
                     class="me-2"
@@ -239,11 +239,11 @@ const newEduProg = ref({
                 </template>
 
 
-                <VListItemTitle @click="renameEduProgDialog(item)">
+                <VListItemTitle >
                   Перейменувати
                 </VListItemTitle>
               </VListItem>
-              <VListItem link>
+              <VListItem link  @click="deleteEduProgDialog(item)">
                 <template #prepend>
                   <VIcon
                     class="me-2"
@@ -252,7 +252,7 @@ const newEduProg = ref({
                   />
                 </template>
 
-                <VListItemTitle @click="deleteEduProgDialog(item)">
+                <VListItemTitle>
                   Видалити
                 </VListItemTitle>
               </VListItem>

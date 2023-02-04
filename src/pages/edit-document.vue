@@ -4,10 +4,14 @@ import EditDocumentCharacteristic from '@/views/pages/edit-document/EditDocument
 import EditDocumentComponents from '@/views/pages/edit-document/EditDocumentComponents.vue'
 import EditDocumentSchema from '@/views/pages/edit-document/EditDocumentSchema.vue'
 import EditDocumentSequence from '@/views/pages/edit-document/EditDocumentSequence.vue'
+import { useEduProgsStore } from '@/stores/eduProgs.js'
+const eduProgsStore = useEduProgsStore()
 
 const route = useRoute()
 const activeTab = ref(route.params.tab)
-
+onMounted(async ()=>{
+  await eduProgsStore.findEduProgById(23)
+})
 // tabs
 const tabs = [
   {
@@ -58,10 +62,11 @@ const tabs = [
       v-model="activeTab"
       class="mt-5 disable-tab-transition"
       :touch="false"
+      v-if="!eduProgsStore.isLoading && eduProgsStore.getEduProg"
     >
       <!-- Account -->
       <VWindowItem value="characteristic">
-        <EditDocumentCharacteristic />
+        <EditDocumentCharacteristic :edu-prog="eduProgsStore.getEduProg"/>
       </VWindowItem>
 
       <!-- Security -->
