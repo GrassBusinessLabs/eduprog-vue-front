@@ -6,10 +6,14 @@ export const useEduProgsStore = defineStore({
 
   state: () => ({
     eduProgs:[],
+    loading: false,
+    eduProgData: {}
   }),
 
   getters: {
     getEduProgs: state => state.eduProgs,
+    isLoading: state => state.loading,
+    getEduProg: state => state.eduProgData
   },
 
   actions: {
@@ -32,9 +36,20 @@ export const useEduProgsStore = defineStore({
     this.fetchEduProgs
     },
     async findEduProgById(id){
-      const response = await getData('eduprogs/'+id);
-      console.log(response)
-      return response
+      if (!this.loading) {
+        try {
+          this.loading = true;
+          const response = await getData('eduprogs/'+id);
+          console.log(response)
+          this.eduProgData = response
+        }finally {
+          this.loading = false;
+        }
+      }
+  },
+  async editEduprog(payload){
+    console.log(payload)
+    await editData('eduprogs/'+this.eduProgData.id, payload);
   },
   },
 })

@@ -9,6 +9,7 @@
             <VTextField
               label="Назва документу "
               required
+              v-model="eduProgData.name"
             />
           </VCol>
           <VCol
@@ -16,6 +17,7 @@
           >
             <VTextField
               label="Освітній рівень"
+              v-model="eduProgData.education_level"
             />
           </VCol>
           <VCol
@@ -24,6 +26,7 @@
             <VTextField
               label="Освітній ступінь"
               required
+              v-model="eduProgData.stage"
             />
           </VCol>
           <VCol
@@ -32,6 +35,7 @@
             <VTextField
               label="Спеціальність"
               required
+              v-model="eduProgData.speciality"
             />
           </VCol>
           <VCol
@@ -40,16 +44,30 @@
             <VTextField
               label="Галузь знань"
               required
+              v-model="eduProgData.knowledge_field"
             />
           </VCol>
+        </VRow>
+        <VRow justify="end">
+          <VBtn
+            class="mt-10"
+            dark
+            @click="saveChanges"
+          >
+            Зберегти зміни
+          </VBtn>
         </VRow>
       </VContainer>
     </VCardText>
   </VCard>
 </template>
 <script setup>
-const props = defineProps(['eduProg']
-)
-console.log(props)
+import { useEduProgsStore } from '@/stores/eduProgs.js'
+const props = defineProps(['eduProg'])
+const eduProgsStore = useEduProgsStore()
+const saveChanges = async () => {
+  await eduProgsStore.editEduprog(eduProgData)
+}
+const eduProgData = eduProgsStore.getEduProg
 </script>
 
