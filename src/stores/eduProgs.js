@@ -7,13 +7,15 @@ export const useEduProgsStore = defineStore({
   state: () => ({
     eduProgs:[],
     loading: false,
-    eduProgData: {}
+    eduProgData: {},
+    creditsInfo: {}
   }),
 
   getters: {
     getEduProgs: state => state.eduProgs,
     isLoading: state => state.loading,
-    getEduProg: state => state.eduProgData
+    getEduProg: state => state.eduProgData,
+    getCreditsInfo: state => state.creditsInfo,
   },
 
   actions: {
@@ -27,7 +29,6 @@ export const useEduProgsStore = defineStore({
     },
     async createEduProg(payload){
       const response = await postData('/eduprogs/create', payload);
-      console.log(response)
       this.fetchEduProgs
       router.replace('/eduprogs/'+response.id)
     },
@@ -40,16 +41,28 @@ export const useEduProgsStore = defineStore({
         try {
           this.loading = true;
           const response = await getData('eduprogs/'+id);
-          console.log(response)
-          this.eduProgData = response
+          this.eduProgData = response;
+          this.creditsInfo = await getData('/eduprogs/credits/'+id)
         }finally {
           this.loading = false;
         }
+        console.log(this.creditsInfo)
       }
   },
   async editEduprog(payload){
-    console.log(payload)
     await editData('eduprogs/'+this.eduProgData.id, payload);
+  },
+  async addComponent(payload){
+    const response = await postData('eduprogs/comps/create', payload);
+    console.log(response);
+  },
+  async editComponent(id, payload){
+    await editData('eduprogs/comps/'+id, payload);
+    const response = await getData('eduprogs/credits/'+payload.eduprog_id);
+    this.creditsInfo = response
+  },
+  async deleteComponent(id){
+    const response = await deleteData('eduprogs/comps/'+id);
   },
   },
 })

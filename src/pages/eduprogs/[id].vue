@@ -5,16 +5,24 @@ import EditDocumentComponents from '@/views/pages/edit-document/EditDocumentComp
 import EditDocumentSchema from '@/views/pages/edit-document/EditDocumentSchema.vue'
 import EditDocumentSequence from '@/views/pages/edit-document/EditDocumentSequence.vue'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
-import { onMounted } from 'vue-demi'
-import { onServerPrefetch } from 'vue'
 const eduProgsStore = useEduProgsStore()
+
 const route = useRoute()
-const activeTab = ref(route.params)
-const eduProgData = ref(null)
+const activeTab = ref(route.params.tab)
 onMounted(async ()=>{
-  eduProgData.value = await eduProgsStore.findEduProgById(route.params.id)
-  console.log(eduProgData.value)
+  await eduProgsStore.findEduProgById(route.params.id)
 })
+const editComponent = ( async payload => {
+  await eduProgsStore.editComponent(payload.id, payload)
+})
+const addComponent = ( async payload => {
+  await eduProgsStore.addComponent(payload)
+})
+const deleteComponent = ( async id => {
+  await eduProgsStore.deleteComponent(id)
+  await eduProgsStore.findEduProgById(route.params.id)
+})
+// tabs
 const tabs = [
   {
     title: 'Загальна Характеристика',
@@ -40,7 +48,7 @@ const tabs = [
 </script>
 
 <template>
-  <div>
+  <div v-if="!eduProgsStore.isLoading && eduProgsStore.getEduProg && eduProgsStore.getEduProg.id!=0" >
     <VTabs
       v-model="activeTab"
       show-arrows
@@ -65,32 +73,38 @@ const tabs = [
       class="mt-5 disable-tab-transition"
       :touch="false"
     >
-      <!-- Account -->
+      <!-- Головна -->
       <VWindowItem value="characteristic">
-        <Suspense>
-          <EditDocumentCharacteristic v-if="eduProgData" :edu-prog="eduProgData.value" />
-        </Suspense>
+        <EditDocumentCharacteristic :edu-prog="eduProgsStore.getEduProg"/>
       </VWindowItem>
 
-      <!-- Security -->
+      <!-- Перелік компонент -->
       <VWindowItem value="components">
-        <EditDocumentComponents />
+        <EditDocumentComponents :components="eduProgsStore.getEduProg.components" :creditsInfo="eduProgsStore.creditsInfo" @saveComponent="editComponent" @deleteComponent="deleteComponent" @addComponent="addComponent"/>
       </VWindowItem>
 
-      <!-- Notification -->
+      <!-- Структурно логічна послідовнсість -->
       <VWindowItem value="schema">
-        <EditDocumentSequence />
+        <EditDocumentSequence/>
       </VWindowItem>
 
+      <!-- Структурно логічна схема -->
       <VWindowItem value="sequence">
         <EditDocumentSchema />
       </VWindowItem>
     </VWindow>
   </div>
+  <v-alert v-if="eduProgsStore.getEduProg.id==0"
+      border="bottom"
+      colored-border
+      type="warning"
+      elevation="2"
+    >
+      ОПП з таким id не знайдено.
+  </v-alert>
 </template>
 
 <route lang="yaml">
 meta:
 navActiveLink: pages-account-settings-tab
-requiresAuth: true
 </route>
