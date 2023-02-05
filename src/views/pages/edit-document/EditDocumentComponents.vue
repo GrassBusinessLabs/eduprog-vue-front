@@ -33,26 +33,26 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
     </thead>
     <tbody>
       <tr
-        v-for="(item, index) in itemsOP"
+        v-for="(item, index) in mandatoryComponents"
         :key="index"
       >
-        <td>{{ 'ОК ' + (index +1) }}</td>
+        <td>{{ 'ОК ' + item.code }}</td>
         <td>
-          <span v-if="editIndex !== index">{{ item.COP }}</span>
+          <span v-if="editIndex !== index">{{ item.name }}</span>
           <span v-if="editIndex === index">
-            <input  class="border-solid"     v-model="item.COP">
+            <input  class="border-solid" v-model="item.name">
           </span>
         </td>
         <td>
-          <span v-if="editIndex !== index">{{ item.credit_COP }}</span>
+          <span v-if="editIndex !== index">{{ item.credits }}</span>
           <span v-if="editIndex === index">
-            <input type="number" class="border-solid"    v-model="item.credit_COP">
+            <input type="number" class="border-solid"  v-model="item.credits">
           </span>
         </td>
         <td>
-          <span v-if="editIndex !== index" >{{ item.FC_COP }}</span>
+          <span v-if="editIndex !== index" >{{ item.control_type }}</span>
           <span v-if="editIndex === index">
-            <input  class="border-solid"   v-model="item.FC_COP" >
+            <input  class="border-solid"   v-model="item.control_type" >
           </span>
         </td>
         <td>
@@ -90,7 +90,7 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
                     Редагувати
                   </VListItemTitle>
                 </VListItem>
-                <VListItem link @click="remove(item, index)" >
+                <VListItem link @click="deleteComponent(item.id)" >
                   <template #prepend>
                     <VIcon
                       class="me-2"
@@ -125,8 +125,8 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
                 </VBtn>
               </template>
 
-              <VList>
-                <VListItem link @click="save(item)" >
+              <VList >
+                <VListItem link @click="saveComponent(item)" :disabled="!(item.name && item.credits && item.control_type )" >
                   <template #prepend>
                     <VIcon
                       class="me-2"
@@ -161,6 +161,18 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
     </tbody>
 
     <thead class="thead-light">
+      <tr>
+        <th>Загальний обсяг обов’язкових компонентів:</th>
+        <th>
+
+            <input class='text-right' disabled :value="creditsInfo.total_credits">/180 кредитів
+
+        </th>
+      </tr>
+    </thead>
+  </VTable>
+  <VTable>
+    <thead>
     <tr>
       <th colspan='5' >
         <div style="float: left" >Загальний обсяг обов’язкових компонентів:</div>
@@ -331,6 +343,22 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
     </tbody>
 
   </VTable>
+  <v-snackbar
+      v-model="snackbar"
+    >
+      {{ text }}
+
+      <template v-slot:action="{ attrs }">
+        <v-btn
+          color="pink"
+          text
+          v-bind="attrs"
+          @click="snackbar = false"
+        >
+          Закрити
+        </v-btn>
+      </template>
+    </v-snackbar>
 </template>
 
 <script>
@@ -340,27 +368,29 @@ export default {
     return {
       editIndex: null,
       originalData: null,
-      itemsOP: [
-        { COP: 'Філософія', credit_COP: "6", FC_COP: 'Залік' },
-      ],
-      itemsVB:[
-        { COP_VB: 'Право', credit_COP_VB: "2", FC_COP_VB: 'Екзамен' },
-      ],
+      mandatoryComponents: this.components.mandatory,
+      isDisabled: false,
     }
   },
-  computed: {
-    allSubTotal() {
-      return this.itemsOP
-        .map(item => Number(this.subtotal(item)))
-        .reduce((a, b) => a + b, 0)
-    },
-  },
+  props: ['components', 'creditsInfo'],
 
   methods: {
     add() {
       this.originalData = null
-      this.itemsOP.push({ COP: '', credit_COP: "0", FC_COP: ''})
-      this.editIndex = this.itemsOP.length - 1
+      const newComponent={
+          code: 2,
+          name: "",
+          credits:0,
+          control_type:"", 
+          type:"", 
+          sub_type: "",
+          category: "",
+          eduprog_id: 23 
+      }
+      this.mandatoryComponents.push(newComponent)
+      this.$emit('addComponent', newComponent)
+      this.editIndex = this.mandatoryComponents.length - 1
+      this.isDisabled = true
     },
     edit(item, index) {
       this.originalData = Object.assign({}, item)
@@ -376,12 +406,22 @@ export default {
       Object.assign(item, this.originalData)
       this.originalData = null
     },
-    remove(item, index) {
-      this.itemsOP.splice(index, 1)
+    remove(id) {
+      this.$emit('deleteComponent', id)
     },
     save(item) {
       this.originalData = null
       this.editIndex = null
+    },
+    saveComponent(component) {
+      console.log(this.creditsInfo)
+      this.$emit('saveComponent', component)
+      this.originalData = null
+      this.editIndex = null
+      this.isDisabled = false
+    },
+    deleteComponent(id) {
+      this.$emit('deleteComponent', id)
     },
     subtotal(item) {
       return (item.credit_COP)

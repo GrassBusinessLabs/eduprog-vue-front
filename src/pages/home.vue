@@ -7,6 +7,7 @@ import TableFixedHeader from '@/views/user-interface/tables/TableFixedHeader.vue
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 import { computed } from 'vue-demi'
 import moment from 'moment'
+import router from '../router';
 const eduProgsStore = useEduProgsStore()
 
 //return { eduProgs: useEduProgsStore.getEduProgs }
@@ -18,7 +19,6 @@ onMounted( async () => {
 let currentEduProg = null
 let newNameEduProg = ref(null)
 const eduProgs = computed(() => eduProgsStore.getEduProgs)
-
 
 
 const deleteEduProg =( async id => {
@@ -72,6 +72,9 @@ const renameEduProgDialog = function dialogg(id) {
 const deleteEduProgDialog= function dialogg(id) {
   dialogDelete.value=true
   currentEduProg = id
+}
+const editEduProg = function edit(id) {
+  router.replace('/eduprogs/'+id)
 }
 
 
@@ -195,7 +198,7 @@ const newEduProg = ref({
       </tr>
     </thead>
     <tbody>
-      <tr
+      <tr 
         v-for="item in eduProgs"
         :key="item.id"
       >
@@ -229,6 +232,19 @@ const newEduProg = ref({
             </template>
 
             <VList>
+               <VListItem link  @click="editEduProg(item.id)">
+                <template #prepend>
+                  <VIcon
+                    class="me-2"
+                    icon="mdi-file-edit"
+                    size="22"
+                  />
+                </template>
+
+                <VListItemTitle>
+                  Редагувати
+                </VListItemTitle>
+              </VListItem>
               <VListItem link @click="renameEduProgDialog(item)">
                 <template #prepend>
                   <VIcon

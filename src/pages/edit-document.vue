@@ -64,21 +64,22 @@ const tabs = [
       :touch="false"
       v-if="!eduProgsStore.isLoading && eduProgsStore.getEduProg"
     >
-      <!-- Account -->
+      <!-- Головна -->
       <VWindowItem value="characteristic">
         <EditDocumentCharacteristic :edu-prog="eduProgsStore.getEduProg"/>
       </VWindowItem>
 
-      <!-- Security -->
+      <!-- Перелік компонент -->
       <VWindowItem value="components">
-        <EditDocumentComponents />
+        <EditDocumentComponents :components="eduProgsStore.getEduProgComponents" />
       </VWindowItem>
 
-      <!-- Notification -->
+      <!-- Структурно логічна послідовнсість -->
       <VWindowItem value="schema">
-        <EditDocumentSequence />
+        <EditDocumentSequence/>
       </VWindowItem>
 
+      <!-- Структурно логічна схема -->
       <VWindowItem value="sequence">
         <EditDocumentSchema />
       </VWindowItem>

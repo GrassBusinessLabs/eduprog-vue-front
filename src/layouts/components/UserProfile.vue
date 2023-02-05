@@ -1,9 +1,11 @@
 <script setup>
 import avatar1 from '@/assets/images/avatars/avatar-1.png'
 import { useUserStore } from '@/stores/user'
-
 const userStore = useUserStore()
-
+onMounted( async () => {
+    await userStore.fetchUserData()
+})
+const userData = computed(() => userStore.getUserData)
 const avatarBadgeProps = {
   dot: true,
   location: 'bottom right',
@@ -52,11 +54,8 @@ const logout = () => {
             </template>
 
             <VListItemTitle class="font-weight-semibold">
-              John Doe
+              {{userData.name}}
             </VListItemTitle>
-            <VListItemSubtitle class="text-disabled">
-              Admin
-            </VListItemSubtitle>
           </VListItem>
 
           <VDivider class="my-2" />

@@ -68,6 +68,6 @@ const eduProgsStore = useEduProgsStore()
 const saveChanges = async () => {
   await eduProgsStore.editEduprog(eduProgData)
 }
-const eduProgData = eduProgsStore.getEduProg
+const eduProgData = props.eduProg
 </script>
 
