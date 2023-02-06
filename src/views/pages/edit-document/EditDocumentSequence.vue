@@ -1,17 +1,13 @@
 <script>
 export default {
   name: 'Uhuy',
- 
+  props:['components'],
   data() {
     return {
-      items: [
-        { COP: 'Філософія', credit_COP: "6", FC_COP: 'Залік' },
-        { COP: 'Математика', credit_COP: "6", FC_COP: 'Залік' }
-      ],
-      prost:['Філософія','Математика','qwewqewqeqw','ewqeqwewq']   //З сервера має надходити массив з доступними предметами
-   
+      prost:['Філософія','Математика','qwewqewqeqw','ewqeqwewq'],//З сервера має надходити массив з доступними предметами
+      mandatoryComponents: this.components.mandatory,
     }
-  }
+  },
 }
 
 </script>
@@ -36,17 +32,29 @@ export default {
     </thead>
     <tbody>
       <tr
-        v-for="(item, index) in items"
-        :key="index"
+        v-for="(item) in mandatoryComponents"
+        :key="item.id"
       >
-      <td>{{ 'ОК ' + index }}</td>
+      <td>{{ 'ОК ' + item.code }}</td>
         <td >
-          <span>{{ item.COP }}</span>
+          <span>{{ item.name }}</span>
           <span></span>
           
          </td> 
          <td>
-          <VSelect label="select" :items="prost" persistent-hint multiple  ></VSelect> <!--fix position Vselect, his ride on page -->
+          <VContainer fluid>
+            <VRow>
+              <VCol cols="12">
+                <VCombobox
+                  v-model="prost"
+
+                  multiple
+                  small-chips
+                />
+              </VCol>
+            </VRow>
+          </VContainer>
+          <!-- <VSelect class="my-5" label="select" :items="mandatoryComponents" persistent-hint multiple  ></VSelect>fix position Vselect, his ride on page -->
          </td>    
     </tr>
     </tbody>

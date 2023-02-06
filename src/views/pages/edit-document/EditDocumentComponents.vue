@@ -26,7 +26,7 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
           <VBtn
             icon="mdi-plus"
             size="x-small"
-            @click="add"
+            @click="dialogCreate = true"
           />
         </th>
       </tr>
@@ -160,26 +160,16 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
       </tr>
     </tbody>
 
-    <thead class="thead-light">
-      <tr>
-        <th>Загальний обсяг обов’язкових компонентів:</th>
-        <th>
-
-            <input class='text-right' disabled :value="creditsInfo.total_credits">/180 кредитів
-
-        </th>
-      </tr>
-    </thead>
-  </VTable>
-  <VTable>
     <thead>
     <tr>
       <th colspan='5' >
         <div style="float: left" >Загальний обсяг обов’язкових компонентів:</div>
-        <div style="float: left"><input class='text-right' disabled :value="allSubTotal ">/180 кредитів</div>
+        <div style="float: left"><input class='text-right' disabled :value="creditsInfo.total_credits">/180 кредитів</div>
       </th>
     </tr>
     </thead>
+  </VTable>
+  <VTable>
 
     <!-- Вибірковий компонент -->
 
@@ -343,22 +333,63 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
     </tbody>
 
   </VTable>
-  <v-snackbar
-      v-model="snackbar"
-    >
-      {{ text }}
+  <VDialog
+    v-model="dialogCreate"
+    persistent
+    max-width="600"
+  >
+    <VCard>
+      <VCardTitle>Створити новий обов’язковий компонент</VCardTitle>
+      <VCardText>
+        <VContainer>
+          <VRow>
+            <VCol
+              cols="12"
+            >
+              <VTextField
+                v-model="newComponent.name"
+                label="Назва компонента"
+                required
+              />
+            </VCol>
+            <VCol
+              cols="12"
+            >
+              <VTextField
+                v-model="newComponent.credits"
+                label="Кількість кредитів"
+              />
+            </VCol>
+            <VCol
+              cols="12"
+            >
+              <VTextField
+                v-model="newComponent.control_type"
+                label="Форма підсумку контролю"
+                required
+              />
+            </VCol>
+          </VRow>
+        </VContainer>
 
-      <template v-slot:action="{ attrs }">
-        <v-btn
-          color="pink"
-          text
-          v-bind="attrs"
-          @click="snackbar = false"
-        >
-          Закрити
-        </v-btn>
-      </template>
-    </v-snackbar>
+        <VCardActions>
+          <VSpacer />
+          <VBtn
+            text
+            @click="dialogCreate = false"
+          >
+            Відмінити
+          </VBtn>
+          <VBtn
+            text
+            @click="createComponent"
+          >
+            Зберегти
+          </VBtn>
+        </VCardActions>
+      </VCardText>
+    </VCard>
+  </VDialog>
 </template>
 
 <script>
@@ -370,27 +401,22 @@ export default {
       originalData: null,
       mandatoryComponents: this.components.mandatory,
       isDisabled: false,
+      dialogCreate: false,
+      newComponent:{
+        name:"",
+        credits: 0,
+        control_type: "",
+        type: "ОК",
+        sub_type: "н/д",
+        category: "н/д",
+      }
     }
   },
   props: ['components', 'creditsInfo'],
 
   methods: {
-    add() {
-      this.originalData = null
-      const newComponent={
-          code: 2,
-          name: "",
-          credits:0,
-          control_type:"", 
-          type:"", 
-          sub_type: "",
-          category: "",
-          eduprog_id: 23 
-      }
-      this.mandatoryComponents.push(newComponent)
-      this.$emit('addComponent', newComponent)
-      this.editIndex = this.mandatoryComponents.length - 1
-      this.isDisabled = true
+    createComponent(){
+      this.dialogCreate = false;
     },
     edit(item, index) {
       this.originalData = Object.assign({}, item)

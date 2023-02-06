@@ -46,15 +46,13 @@ export const useEduProgsStore = defineStore({
         }finally {
           this.loading = false;
         }
-        console.log(this.creditsInfo)
       }
   },
   async editEduprog(payload){
     await editData('eduprogs/'+this.eduProgData.id, payload);
   },
-  async addComponent(payload){
+  async createComponent(payload){
     const response = await postData('eduprogs/comps/create', payload);
-    console.log(response);
   },
   async editComponent(id, payload){
     await editData('eduprogs/comps/'+id, payload);

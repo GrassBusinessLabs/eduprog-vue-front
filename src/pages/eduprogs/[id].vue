@@ -85,12 +85,12 @@ const tabs = [
 
       <!-- Структурно логічна послідовнсість -->
       <VWindowItem value="schema">
-        <EditDocumentSequence/>
+        <EditDocumentSequence  :components="eduProgsStore.getEduProg.components"/>
       </VWindowItem>
 
       <!-- Структурно логічна схема -->
       <VWindowItem value="sequence">
-        <EditDocumentSchema />
+        <EditDocumentSchema/>
       </VWindowItem>
     </VWindow>
   </div>
