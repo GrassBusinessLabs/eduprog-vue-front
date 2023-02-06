@@ -356,6 +356,7 @@ import TableBasic from '@/views/user-interface/tables/TableBasic.vue'
               cols="12"
             >
               <VTextField
+              type="number"
                 v-model="newComponent.credits"
                 label="Кількість кредитів"
               />
@@ -402,13 +403,16 @@ export default {
       mandatoryComponents: this.components.mandatory,
       isDisabled: false,
       dialogCreate: false,
+      eduprogId: 1,
       newComponent:{
+        code: String(this.components.mandatory.length+1),
         name:"",
         credits: 0,
         control_type: "",
         type: "ОК",
         sub_type: "н/д",
         category: "н/д",
+        eduprog_id: 1
       }
     }
   },
@@ -416,6 +420,7 @@ export default {
 
   methods: {
     createComponent(){
+      this.$emit('createComponent', this.newComponent)
       this.dialogCreate = false;
     },
     edit(item, index) {

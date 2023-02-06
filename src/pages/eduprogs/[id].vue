@@ -15,8 +15,9 @@ onMounted(async ()=>{
 const editComponent = ( async payload => {
   await eduProgsStore.editComponent(payload.id, payload)
 })
-const addComponent = ( async payload => {
-  await eduProgsStore.addComponent(payload)
+const createComponent = ( async payload => {
+  await eduProgsStore.createComponent(payload)
+  await eduProgsStore.findEduProgById(route.params.id)
 })
 const deleteComponent = ( async id => {
   await eduProgsStore.deleteComponent(id)
@@ -80,7 +81,7 @@ const tabs = [
 
       <!-- Перелік компонент -->
       <VWindowItem value="components">
-        <EditDocumentComponents :components="eduProgsStore.getEduProg.components" :creditsInfo="eduProgsStore.creditsInfo" @saveComponent="editComponent" @deleteComponent="deleteComponent" @addComponent="addComponent"/>
+        <EditDocumentComponents :components="eduProgsStore.getEduProg.components" :creditsInfo="eduProgsStore.creditsInfo" @saveComponent="editComponent" @deleteComponent="deleteComponent" @createComponent="createComponent"/>
       </VWindowItem>
 
       <!-- Структурно логічна послідовнсість -->
