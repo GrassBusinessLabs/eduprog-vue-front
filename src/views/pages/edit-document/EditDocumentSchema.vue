@@ -176,7 +176,7 @@
               <VCol cols="12">
                 <VCombobox
                   v-model="itemsS.S1"
-                  :items="items"
+                  :items="items[0].name"
                   hide-selected
                   multiple
                   small-chips
@@ -303,12 +303,6 @@ export default {
       originalData: null,
       itemsS: [
         { DS: "Дисципліни фахової спеціалізації", S1: "", S2: "", S3: "", S4: "", S5: "", S6: "", S7: "", S8: ""},
-      ],
-      items: [
-        'Programming',
-        'Design',
-        'Vue',
-        'Vuetify',
       ],
       items: this.components.mandatory
     }
