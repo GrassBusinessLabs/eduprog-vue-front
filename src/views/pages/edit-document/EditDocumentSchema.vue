@@ -186,7 +186,7 @@
             <VRow>
               <VCol cols="12">
                 <VCombobox
-                  v-model="select"
+                  v-model="itemsS.S1"
                   :items="items"
                   hide-selected
                   multiple
@@ -201,7 +201,8 @@
             <VRow>
               <VCol cols="12">
                 <VCombobox
-                  v-model="select"
+                  v-model="itemsS.S2"
+                  :items="items"
                   hide-selected
                   multiple
                   small-chips
@@ -215,7 +216,8 @@
             <VRow>
               <VCol cols="12">
                 <VCombobox
-                  v-model="select"
+                  v-model="itemsS.S3"
+                  :items="items"
                   hide-selected
                   multiple
                   small-chips
@@ -229,7 +231,8 @@
             <VRow>
               <VCol cols="12">
                 <VCombobox
-                  v-model="select"
+                  v-model="itemsS.S4"
+                  :items="items"
                   hide-selected
                   multiple
                   small-chips
@@ -243,7 +246,8 @@
             <VRow>
               <VCol cols="12">
                 <VCombobox
-                  v-model="select"
+                  v-model="itemsS.S5"
+                  :items="items"
                   hide-selected
                   multiple
                   small-chips
@@ -257,7 +261,8 @@
             <VRow>
               <VCol cols="12">
                 <VCombobox
-                  v-model="select"
+                  v-model="itemsS.S6"
+                  :items="items"
                   hide-selected
                   multiple
                   small-chips
@@ -271,7 +276,8 @@
             <VRow>
               <VCol cols="12">
                 <VCombobox
-                  v-model="select"
+                  v-model="itemsS.S7"
+                  :items="items"
                   hide-selected
                   multiple
                   small-chips
@@ -285,7 +291,8 @@
             <VRow>
               <VCol cols="12">
                 <VCombobox
-                  v-model="select"
+                  v-model="itemsS.S8"
+                  :items="items"
                   hide-selected
                   multiple
                   small-chips
@@ -307,10 +314,7 @@ export default {
       editIndex: null,
       originalData: null,
       itemsS: [
-        { DS: "Дисципліни фахової спеціалізації", S1: '', S2: '', S3: '', S4: '', S5: '', S6: '', S7: '', S8: ''},
-      ],
-      select: [
-
+        { DS: "Дисципліни фахової спеціалізації", S1: "", S2: "", S3: "", S4: "", S5: "", S6: "", S7: "", S8: ""},
       ],
       items: [
         'Programming',
