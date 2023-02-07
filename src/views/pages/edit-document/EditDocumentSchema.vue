@@ -1,4 +1,3 @@
-
 <template>
   <VTable>
     <thead>
@@ -41,144 +40,134 @@
       </tr>
 
       <tr>
-        <th class="text-center">
-          1 семестр
-        </th>
-        <th class="text-center">
-          2 семестр
-        </th>
-        <th class="text-center">
-          3 семестр
-        </th>
-        <th class="text-center">
-          4 семестр
-        </th>
-        <th class="text-center">
-          5 семестр
-        </th>
-        <th class="text-center">
-          6 семестр
-        </th>
-        <th class="text-center">
-          7 семестр
-        </th>
-        <th class="text-center">
-          8 семестр
-        </th>
+        <th class="text-center">1 семестр</th>
+        <th class="text-center">2 семестр</th>
+        <th class="text-center">3 семестр</th>
+        <th class="text-center">4 семестр</th>
+        <th class="text-center">5 семестр</th>
+        <th class="text-center">6 семестр</th>
+        <th class="text-center">7 семестр</th>
+        <th class="text-center">8 семестр</th>
       </tr>
     </thead>
     <tbody>
       <tr
         v-for="(item, index) in itemsS"
-        :key="index">
+        :key="index"
+      >
         <td>
-          <div style='text-align: center'>
-            <span v-if="editIndex !== index" >{{ item.DS }}</span>
+          <div style="text-align: center">
+            <span v-if="editIndex !== index">{{ item.DS }}</span>
             <span v-if="editIndex === index">
-            <input  class="border-solid"   v-model="item.DS" >
-          </span>
+              <input
+                class="border-solid"
+                v-model="item.DS"
+              />
+            </span>
           </div>
-          <div style='text-align: center; margin-top: 5%; margin-bottom: 5%' >
-          <span v-if="editIndex !== index">
-            <VMenu
-              bottom
-              left
-              activator="parent"
-            >
-              <template #activator="{ on, attrs }">
-                <VBtn
-                  dark
-                  icon
-                  v-bind="attrs"
-                  :shaped="false"
-                  size="x-small"
-                  v-on="on"
-                >
-                  <VIcon>mdi-dots-horizontal</VIcon>
-                </VBtn>
-              </template>
+          <div style="text-align: center; margin-top: 5%; margin-bottom: 5%">
+            <span v-if="editIndex !== index">
+              <VMenu
+                bottom
+                left
+                activator="parent"
+              >
+                <template #activator="{ on, attrs }">
+                  <VBtn
+                    dark
+                    icon
+                    v-bind="attrs"
+                    :shaped="false"
+                    size="x-small"
+                    v-on="on"
+                  >
+                    <VIcon>mdi-dots-horizontal</VIcon>
+                  </VBtn>
+                </template>
 
-              <VList>
-                <VListItem link @click="edit(item, index)" >
-                  <template #prepend>
-                    <VIcon
-                      class="me-2"
-                      icon="mdi-pencil"
-                      size="22"
-                    />
-                  </template>
+                <VList>
+                  <VListItem
+                    link
+                    @click="edit(item, index)"
+                  >
+                    <template #prepend>
+                      <VIcon
+                        class="me-2"
+                        icon="mdi-pencil"
+                        size="22"
+                      />
+                    </template>
 
+                    <VListItemTitle> Редагувати </VListItemTitle>
+                  </VListItem>
+                  <VListItem
+                    link
+                    @click="remove(item, index)"
+                  >
+                    <template #prepend>
+                      <VIcon
+                        class="me-2"
+                        icon="mdi-trash-can"
+                        size="22"
+                      />
+                    </template>
 
-                  <VListItemTitle>
-                    Редагувати
-                  </VListItemTitle>
-                </VListItem>
-                <VListItem link @click="remove(item, index)" >
-                  <template #prepend>
-                    <VIcon
-                      class="me-2"
-                      icon="mdi-trash-can"
-                      size="22"
-                    />
-                  </template>
+                    <VListItemTitle> Видалити </VListItemTitle>
+                  </VListItem>
+                </VList>
+              </VMenu>
+            </span>
+            <span v-else>
+              <VMenu
+                bottom
+                left
+                activator="parent"
+              >
+                <template #activator="{ on, attrs }">
+                  <VBtn
+                    dark
+                    icon
+                    v-bind="attrs"
+                    :shaped="false"
+                    size="x-small"
+                    v-on="on"
+                  >
+                    <VIcon>mdi-dots-horizontal</VIcon>
+                  </VBtn>
+                </template>
 
-                  <VListItemTitle>
-                    Видалити
-                  </VListItemTitle>
-                </VListItem>
-              </VList>
-            </VMenu>
-          </span>
-          <span v-else>
-            <VMenu
-              bottom
-              left
-              activator="parent"
-            >
-              <template #activator="{ on, attrs }">
-                <VBtn
-                  dark
-                  icon
-                  v-bind="attrs"
-                  :shaped="false"
-                  size="x-small"
-                  v-on="on"
-                >
-                  <VIcon>mdi-dots-horizontal</VIcon>
-                </VBtn>
-              </template>
+                <VList>
+                  <VListItem
+                    link
+                    @click="save(item)"
+                  >
+                    <template #prepend>
+                      <VIcon
+                        class="me-2"
+                        icon="mdi-pencil"
+                        size="22"
+                      />
+                    </template>
 
-              <VList>
-                <VListItem link @click="save(item)" >
-                  <template #prepend>
-                    <VIcon
-                      class="me-2"
-                      icon="mdi-pencil"
-                      size="22"
-                    />
-                  </template>
+                    <VListItemTitle> Зберегти </VListItemTitle>
+                  </VListItem>
+                  <VListItem
+                    @click="cancel(item)"
+                    link
+                  >
+                    <template #prepend>
+                      <VIcon
+                        class="me-2"
+                        icon="mdi-trash-can"
+                        size="22"
+                      />
+                    </template>
 
-
-                  <VListItemTitle >
-                    Зберегти
-                  </VListItemTitle>
-                </VListItem>
-                <VListItem @click="cancel(item)" link>
-                  <template #prepend>
-                    <VIcon
-                      class="me-2"
-                      icon="mdi-trash-can"
-                      size="22"
-                    />
-                  </template>
-
-                  <VListItemTitle >
-                    Відмінити
-                  </VListItemTitle>
-                </VListItem>
-              </VList>
-            </VMenu>
-          </span>
+                    <VListItemTitle> Відмінити </VListItemTitle>
+                  </VListItem>
+                </VList>
+              </VMenu>
+            </span>
           </div>
         </td>
         <td>
@@ -186,7 +175,7 @@
             <VRow>
               <VCol cols="12">
                 <VCombobox
-                  v-model="select"
+                  v-model="itemsS.S1"
                   :items="items"
                   hide-selected
                   multiple
@@ -201,7 +190,8 @@
             <VRow>
               <VCol cols="12">
                 <VCombobox
-                  v-model="select"
+                  v-model="itemsS.S2"
+                  :items="items"
                   hide-selected
                   multiple
                   small-chips
@@ -215,7 +205,8 @@
             <VRow>
               <VCol cols="12">
                 <VCombobox
-                  v-model="select"
+                  v-model="itemsS.S3"
+                  :items="items"
                   hide-selected
                   multiple
                   small-chips
@@ -229,7 +220,8 @@
             <VRow>
               <VCol cols="12">
                 <VCombobox
-                  v-model="select"
+                  v-model="itemsS.S4"
+                  :items="items"
                   hide-selected
                   multiple
                   small-chips
@@ -243,7 +235,8 @@
             <VRow>
               <VCol cols="12">
                 <VCombobox
-                  v-model="select"
+                  v-model="itemsS.S5"
+                  :items="items.name"
                   hide-selected
                   multiple
                   small-chips
@@ -257,7 +250,8 @@
             <VRow>
               <VCol cols="12">
                 <VCombobox
-                  v-model="select"
+                  v-model="itemsS.S6"
+                  :items="items"
                   hide-selected
                   multiple
                   small-chips
@@ -271,7 +265,8 @@
             <VRow>
               <VCol cols="12">
                 <VCombobox
-                  v-model="select"
+                  v-model="itemsS.S7"
+                  :items="items"
                   hide-selected
                   multiple
                   small-chips
@@ -285,7 +280,8 @@
             <VRow>
               <VCol cols="12">
                 <VCombobox
-                  v-model="select"
+                  v-model="itemsS.S8"
+                  :items="items"
                   hide-selected
                   multiple
                   small-chips
@@ -301,31 +297,23 @@
 
 <script>
 export default {
-
   data() {
     return {
       editIndex: null,
       originalData: null,
       itemsS: [
-        { DS: "Дисципліни фахової спеціалізації", S1: '', S2: '', S3: '', S4: '', S5: '', S6: '', S7: '', S8: ''},
+        { DS: 'Дисципліни фахової спеціалізації', S1: '', S2: '', S3: '', S4: '', S5: '', S6: '', S7: '', S8: '' },
       ],
-      select: [
-
-      ],
-      items: [
-        'Programming',
-        'Design',
-        'Vue',
-        'Vuetify',
-      ],
+      items: this.components.mandatory
     }
   },
-
+  props: ['scheme', 'components'],
   methods: {
     add() {
       this.originalData = null
-      this.itemsS.push({ DS: ' ', S1: '', S2: '', S3: '', S4: '', S5: '', S6: '', S7: '', S8: ''})
+      this.itemsS.push({ DS: ' ', S1: '', S2: '', S3: '', S4: '', S5: '', S6: '', S7: '', S8: '' })
       this.editIndex = this.itemsS.length - 1
+      console.log(this.components.mandatory)
     },
     edit(item, index) {
       this.originalData = Object.assign({}, item)
@@ -349,6 +337,32 @@ export default {
       this.editIndex = null
     },
   },
+  computed: {
+    sortedScheme() {
+      const data = this.scheme
+      const groupedData = data.reduce((acc, item) => {
+        const discipline = item.discipline
+        if (!acc[discipline]) {
+          acc[discipline] = []
+        }
+        acc[discipline].push(item)
+        return acc
+      }, {})
 
+      const groupedAndSortedData = Object.values(groupedData).map(array => {
+        return array.reduce((acc, item) => {
+          const semesterNum = item.semester_num
+          if (!acc[semesterNum]) {
+            acc[semesterNum] = []
+          }
+          acc[semesterNum].push(item)
+          return acc
+        }, {})
+      })
+
+      const finalArrays = groupedAndSortedData.map(object => Object.values(object))
+      return finalArrays
+    },
+  },
 }
 </script>

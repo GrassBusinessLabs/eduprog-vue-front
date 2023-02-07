@@ -412,11 +412,11 @@ export default {
         type: "ОК",
         sub_type: "н/д",
         category: "н/д",
-        eduprog_id: 1
+        eduprog_id: +this.eduProgId
       }
     }
   },
-  props: ['components', 'creditsInfo'],
+  props: ['components', 'creditsInfo', 'eduProgId'],
 
   methods: {
     createComponent(){

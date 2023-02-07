@@ -11,6 +11,7 @@ const route = useRoute()
 const activeTab = ref(route.params.tab)
 onMounted(async ()=>{
   await eduProgsStore.findEduProgById(route.params.id)
+  await eduProgsStore.fetchScheme(route.params.id)
 })
 const editComponent = ( async payload => {
   await eduProgsStore.editComponent(payload.id, payload)
@@ -81,7 +82,7 @@ const tabs = [
 
       <!-- Перелік компонент -->
       <VWindowItem value="components">
-        <EditDocumentComponents :components="eduProgsStore.getEduProg.components" :creditsInfo="eduProgsStore.creditsInfo" @saveComponent="editComponent" @deleteComponent="deleteComponent" @createComponent="createComponent"/>
+        <EditDocumentComponents :components="eduProgsStore.getEduProg.components" :creditsInfo="eduProgsStore.creditsInfo" :edu-prog-id="route.params.id" @saveComponent="editComponent" @deleteComponent="deleteComponent" @createComponent="createComponent" />
       </VWindowItem>
 
       <!-- Структурно логічна послідовнсість -->
@@ -91,7 +92,7 @@ const tabs = [
 
       <!-- Структурно логічна схема -->
       <VWindowItem value="sequence">
-        <EditDocumentSchema/>
+        <EditDocumentSchema :scheme="eduProgsStore.getScheme" :components="eduProgsStore.getEduProg.components"/>
       </VWindowItem>
     </VWindow>
   </div>

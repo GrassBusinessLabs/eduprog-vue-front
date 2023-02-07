@@ -8,7 +8,8 @@ export const useEduProgsStore = defineStore({
     eduProgs:[],
     loading: false,
     eduProgData: {},
-    creditsInfo: {}
+    creditsInfo: {},
+    scheme:[]
   }),
 
   getters: {
@@ -16,6 +17,7 @@ export const useEduProgsStore = defineStore({
     isLoading: state => state.loading,
     getEduProg: state => state.eduProgData,
     getCreditsInfo: state => state.creditsInfo,
+    getScheme: state => state.scheme,
   },
 
   actions: {
@@ -36,18 +38,22 @@ export const useEduProgsStore = defineStore({
     await editData('/eduprogs/'+ id, payload);
     this.fetchEduProgs
     },
-    async findEduProgById(id){
-      if (!this.loading) {
-        try {
-          this.loading = true;
-          const response = await getData('eduprogs/'+id);
-          this.eduProgData = response;
-          this.creditsInfo = await getData('/eduprogs/credits/'+id)
-        }finally {
-          this.loading = false;
-        }
-      }
+    async fetchScheme(id){
+      this.scheme = await getData('/eduprogs/scheme/byEduprogId/'+id);
+      console.log(this.scheme)
   },
+  async findEduProgById(id){
+    if (!this.loading) {
+      try {
+        this.loading = true;
+        const response = await getData('eduprogs/'+id);
+        this.eduProgData = response;
+        this.creditsInfo = await getData('/eduprogs/credits/'+id)
+      }finally {
+        this.loading = false;
+      }
+    }
+},
   async editEduprog(payload){
     await editData('eduprogs/'+this.eduProgData.id, payload);
   },
