@@ -52,12 +52,12 @@
     </thead>
     <tbody>
       <tr
-        v-for="(item, index) in itemsS"
+        v-for="(item, index) in disciplines"
         :key="index"
       >
         <td>
           <div style="text-align: center">
-            <span v-if="editIndex !== index">{{ item.DS }}</span>
+            <span v-if="editIndex !== index">{{ item }}</span>
             <span v-if="editIndex === index">
               <input
                 class="border-solid"
@@ -170,119 +170,17 @@
             </span>
           </div>
         </td>
-        <td>
+        <td v-for="semester in semesters"
+        :key="semester">
           <VContainer fluid>
             <VRow>
               <VCol cols="12">
                 <VCombobox
-                  v-model="itemsS.S1"
-                  :items="items[0].name"
-                  hide-selected
-                  multiple
-                  small-chips
-                />
-              </VCol>
-            </VRow>
-          </VContainer>
-        </td>
-        <td>
-          <VContainer fluid>
-            <VRow>
-              <VCol cols="12">
-                <VCombobox
-                  v-model="itemsS.S2"
-                  :items="items"
-                  hide-selected
-                  multiple
-                  small-chips
-                />
-              </VCol>
-            </VRow>
-          </VContainer>
-        </td>
-        <td>
-          <VContainer fluid>
-            <VRow>
-              <VCol cols="12">
-                <VCombobox
-                  v-model="itemsS.S3"
-                  :items="items"
-                  hide-selected
-                  multiple
-                  small-chips
-                />
-              </VCol>
-            </VRow>
-          </VContainer>
-        </td>
-        <td>
-          <VContainer fluid>
-            <VRow>
-              <VCol cols="12">
-                <VCombobox
-                  v-model="itemsS.S4"
-                  :items="items"
-                  hide-selected
-                  multiple
-                  small-chips
-                />
-              </VCol>
-            </VRow>
-          </VContainer>
-        </td>
-        <td>
-          <VContainer fluid>
-            <VRow>
-              <VCol cols="12">
-                <VCombobox
-                  v-model="itemsS.S5"
-                  :items="items"
-                  hide-selected
-                  multiple
-                  small-chips
-                />
-              </VCol>
-            </VRow>
-          </VContainer>
-        </td>
-        <td>
-          <VContainer fluid>
-            <VRow>
-              <VCol cols="12">
-                <VCombobox
-                  v-model="itemsS.S6"
-                  :items="items"
-                  hide-selected
-                  multiple
-                  small-chips
-                />
-              </VCol>
-            </VRow>
-          </VContainer>
-        </td>
-        <td>
-          <VContainer fluid>
-            <VRow>
-              <VCol cols="12">
-                <VCombobox
-                  v-model="itemsS.S7"
-                  :items="items"
-                  hide-selected
-                  multiple
-                  small-chips
-                />
-              </VCol>
-            </VRow>
-          </VContainer>
-        </td>
-        <td>
-          <VContainer fluid>
-            <VRow>
-              <VCol cols="12">
-                <VCombobox
-                  v-model="itemsS.S8"
-                  :items="items"
-                  hide-selected
+                  @update:modelValue="handleSubject($event, semester, item)"
+                  @blur="closeCombobox"
+                  :items="getSubjects()"
+                  item-title="name"
+                  item-value="id"
                   multiple
                   small-chips
                 />
@@ -301,10 +199,13 @@ export default {
     return {
       editIndex: null,
       originalData: null,
-      itemsS: [
-        { DS: "Дисципліни фахової спеціалізації", S1: "", S2: "", S3: "", S4: "", S5: "", S6: "", S7: "", S8: ""},
-      ],
-      items: this.components.mandatory
+      disciplines: [...new Set(this.scheme.map(e => e.discipline))],
+      semesters:[...Array(8).keys()],
+      changes: {
+        subjects: [],
+        semester: '',
+        discipline: ''
+      },
     }
   },
   props: ['scheme', 'components'],
@@ -313,7 +214,7 @@ export default {
       this.originalData = null
       this.itemsS.push({ DS: ' ', S1: '', S2: '', S3: '', S4: '', S5: '', S6: '', S7: '', S8: '' })
       this.editIndex = this.itemsS.length - 1
-      console.log(this.components.mandatory)
+      console.log(this.disciplines)
     },
     edit(item, index) {
       this.originalData = Object.assign({}, item)
@@ -336,33 +237,53 @@ export default {
       this.originalData = null
       this.editIndex = null
     },
-  },
-  computed: {
-    sortedScheme() {
-      const data = this.scheme
-      const groupedData = data.reduce((acc, item) => {
-        const discipline = item.discipline
-        if (!acc[discipline]) {
-          acc[discipline] = []
+    getComponentByDiscipline(discipline, semestr){
+      let array = this.scheme.filter(e => {
+        if(e.discipline===discipline && e.semester_num === semestr){
+          return e
         }
-        acc[discipline].push(item)
-        return acc
-      }, {})
-
-      const groupedAndSortedData = Object.values(groupedData).map(array => {
-        return array.reduce((acc, item) => {
-          const semesterNum = item.semester_num
-          if (!acc[semesterNum]) {
-            acc[semesterNum] = []
-          }
-          acc[semesterNum].push(item)
-          return acc
-        }, {})
       })
-
-      const finalArrays = groupedAndSortedData.map(object => Object.values(object))
-      return finalArrays
+      array.map(e => {
+        e.title=e.eduprogcomp.name
+        e.value=e.eduprogcomp.id
+      })
+      console.log(array)
+      return array
     },
+    getSubjects(){
+      console.log(this.components.mandatory.concat(this.components.selective))
+      return this.components.mandatory.concat(this.components.selective)
+    },
+    handleSubject(event, semester, discipline){
+      this.changes.subjects = event;
+      this.changes.semester = semester+1;
+      this.changes.discipline = discipline;
+      // console.log(event, discipline, semester+1)
+      // const foundedSubjects = this.scheme.find(e => {
+      //   console.log(e.semester_num, semester+1, e.discipline, discipline, e.eduprogcomp_id, event[event.length-1].id)
+      //   if(e.semester_num === semester+1 && e.discipline===discipline && e.eduprogcomp_id===event.id){
+      //     return e
+      //   }
+      // })
+    },
+    closeCombobox(){
+      console.log(this.changes)
+      console.log('схема:', this.scheme)
+      const filteredScheme =this.scheme.filter(e => {
+        console.log(e.semester_num, this.changes.semester, e.discipline, this.changes.discipline)
+        if(e.semester_num === this.changes.semester && e.discipline === this.changes.discipline){
+          return e
+        }
+      })
+      console.log('Фильтрована схема', filteredScheme)
+      const forAdd=[];
+      this.changes.subjects.forEach(element => {
+      if(!this.scheme.find(e => element.id===e.eduprogcomp.id)){
+        forAdd.push(element)
+      }
+      });
+      console.log('Массив для добавления: ', forAdd)
+    }
   },
 }
 </script>
