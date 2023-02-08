@@ -24,6 +24,13 @@ const deleteComponent = ( async id => {
   await eduProgsStore.deleteComponent(id)
   await eduProgsStore.findEduProgById(route.params.id)
 })
+const addComponentToScheme = ( async payload => {
+  await eduProgsStore.setComponentToScheme(payload)
+})
+const deleteComponentFromSheme = ( async id => {
+  await eduProgsStore.deleteComponentFromSheme(id)
+})
+
 // tabs
 const tabs = [
   {
@@ -92,7 +99,7 @@ const tabs = [
 
       <!-- Структурно логічна схема -->
       <VWindowItem value="sequence">
-        <EditDocumentSchema :scheme="eduProgsStore.getScheme" :components="eduProgsStore.getEduProg.components"/>
+        <EditDocumentSchema :scheme="eduProgsStore.getScheme" :components="eduProgsStore.getEduProg.components" @addComponentToScheme='addComponentToScheme' @deleteComponentFromSheme='deleteComponentFromSheme'/>
       </VWindowItem>
     </VWindow>
   </div>

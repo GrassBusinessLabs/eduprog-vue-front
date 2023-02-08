@@ -40,14 +40,30 @@
       </tr>
 
       <tr>
-        <th class="text-center">1 семестр</th>
-        <th class="text-center">2 семестр</th>
-        <th class="text-center">3 семестр</th>
-        <th class="text-center">4 семестр</th>
-        <th class="text-center">5 семестр</th>
-        <th class="text-center">6 семестр</th>
-        <th class="text-center">7 семестр</th>
-        <th class="text-center">8 семестр</th>
+        <th class="text-center">
+          1 семестр
+        </th>
+        <th class="text-center">
+          2 семестр
+        </th>
+        <th class="text-center">
+          3 семестр
+        </th>
+        <th class="text-center">
+          4 семестр
+        </th>
+        <th class="text-center">
+          5 семестр
+        </th>
+        <th class="text-center">
+          6 семестр
+        </th>
+        <th class="text-center">
+          7 семестр
+        </th>
+        <th class="text-center">
+          8 семестр
+        </th>
       </tr>
     </thead>
     <tbody>
@@ -60,9 +76,9 @@
             <span v-if="editIndex !== index">{{ item }}</span>
             <span v-if="editIndex === index">
               <input
-                class="border-solid"
                 v-model="item.DS"
-              />
+                class="border-solid"
+              >
             </span>
           </div>
           <div style="text-align: center; margin-top: 5%; margin-bottom: 5%">
@@ -152,8 +168,8 @@
                     <VListItemTitle> Зберегти </VListItemTitle>
                   </VListItem>
                   <VListItem
-                    @click="cancel(item)"
                     link
+                    @click="cancel(item)"
                   >
                     <template #prepend>
                       <VIcon
@@ -170,19 +186,21 @@
             </span>
           </div>
         </td>
-        <td v-for="semester in semesters"
-        :key="semester">
+        <td
+          v-for="semester in semesters"
+          :key="semester"
+        >
           <VContainer fluid>
             <VRow>
               <VCol cols="12">
                 <VCombobox
-                  @update:modelValue="handleSubject($event, semester, item)"
-                  @blur="closeCombobox"
                   :items="getSubjects()"
                   item-title="name"
                   item-value="id"
                   multiple
                   small-chips
+                  @update:modelValue="handleSubject($event, semester, item)"
+                  @blur="closeCombobox"
                 />
               </VCol>
             </VRow>
@@ -195,6 +213,7 @@
 
 <script>
 export default {
+  props: ['scheme', 'components'],
   data() {
     return {
       editIndex: null,
@@ -204,11 +223,10 @@ export default {
       changes: {
         subjects: [],
         semester: '',
-        discipline: ''
+        discipline: '',
       },
     }
   },
-  props: ['scheme', 'components'],
   methods: {
     add() {
       this.originalData = null
@@ -248,16 +266,17 @@ export default {
         e.value=e.eduprogcomp.id
       })
       console.log(array)
+      
       return array
     },
     getSubjects(){
-      console.log(this.components.mandatory.concat(this.components.selective))
       return this.components.mandatory.concat(this.components.selective)
     },
     handleSubject(event, semester, discipline){
-      this.changes.subjects = event;
-      this.changes.semester = semester+1;
-      this.changes.discipline = discipline;
+      this.changes.subjects = event
+      this.changes.semester = semester+1
+      this.changes.discipline = discipline
+
       // console.log(event, discipline, semester+1)
       // const foundedSubjects = this.scheme.find(e => {
       //   console.log(e.semester_num, semester+1, e.discipline, discipline, e.eduprogcomp_id, event[event.length-1].id)
@@ -270,20 +289,45 @@ export default {
       console.log(this.changes)
       console.log('схема:', this.scheme)
       const filteredScheme =this.scheme.filter(e => {
-        console.log(e.semester_num, this.changes.semester, e.discipline, this.changes.discipline)
         if(e.semester_num === this.changes.semester && e.discipline === this.changes.discipline){
           return e
         }
       })
       console.log('Фильтрована схема', filteredScheme)
-      const forAdd=[];
+      const forAdd=[]
+      const forDelete = []
+
       this.changes.subjects.forEach(element => {
-      if(!this.scheme.find(e => element.id===e.eduprogcomp.id)){
-        forAdd.push(element)
-      }
-      });
+        if(!this.scheme.find(e => element.id===e.eduprogcomp.id)){
+          forAdd.push(element)
+        }
+      })
+      filteredScheme.forEach(element => {
+        if (!this.changes.subjects.find(e => e.id=== element.eduprogcomp.id)){
+          forDelete.push(element)
+        }
+      },
+      )
+
+      forAdd.forEach(element => {
+        const newComponent = {
+          discipline: this.changes.discipline,
+          semester_num: this.changes.semester,
+          eduprog_id: element.eduprog_id ,
+          eduprogcomp_id:element.id ,
+          credits_per_semester: 10
+        }
+        console.log('Елемент для создания', newComponent)
+        this.$emit('addComponentToScheme', newComponent)
+        console.log('bebra', this.scheme)
+      })
+      forDelete.forEach(element => {
+        console.log('Елемент для удаления', element)
+        this.$emit('deleteComponentFromSheme', element.id)
+      })
       console.log('Массив для добавления: ', forAdd)
-    }
+      console.log('Массив для delete: ', forDelete)
+    },
   },
 }
 </script>
