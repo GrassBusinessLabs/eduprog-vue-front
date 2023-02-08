@@ -227,22 +227,20 @@ export default {
         semester: '',
         discipline: '',
       },
-      selected:{
-        economy: [[],[],[],[],[],[],[],[]]
-      },
+      selected:{},
     }
   },
 mounted(){
-  // this.disciplines.forEach(el => {
-  //   this.selected[el]=[[],[],[],[],[],[],[],[]];
-  // })
-  // Object.keys(this.selected).map(key => {
-  //   this.selected[key].forEach((semester, index) =>{
-  //     this.selected[key][index].push(...this.getComponentByDiscipline(key, index+1))
-  //     //return [...this.getComponentByDiscipline(key, index+1)]
-  //   })
-  // })
-  // console.log(this.selected)
+  this.disciplines.forEach(el => {
+    this.selected[el]=[[],[],[],[],[],[],[],[]];
+  })
+  Object.keys(this.selected).map(key => {
+    this.selected[key].forEach((semester, index) =>{
+      this.selected[key][index].push(...this.getComponentByDiscipline(key, index+1))
+      //return [...this.getComponentByDiscipline(key, index+1)]
+    })
+  })
+  console.log(this.selected)
 },
   methods: {
     add() {
@@ -286,7 +284,7 @@ mounted(){
         }
       })
       array.map(e => {
-          e.title=e.eduprogcomp.name
+          e.name=e.eduprogcomp.name
           e.value=e.eduprogcomp.id
       })
       console.log(array)
