@@ -227,6 +227,13 @@ export default {
       },
     }
   },
+
+  computed:{
+    schemeData(){
+      return this.scheme
+    }
+  },
+
   methods: {
     add() {
       this.originalData = null
@@ -297,8 +304,9 @@ export default {
       const forAdd=[]
       const forDelete = []
 
+
       this.changes.subjects.forEach(element => {
-        if(!this.scheme.find(e => element.id===e.eduprogcomp.id)){
+        if(!filteredScheme.find(e => element.id===e.eduprogcomp.id)){
           forAdd.push(element)
         }
       })
@@ -306,8 +314,7 @@ export default {
         if (!this.changes.subjects.find(e => e.id=== element.eduprogcomp.id)){
           forDelete.push(element)
         }
-      },
-      )
+      },)
 
       forAdd.forEach(element => {
         const newComponent = {
@@ -327,6 +334,7 @@ export default {
       })
       console.log('Массив для добавления: ', forAdd)
       console.log('Массив для delete: ', forDelete)
+      console.log('Схема просто',this.scheme)
     },
   },
 }
