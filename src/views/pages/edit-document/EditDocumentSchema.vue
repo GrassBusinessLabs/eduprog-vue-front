@@ -76,7 +76,7 @@
             <span v-if="editIndex !== index">{{ item }}</span>
             <span v-if="editIndex === index">
               <input
-                v-model="item.DS"
+                v-model="disciplines[index]"
                 class="border-solid"
               >
             </span>
@@ -228,18 +228,11 @@ export default {
     }
   },
 
-  computed:{
-    schemeData(){
-      return this.scheme
-    }
-  },
-
   methods: {
     add() {
       this.originalData = null
-      this.itemsS.push({ DS: ' ', S1: '', S2: '', S3: '', S4: '', S5: '', S6: '', S7: '', S8: '' })
-      this.editIndex = this.itemsS.length - 1
-      console.log(this.disciplines)
+      this.disciplines.push('')
+      this.editIndex = this.disciplines.length - 1
     },
     edit(item, index) {
       this.originalData = Object.assign({}, item)

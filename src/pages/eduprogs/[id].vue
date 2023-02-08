@@ -26,9 +26,11 @@ const deleteComponent = ( async id => {
 })
 const addComponentToScheme = ( async payload => {
   await eduProgsStore.setComponentToScheme(payload)
+  await eduProgsStore.fetchScheme(route.params.id)
 })
 const deleteComponentFromSheme = ( async id => {
   await eduProgsStore.deleteComponentFromSheme(id)
+  await eduProgsStore.fetchScheme(route.params.id)
 })
 
 // tabs
