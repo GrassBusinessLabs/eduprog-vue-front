@@ -194,6 +194,7 @@
             <VRow>
               <VCol cols="12">
                 <VCombobox
+                  v-if="Object.keys(this.selected).length"
                   :items="getSubjects()"
                   item-title="name"
                   item-value="id"
@@ -201,6 +202,7 @@
                   small-chips
                   @update:modelValue="handleSubject($event, semester, item)"
                   @blur="closeCombobox"
+                  v-model="selected[item][semester]"
                 />
               </VCol>
             </VRow>
@@ -225,14 +227,36 @@ export default {
         semester: '',
         discipline: '',
       },
+      selected:{
+        economy: [[],[],[],[],[],[],[],[]]
+      },
     }
   },
-
+mounted(){
+  // this.disciplines.forEach(el => {
+  //   this.selected[el]=[[],[],[],[],[],[],[],[]];
+  // })
+  // Object.keys(this.selected).map(key => {
+  //   this.selected[key].forEach((semester, index) =>{
+  //     this.selected[key][index].push(...this.getComponentByDiscipline(key, index+1))
+  //     //return [...this.getComponentByDiscipline(key, index+1)]
+  //   })
+  // })
+  // console.log(this.selected)
+},
   methods: {
     add() {
+      // this.selected.forEach(element=>{
+      //   element.forEach(e =>{
+      //     if(getComponentByDiscipline(element, e+1)){
+      //       element[e].push(getComponentByDiscipline(element, e+1))
+      //     }
+      //   })
+      // })
+      console.log(this.selected)
       this.originalData = null
       this.disciplines.push('')
-      this.editIndex = this.disciplines.length - 1
+      this.editIndex = this.disciplines.length
     },
     edit(item, index) {
       this.originalData = Object.assign({}, item)
@@ -258,12 +282,12 @@ export default {
     getComponentByDiscipline(discipline, semestr){
       let array = this.scheme.filter(e => {
         if(e.discipline===discipline && e.semester_num === semestr){
-          return e
+          return e.eduprogcomp.name
         }
       })
       array.map(e => {
-        e.title=e.eduprogcomp.name
-        e.value=e.eduprogcomp.id
+          e.title=e.eduprogcomp.name
+          e.value=e.eduprogcomp.id
       })
       console.log(array)
       
@@ -286,8 +310,7 @@ export default {
       // })
     },
     closeCombobox(){
-      console.log(this.changes)
-      console.log('схема:', this.scheme)
+      console.log('селектед:', this.selected)
       const filteredScheme =this.scheme.filter(e => {
         if(e.semester_num === this.changes.semester && e.discipline === this.changes.discipline){
           return e
@@ -317,17 +340,16 @@ export default {
           eduprogcomp_id:element.id ,
           credits_per_semester: 10
         }
-        console.log('Елемент для создания', newComponent)
+        //console.log('Елемент для создания', newComponent)
         this.$emit('addComponentToScheme', newComponent)
-        console.log('bebra', this.scheme)
       })
       forDelete.forEach(element => {
-        console.log('Елемент для удаления', element)
+        //console.log('Елемент для удаления', element)
         this.$emit('deleteComponentFromSheme', element.id)
       })
-      console.log('Массив для добавления: ', forAdd)
-      console.log('Массив для delete: ', forDelete)
-      console.log('Схема просто',this.scheme)
+      // console.log('Массив для добавления: ', forAdd)
+      // console.log('Массив для delete: ', forDelete)
+      // console.log('Схема просто',this.scheme)
     },
   },
 }
