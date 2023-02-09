@@ -285,7 +285,7 @@ mounted(){
       })
       array.map(e => {
           e.name=e.eduprogcomp.name
-          e.value=e.eduprogcomp.id
+          e.id=e.eduprogcomp.id
       })
       console.log(array)
       
