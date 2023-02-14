@@ -36,7 +36,6 @@ const createEduProg =( async() => {
   dialogCreate.value=false
   await eduProgsStore.fetchEduProgs()
 })
-
 // const createEduProg =( async() => {
 //   console.log(newEduProg)
 //   await eduProgsStore.createEduProg(newEduProg)
@@ -179,7 +178,7 @@ const newEduProg = ref({
   </VDialog>
 
 
-  <VTable>
+  <VTable v-if="eduProgs.length>0">
     <thead>
       <tr>
         <th class="text-uppercase">
@@ -254,10 +253,7 @@ const newEduProg = ref({
                   />
                 </template>
 
-
-                <VListItemTitle >
-                  Перейменувати
-                </VListItemTitle>
+                <VListItemTitle @click="renameEduProgDialog(item)">Перейменувати</VListItemTitle>
               </VListItem>
               <VListItem link  @click="deleteEduProgDialog(item)">
                 <template #prepend>
@@ -268,9 +264,7 @@ const newEduProg = ref({
                   />
                 </template>
 
-                <VListItemTitle>
-                  Видалити
-                </VListItemTitle>
+                <VListItemTitle @click="deleteEduProgDialog(item)">Видалити</VListItemTitle>
               </VListItem>
             </VList>
           </VMenu>
@@ -278,13 +272,18 @@ const newEduProg = ref({
       </tr>
     </tbody>
   </VTable>
-
-
-  <VDialog
-    v-model="dialogRename"
-    persistent
-    max-width="600"
+  <v-alert
+  border="left"
+  text
+  type="info"
+  prominent
+  v-else
   >
+  Поки що не створено жодної освітньо-професійної програми.
+  </v-alert>
+  <VDialog v-model="dialogRename"
+            persistent
+           max-width="600">
     <VCard>
       <VCardTitle>Перейменувати ОПП</VCardTitle>
       <VCardText>

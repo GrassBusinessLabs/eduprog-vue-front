@@ -5,20 +5,33 @@ const userStore = useUserStore()
 onMounted( async () => {
     await userStore.fetchUserData()
 })
+const oneDigitRegex = ".*\\d+.*"
 const changePassword =( async() => {
-  if(
-    confirmPassword.value == newPassword.value 
-    // &&
-    // newPassword.value.length >= 8 &&
-    // newPasswords.matches(".*[a-z]+.*") &&
-    // newPasswords.matches(".*[0-9]+.*")
+  const oneLetterRegex = ".*[a-z].*"
+  if(confirmPassword.value != newPassword.value) {
+    isPasswordErrorVisible.value = true
+    passwordErrorText.value = "Паролі не співпадають"
+  } else if(
+    newPassword.value.length < 8 ||
+    !newPassword.value.match(oneLetterRegex) ||
+    !newPassword.value.match(oneDigitRegex)
   ) {
-    await userStore.changePassword(currentPassword.value, newPassword.value)
-    await userStore.fetchUserData()
-    newPassword.value=''
-    confirmPassword.value=''
-    currentPassword.value=''
+    isPasswordErrorVisible.value = true
+    passwordErrorText.value = "Пароль не відповідає вимогам"
+  } else if(currentPassword.value == newPassword.value){
+    isPasswordErrorVisible.value = true
+    passwordErrorText.value = "Старий та новий пароль співпадають"
   } else {
+    try {
+      await userStore.changePassword(currentPassword.value, newPassword.value)
+      await userStore.fetchUserData()
+      newPassword.value=''
+      confirmPassword.value=''
+      currentPassword.value=''
+    } catch(error) {
+      isPasswordErrorVisible.value = true
+      passwordErrorText.value = "Невірний старий пароль"
+    }
   }
 })
 const userData = computed(() => userStore.getUserData)
@@ -34,11 +47,23 @@ const passwordRequirements = [
   'Принаймні один малий регістр',
   'Принаймні одне число, символ або пробіл',
 ]
+const isPasswordErrorVisible = ref(false)
+const passwordErrorText = ref('')
+const isNameErrorVisible = ref(false)
+const nameErrorText = ref('')
 const newName = ref('')
 const changeName =( async() => {
-  await userStore.changeUserName(newName.value)
-  await userStore.fetchUserData()
-  newName.value=''
+  if(newName.value.length < 3) {
+    isNameErrorVisible.value = true
+    nameErrorText.value = "Ім'я занадто коротке"
+  } else if(newName.value.match(oneDigitRegex)) {
+    isNameErrorVisible.value = true
+    nameErrorText.value = "Ім'я не повинно містити цифр"
+  } else {
+    await userStore.changeUserName(newName.value)
+    await userStore.fetchUserData()
+    newName.value=''
+  }
 })
 // const changeAvatar = file => {
 //   const fileReader = new FileReader()
@@ -144,8 +169,18 @@ const changeName =( async() => {
               >
                 <VTextField
                   label="Введіть сюди нове ім'я"
+                  @input='isNameErrorVisible = false'
                   v-model="newName"
                 />
+              
+                <div class='mt-4'>
+                  <VAlert 
+                    type="error" 
+                    :class="isNameErrorVisible ? 'd-flex' : 'd-none'"
+                  >
+                    {{ unref(nameErrorText) }}
+                  </VAlert>
+                </div>
               </VCol>
 
 
@@ -179,6 +214,7 @@ const changeName =( async() => {
                   :append-inner-icon="isCurrentPasswordVisible ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
                   label="Старий пароль"
                   @click:append-inner="isCurrentPasswordVisible = !isCurrentPasswordVisible"
+                  @input='isPasswordErrorVisible = false'
                 />
               </VCol>
             </VRow>
@@ -196,9 +232,10 @@ const changeName =( async() => {
                   :append-inner-icon="isNewPasswordVisible ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
                   label="Новий пароль"
                   @click:append-inner="isNewPasswordVisible = !isNewPasswordVisible"
+                  @input='isPasswordErrorVisible = false'
                 />
               </VCol>
-
+                
               <VCol
                 cols="12"
                 md="6"
@@ -210,9 +247,19 @@ const changeName =( async() => {
                   :append-inner-icon="isConfirmPasswordVisible ? 'mdi-eye-off-outline' : 'mdi-eye-outline'"
                   label="Повторіть пароль"
                   @click:append-inner="isConfirmPasswordVisible = !isConfirmPasswordVisible"
+                  @input='isPasswordErrorVisible = false'
                 />
               </VCol>
             </VRow>
+
+            <div class='mt-4'>
+              <VAlert 
+                type="error" 
+                :class="isPasswordErrorVisible ? 'd-flex' : 'd-none'"
+              >
+                {{ unref(passwordErrorText) }}
+              </VAlert>
+            </div>
           </VCardText>
 
           <!-- 👉 Password Requirements -->
