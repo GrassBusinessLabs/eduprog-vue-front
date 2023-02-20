@@ -224,15 +224,16 @@
         :list="selected[item][semester]"
         :disabled="!enabled"
         item-key="name"
-        class="v-card"
+        class="slot-for-components"
         ghost-class="ghost"
         group='people'
         @start="dragging = true"
         @end="dragging = false"
+        @add="addNewComponent($event, item, semester)"
       >
         <template #item="{ element }">
           <div :class="{ 'not-draggable': !enabled }">
-             <v-chip class="mb-2">
+             <v-chip class="my-2" closable @click:close="deleteComponent($event)">
               {{ element.name }}
             </v-chip>
           </div>
@@ -284,6 +285,22 @@ mounted(){
   console.log(this.selected)
 },
   methods: {
+    addNewComponent(event, discipline, semester){
+      const componentData = event.item.__draggable_context.element;
+      const newComponent = {
+          discipline: discipline,
+          semester_num: semester+1,
+          eduprog_id: componentData.eduprog_id ,
+          eduprogcomp_id: componentData.id ,
+          credits_per_semester: 10
+      }
+      console.log(componentData)
+      console.log(newComponent)
+      this.$emit('addComponentToScheme', newComponent)
+    },
+    deleteComponent(event){
+      console.log(event)
+    },
     add() {
       // this.selected.forEach(element=>{
       //   element.forEach(e =>{
@@ -393,10 +410,7 @@ mounted(){
 }
 </script>
 <style scoped>
-.list-item{
-  background: #f7f7f8;
-  margin: 10px 0;
-  padding: 10px;
-  width: 100%;
+.slot-for-components{
+ height: 100%;
 }
 </style>
