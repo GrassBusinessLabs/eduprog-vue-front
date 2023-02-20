@@ -12,9 +12,9 @@ const router = createRouter({
 })
 
 router.beforeEach(function(to, from, next){
-  // if(to.fullPath==="/"){
-  //   next('/home')
-  // }
+  if(to.fullPath==="/"){
+     next('/home')
+  }
   if(to.meta.requiresUnAuth && localStorage.getItem('token')){
     next('/home')
   }
