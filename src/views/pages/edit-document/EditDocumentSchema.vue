@@ -1,4 +1,33 @@
 <template>
+
+  <VRow>
+  <VCol cols="2">
+      <VCard title="Всі предмети" class="mb-5">
+        <VCardText cols="12">
+      <draggable
+        :list="getSubjects()"
+        :disabled="!enabled"
+        item-key="name"
+        class="list-group"
+        ghost-class="ghost"
+        :group="{ name: 'people', pull: function (to, from) {
+          return to.el.children.length < 2 || 'clone';
+        }, 
+        put: false }"
+        @start="dragging = true"
+        @end="dragging = false"
+      >
+        <template #item="{ element }">
+          <div class="list-item" :class="{ 'not-draggable': !enabled }">
+            {{ element.name }}
+          </div>
+        </template>
+      </draggable>
+        </VCardText>
+
+      </VCard>
+  </VCol>
+  <VCol>
   <VTable>
     <thead>
       <tr>
@@ -193,17 +222,23 @@
           <VContainer fluid>
             <VRow>
               <VCol cols="12">
-                <VCombobox
-                  v-if="Object.keys(this.selected).length"
-                  :items="getSubjects()"
-                  item-title="name"
-                  item-value="id"
-                  multiple
-                  small-chips
-                  @update:modelValue="handleSubject($event, semester, item)"
-                  @blur="closeCombobox"
-                  v-model="selected[item][semester]"
-                />
+                <draggable
+                 v-if="Object.keys(this.selected).length"
+        :list="selected[item][semester]"
+        :disabled="!enabled"
+        item-key="name"
+        class="list-group"
+        ghost-class="ghost"
+        group='people'
+        @start="dragging = true"
+        @end="dragging = false"
+      >
+        <template #item="{ element }">
+          <div class="list-item" :class="{ 'not-draggable': !enabled }">
+            {{ element.name }}
+          </div>
+        </template>
+      </draggable>
               </VCol>
             </VRow>
           </VContainer>
@@ -211,10 +246,17 @@
       </tr>
     </tbody>
   </VTable>
+  </VCol>
+  </VRow>
 </template>
 
 <script>
+import draggable from "vuedraggable";
+import MyComponent from './MyComponent.vue'
 export default {
+  components: {
+    draggable
+  },
   props: ['scheme', 'components'],
   data() {
     return {
@@ -228,9 +270,12 @@ export default {
         discipline: '',
       },
       selected:{},
+      enabled: true,
+      dragging: false
     }
   },
 mounted(){
+  console.log("компоненты", this.components)
   this.disciplines.forEach(el => {
     this.selected[el]=[[],[],[],[],[],[],[],[]];
   })
@@ -287,8 +332,7 @@ mounted(){
           e.name=e.eduprogcomp.name
           e.id=e.eduprogcomp.id
       })
-      console.log(array)
-      
+      console.log("Масив по дисицпление",array)
       return array
     },
     getSubjects(){
@@ -346,9 +390,17 @@ mounted(){
         this.$emit('deleteComponentFromSheme', element.id)
       })
       // console.log('Массив для добавления: ', forAdd)
-      // console.log('Массив для delete: ', forDelete)
+      console.log('Массив для delete: ', forDelete)
       // console.log('Схема просто',this.scheme)
     },
   },
 }
 </script>
+<style scoped>
+.list-item{
+  background: #f7f7f8;
+  margin: 10px 0;
+  padding: 10px;
+  width: 100%;
+}
+</style>

@@ -12,8 +12,11 @@ const router = createRouter({
 })
 
 router.beforeEach(function(to, from, next){
+  // if(to.fullPath==="/"){
+  //   next('/home')
+  // }
   if(to.meta.requiresUnAuth && localStorage.getItem('token')){
-    next('/')
+    next('/home')
   }
   else if(to.meta.requiresAuth && !localStorage.getItem('token')){
     next('/login')
