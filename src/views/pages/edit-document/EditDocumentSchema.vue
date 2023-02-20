@@ -1,5 +1,4 @@
 <template>
-
   <VRow>
   <VCol cols="2">
       <VCard title="Всі предмети" class="mb-5">
@@ -10,16 +9,17 @@
         item-key="name"
         class="list-group"
         ghost-class="ghost"
-        :group="{ name: 'people', pull: function (to, from) {
-          return to.el.children.length < 2 || 'clone';
-        }, 
+        :group="{ name: 'people', pull: true, 
         put: false }"
         @start="dragging = true"
         @end="dragging = false"
+        :sort="false"
       >
         <template #item="{ element }">
-          <div class="list-item" :class="{ 'not-draggable': !enabled }">
-            {{ element.name }}
+          <div :class="{ 'not-draggable': !enabled }">
+            <v-chip class="mb-2">
+              {{ element.name }}
+            </v-chip>
           </div>
         </template>
       </draggable>
@@ -219,29 +219,25 @@
           v-for="semester in semesters"
           :key="semester"
         >
-          <VContainer fluid>
-            <VRow>
-              <VCol cols="12">
                 <draggable
                  v-if="Object.keys(this.selected).length"
         :list="selected[item][semester]"
         :disabled="!enabled"
         item-key="name"
-        class="list-group"
+        class="v-card"
         ghost-class="ghost"
         group='people'
         @start="dragging = true"
         @end="dragging = false"
       >
         <template #item="{ element }">
-          <div class="list-item" :class="{ 'not-draggable': !enabled }">
-            {{ element.name }}
+          <div :class="{ 'not-draggable': !enabled }">
+             <v-chip class="mb-2">
+              {{ element.name }}
+            </v-chip>
           </div>
         </template>
       </draggable>
-              </VCol>
-            </VRow>
-          </VContainer>
         </td>
       </tr>
     </tbody>
