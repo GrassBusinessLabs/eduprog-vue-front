@@ -1,258 +1,253 @@
 <template>
   <VRow>
-  <VCol cols="2">
-      <VCard title="Всі предмети" class="mb-5">
+    <VCol cols="2">
+      <VCard
+        title="Всі предмети"
+        class="mb-5"
+      >
         <VCardText cols="12">
-      <draggable
-        :list="getSubjects()"
-        :disabled="!enabled"
-        item-key="name"
-        class="list-group"
-        ghost-class="ghost"
-        :group="{ name: 'people', pull: true, 
-        put: false }"
-        @start="dragging = true"
-        @end="dragging = false"
-        :sort="false"
-      >
-        <template #item="{ element }">
-          <div :class="{ 'not-draggable': !enabled }">
-            <v-chip class="mb-2">
-              {{ element.name }}
-            </v-chip>
-          </div>
-        </template>
-      </draggable>
+          <draggable
+            :list="getSubjects()"
+            :disabled="!enabled"
+            item-key="name"
+            class="list-group"
+            ghost-class="ghost"
+            :group="{ name: 'people', pull: true, put: false }"
+            @start="dragging = true"
+            @end="dragging = false"
+            :sort="false"
+          >
+            <template #item="{ element }">
+              <div :class="{ 'not-draggable': !enabled }">
+                <v-chip class="mb-2">
+                  {{ element.name }}
+                </v-chip>
+              </div>
+            </template>
+          </draggable>
         </VCardText>
-
       </VCard>
-  </VCol>
-  <VCol>
-  <VTable>
-    <thead>
-      <tr>
-        <th
-          rowspan="2"
-          class="text-center"
-        >
-          <p>Дисципліни</p>
-          <VBtn
-            icon="mdi-plus"
-            size="x-small"
-            @click="add"
-          />
-        </th>
-        <th
-          colspan="2"
-          class="text-center"
-        >
-          1 курс
-        </th>
-        <th
-          colspan="2"
-          class="text-center"
-        >
-          2 курс
-        </th>
-        <th
-          colspan="2"
-          class="text-center"
-        >
-          3 курс
-        </th>
-        <th
-          colspan="2"
-          class="text-center"
-        >
-          4 курс
-        </th>
-      </tr>
+    </VCol>
+    <VCol>
+      <VTable>
+        <thead>
+          <tr>
+            <th
+              rowspan="2"
+              class="text-center"
+            >
+              <p>Дисципліни</p>
+              <VBtn
+                icon="mdi-plus"
+                size="x-small"
+                @click="add"
+              />
+            </th>
+            <th
+              colspan="2"
+              class="text-center"
+            >
+              1 курс
+            </th>
+            <th
+              colspan="2"
+              class="text-center"
+            >
+              2 курс
+            </th>
+            <th
+              colspan="2"
+              class="text-center"
+            >
+              3 курс
+            </th>
+            <th
+              colspan="2"
+              class="text-center"
+            >
+              4 курс
+            </th>
+          </tr>
 
-      <tr>
-        <th class="text-center">
-          1 семестр
-        </th>
-        <th class="text-center">
-          2 семестр
-        </th>
-        <th class="text-center">
-          3 семестр
-        </th>
-        <th class="text-center">
-          4 семестр
-        </th>
-        <th class="text-center">
-          5 семестр
-        </th>
-        <th class="text-center">
-          6 семестр
-        </th>
-        <th class="text-center">
-          7 семестр
-        </th>
-        <th class="text-center">
-          8 семестр
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        v-for="(item, index) in disciplines"
-        :key="index"
-      >
-        <td>
-          <div style="text-align: center">
-            <span v-if="editIndex !== index">{{ item }}</span>
-            <span v-if="editIndex === index">
-              <input
-                v-model="disciplines[index]"
-                class="border-solid"
-              >
-            </span>
-          </div>
-          <div style="text-align: center; margin-top: 5%; margin-bottom: 5%">
-            <span v-if="editIndex !== index">
-              <VMenu
-                bottom
-                left
-                activator="parent"
-              >
-                <template #activator="{ on, attrs }">
-                  <VBtn
-                    dark
-                    icon
-                    v-bind="attrs"
-                    :shaped="false"
-                    size="x-small"
-                    v-on="on"
+          <tr>
+            <th class="text-center">1 семестр</th>
+            <th class="text-center">2 семестр</th>
+            <th class="text-center">3 семестр</th>
+            <th class="text-center">4 семестр</th>
+            <th class="text-center">5 семестр</th>
+            <th class="text-center">6 семестр</th>
+            <th class="text-center">7 семестр</th>
+            <th class="text-center">8 семестр</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="(item, index) in disciplines"
+            :key="index"
+          >
+            <td>
+              <div style="text-align: center">
+                <span v-if="editIndex !== index">{{ item }}</span>
+                <span v-if="editIndex === index">
+                  <input
+                    v-model="disciplines[index]"
+                    class="border-solid"
+                  />
+                </span>
+              </div>
+              <div style="text-align: center; margin-top: 5%; margin-bottom: 5%">
+                <span v-if="editIndex !== index">
+                  <VMenu
+                    bottom
+                    left
+                    activator="parent"
                   >
-                    <VIcon>mdi-dots-horizontal</VIcon>
-                  </VBtn>
+                    <template #activator="{ on, attrs }">
+                      <VBtn
+                        dark
+                        icon
+                        v-bind="attrs"
+                        :shaped="false"
+                        size="x-small"
+                        v-on="on"
+                      >
+                        <VIcon>mdi-dots-horizontal</VIcon>
+                      </VBtn>
+                    </template>
+
+                    <VList>
+                      <VListItem
+                        link
+                        @click="edit(item, index)"
+                      >
+                        <template #prepend>
+                          <VIcon
+                            class="me-2"
+                            icon="mdi-pencil"
+                            size="22"
+                          />
+                        </template>
+
+                        <VListItemTitle> Редагувати </VListItemTitle>
+                      </VListItem>
+                      <VListItem
+                        link
+                        @click="remove(item, index)"
+                      >
+                        <template #prepend>
+                          <VIcon
+                            class="me-2"
+                            icon="mdi-trash-can"
+                            size="22"
+                          />
+                        </template>
+
+                        <VListItemTitle> Видалити </VListItemTitle>
+                      </VListItem>
+                    </VList>
+                  </VMenu>
+                </span>
+                <span v-else>
+                  <VMenu
+                    bottom
+                    left
+                    activator="parent"
+                  >
+                    <template #activator="{ on, attrs }">
+                      <VBtn
+                        dark
+                        icon
+                        v-bind="attrs"
+                        :shaped="false"
+                        size="x-small"
+                        v-on="on"
+                      >
+                        <VIcon>mdi-dots-horizontal</VIcon>
+                      </VBtn>
+                    </template>
+
+                    <VList>
+                      <VListItem
+                        link
+                        @click="save(item)"
+                      >
+                        <template #prepend>
+                          <VIcon
+                            class="me-2"
+                            icon="mdi-pencil"
+                            size="22"
+                          />
+                        </template>
+
+                        <VListItemTitle> Зберегти </VListItemTitle>
+                      </VListItem>
+                      <VListItem
+                        link
+                        @click="cancel(item)"
+                      >
+                        <template #prepend>
+                          <VIcon
+                            class="me-2"
+                            icon="mdi-trash-can"
+                            size="22"
+                          />
+                        </template>
+
+                        <VListItemTitle> Відмінити </VListItemTitle>
+                      </VListItem>
+                    </VList>
+                  </VMenu>
+                </span>
+              </div>
+            </td>
+            <td
+              v-for="semester in semesters"
+              :key="semester"
+            >
+              <draggable
+                v-if="Object.keys(this.selected).length"
+                :list="selected[item][semester]"
+                :disabled="!enabled"
+                item-key="name"
+                class="slot-for-components"
+                ghost-class="ghost"
+                :group="{
+                  name: 'people',
+                  put: function (to, from) {
+                    return from.el.children.length < 2 || true
+                  },
+                }"
+                @change="checkPut(event)"
+                @start="dragging = true"
+                @end="dragging = false"
+                @add="addNewComponent($event, item, semester)"
+              >
+                <template #item="{ element }">
+                  <div :class="{ 'not-draggable': !enabled }">
+                    <v-chip
+                      class="my-2"
+                      closable
+                      @click:close="deleteComponent($event, element)"
+                    >
+                      {{ element.name }}
+                    </v-chip>
+                  </div>
                 </template>
-
-                <VList>
-                  <VListItem
-                    link
-                    @click="edit(item, index)"
-                  >
-                    <template #prepend>
-                      <VIcon
-                        class="me-2"
-                        icon="mdi-pencil"
-                        size="22"
-                      />
-                    </template>
-
-                    <VListItemTitle> Редагувати </VListItemTitle>
-                  </VListItem>
-                  <VListItem
-                    link
-                    @click="remove(item, index)"
-                  >
-                    <template #prepend>
-                      <VIcon
-                        class="me-2"
-                        icon="mdi-trash-can"
-                        size="22"
-                      />
-                    </template>
-
-                    <VListItemTitle> Видалити </VListItemTitle>
-                  </VListItem>
-                </VList>
-              </VMenu>
-            </span>
-            <span v-else>
-              <VMenu
-                bottom
-                left
-                activator="parent"
-              >
-                <template #activator="{ on, attrs }">
-                  <VBtn
-                    dark
-                    icon
-                    v-bind="attrs"
-                    :shaped="false"
-                    size="x-small"
-                    v-on="on"
-                  >
-                    <VIcon>mdi-dots-horizontal</VIcon>
-                  </VBtn>
-                </template>
-
-                <VList>
-                  <VListItem
-                    link
-                    @click="save(item)"
-                  >
-                    <template #prepend>
-                      <VIcon
-                        class="me-2"
-                        icon="mdi-pencil"
-                        size="22"
-                      />
-                    </template>
-
-                    <VListItemTitle> Зберегти </VListItemTitle>
-                  </VListItem>
-                  <VListItem
-                    link
-                    @click="cancel(item)"
-                  >
-                    <template #prepend>
-                      <VIcon
-                        class="me-2"
-                        icon="mdi-trash-can"
-                        size="22"
-                      />
-                    </template>
-
-                    <VListItemTitle> Відмінити </VListItemTitle>
-                  </VListItem>
-                </VList>
-              </VMenu>
-            </span>
-          </div>
-        </td>
-        <td
-          v-for="semester in semesters"
-          :key="semester"
-        >
-                <draggable
-                 v-if="Object.keys(this.selected).length"
-        :list="selected[item][semester]"
-        :disabled="!enabled"
-        item-key="name"
-        class="slot-for-components"
-        ghost-class="ghost"
-        group='people'
-        @start="dragging = true"
-        @end="dragging = false"
-        @add="addNewComponent($event, item, semester)"
-      >
-        <template #item="{ element }">
-          <div :class="{ 'not-draggable': !enabled }">
-             <v-chip class="my-2" closable @click:close="deleteComponent($event)">
-              {{ element.name }}
-            </v-chip>
-          </div>
-        </template>
-      </draggable>
-        </td>
-      </tr>
-    </tbody>
-  </VTable>
-  </VCol>
+              </draggable>
+            </td>
+          </tr>
+        </tbody>
+      </VTable>
+    </VCol>
   </VRow>
 </template>
 
 <script>
-import draggable from "vuedraggable";
+import draggable from 'vuedraggable'
 import MyComponent from './MyComponent.vue'
 export default {
   components: {
-    draggable
+    draggable,
   },
   props: ['scheme', 'components'],
   data() {
@@ -260,46 +255,55 @@ export default {
       editIndex: null,
       originalData: null,
       disciplines: [...new Set(this.scheme.map(e => e.discipline))],
-      semesters:[...Array(8).keys()],
+      semesters: [...Array(8).keys()],
       changes: {
         subjects: [],
         semester: '',
         discipline: '',
       },
-      selected:{},
+      selected: {},
       enabled: true,
-      dragging: false
+      dragging: false,
     }
   },
-mounted(){
-  console.log("компоненты", this.components)
-  this.disciplines.forEach(el => {
-    this.selected[el]=[[],[],[],[],[],[],[],[]];
-  })
-  Object.keys(this.selected).map(key => {
-    this.selected[key].forEach((semester, index) =>{
-      this.selected[key][index].push(...this.getComponentByDiscipline(key, index+1))
-      //return [...this.getComponentByDiscipline(key, index+1)]
-    })
-  })
-  console.log(this.selected)
-},
+  mounted() {
+    console.log('компоненты', this.components)
+    this.initData()
+  },
   methods: {
-    addNewComponent(event, discipline, semester){
-      const componentData = event.item.__draggable_context.element;
+    initData(){
+    this.selected={}
+    this.disciplines.forEach(el => {
+      this.selected[el] = [[], [], [], [], [], [], [], []]
+    })
+      Object.keys(this.selected).map(key => {
+      this.selected[key].forEach((semester, index) => {
+        this.selected[key][index].push(...this.getComponentByDiscipline(key, index + 1))
+      })
+    })
+    },
+    checkPut(event) {
+      console.log('Чекаем', event)
+    },
+    addNewComponent(event, discipline, semester) {
+      console.log("Ивент", event)
+      const componentData = event.item.__draggable_context.element
       const newComponent = {
-          discipline: discipline,
-          semester_num: semester+1,
-          eduprog_id: componentData.eduprog_id ,
-          eduprogcomp_id: componentData.id ,
-          credits_per_semester: 10
+        discipline: discipline,
+        semester_num: semester + 1,
+        eduprog_id: componentData.eduprog_id,
+        eduprogcomp_id: componentData.id,
+        credits_per_semester: 10,
       }
       console.log(componentData)
       console.log(newComponent)
       this.$emit('addComponentToScheme', newComponent)
+      console.log('Схема', this.scheme)
+      this.initData()
     },
-    deleteComponent(event){
-      console.log(event)
+    deleteComponent(event, element) {
+      console.log(event, element)
+      this.$emit('deleteComponentFromSheme', element.id)
     },
     add() {
       // this.selected.forEach(element=>{
@@ -335,25 +339,24 @@ mounted(){
       this.originalData = null
       this.editIndex = null
     },
-    getComponentByDiscipline(discipline, semestr){
+    getComponentByDiscipline(discipline, semestr) {
       let array = this.scheme.filter(e => {
-        if(e.discipline===discipline && e.semester_num === semestr){
+        if (e.discipline === discipline && e.semester_num === semestr) {
           return e.eduprogcomp.name
         }
       })
       array.map(e => {
-          e.name=e.eduprogcomp.name
-          e.id=e.eduprogcomp.id
+        e.name = e.eduprogcomp.name
       })
-      console.log("Масив по дисицпление",array)
+      console.log('Масив по дисицпление', array)
       return array
     },
-    getSubjects(){
+    getSubjects() {
       return this.components.mandatory.concat(this.components.selective)
     },
-    handleSubject(event, semester, discipline){
+    handleSubject(event, semester, discipline) {
       this.changes.subjects = event
-      this.changes.semester = semester+1
+      this.changes.semester = semester + 1
       this.changes.discipline = discipline
 
       // console.log(event, discipline, semester+1)
@@ -364,36 +367,35 @@ mounted(){
       //   }
       // })
     },
-    closeCombobox(){
+    closeCombobox() {
       console.log('селектед:', this.selected)
-      const filteredScheme =this.scheme.filter(e => {
-        if(e.semester_num === this.changes.semester && e.discipline === this.changes.discipline){
+      const filteredScheme = this.scheme.filter(e => {
+        if (e.semester_num === this.changes.semester && e.discipline === this.changes.discipline) {
           return e
         }
       })
       console.log('Фильтрована схема', filteredScheme)
-      const forAdd=[]
+      const forAdd = []
       const forDelete = []
 
-
       this.changes.subjects.forEach(element => {
-        if(!filteredScheme.find(e => element.id===e.eduprogcomp.id)){
+        if (!filteredScheme.find(e => element.id === e.eduprogcomp.id)) {
           forAdd.push(element)
         }
       })
       filteredScheme.forEach(element => {
-        if (!this.changes.subjects.find(e => e.id=== element.eduprogcomp.id)){
+        if (!this.changes.subjects.find(e => e.id === element.eduprogcomp.id)) {
           forDelete.push(element)
         }
-      },)
+      })
 
       forAdd.forEach(element => {
         const newComponent = {
           discipline: this.changes.discipline,
           semester_num: this.changes.semester,
-          eduprog_id: element.eduprog_id ,
-          eduprogcomp_id:element.id ,
-          credits_per_semester: 10
+          eduprog_id: element.eduprog_id,
+          eduprogcomp_id: element.id,
+          credits_per_semester: 10,
         }
         //console.log('Елемент для создания', newComponent)
         this.$emit('addComponentToScheme', newComponent)
@@ -410,7 +412,7 @@ mounted(){
 }
 </script>
 <style scoped>
-.slot-for-components{
- height: 100%;
+.slot-for-components {
+  height: 100%;
 }
 </style>
