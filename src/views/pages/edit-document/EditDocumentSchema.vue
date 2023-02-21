@@ -7,7 +7,7 @@
       >
         <VCardText cols="12">
           <draggable
-            :list="components.mandatory"
+            :list="getSubjects()"
             :disabled="!enabled"
             item-key="name"
             class="list-group"
@@ -213,7 +213,9 @@
                 ghost-class="ghost"
                 :group="{
                   name: 'people',
-                  put: true
+                  put: function (to, from) {
+                    return from.el.children.length < 2 || true
+                  },
                 }"
                 @change="checkPut(event)"
                 @start="dragging = true"
@@ -297,6 +299,7 @@ export default {
       console.log(newComponent)
       this.$emit('addComponentToScheme', newComponent)
       console.log('Схема', this.scheme)
+      this.initData()
     },
     deleteComponent(event, element) {
       console.log(event, element)
