@@ -474,6 +474,7 @@ const newComponent = {
   eduprog_id: +props.eduProgId,
 }
 
+
 function createComponent() {
   emit('createComponent',  newComponent.value)
   dialogCreate.value = false
