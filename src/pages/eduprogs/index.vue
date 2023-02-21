@@ -19,12 +19,6 @@ let currentEduProg = null
 let newNameEduProg = ref(null)
 const eduProgs = computed(() => eduProgsStore.getEduProgs)
 
-
-
-const deleteEduProg =( async(id) => {
-  await eduProgsStore.deleteEduProg(id)
-  await eduProgsStore.fetchEduProgs()
-})
 const editNameEduProg =( async() => {
   currentEduProg.name = newNameEduProg.value
   await eduProgsStore.editNameEduProg(currentEduProg, currentEduProg.id)

@@ -22,7 +22,7 @@
           <VBtn
             icon="mdi-plus"
             size="x-small"
-            @click="dialogCreate.value = true"
+            @click="changeDialog"
           />
         </th>
       </tr>
@@ -196,202 +196,6 @@
       </tr>
     </thead>
   </VTable>
-  <VTable>
-    <!-- Вибірковий компонент -->
-
-    <thead>
-      <tr>
-        <th
-          style="text-align: center"
-          colspan="4"
-        >
-          <h3>
-            Вибірковий компонент ОП
-          </h3>
-        </th>
-        <th>
-          <VBtn
-            icon="mdi-plus"
-            size="x-small"
-            @click="add_VB"
-          />
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        v-for="(item, index) in itemsVB"
-        :key="index"
-      >
-        <td
-          style="text-align: center"
-          colspan="4"
-        >
-          {{ 'Вибірковий блок ' + (index +1) }}( <input
-            class="border-solid"
-            style="width: 15%"
-          > )
-        </td>
-        <td>
-          <VBtn
-            icon="mdi-plus"
-            size="x-small"
-            @click="add_VB"
-          />
-        </td>
-      </tr>
-    </tbody>
-    <tbody>
-      <tr
-        v-for="(item, index) in itemsVB"
-        :key="index"
-      >
-        <td>{{ 'ВБ ' + (index +1) }}</td>
-        <td>
-          <span v-if="editIndex !== index">{{ item.COP_VB }}</span>
-          <span v-if="editIndex === index">
-            <input
-              v-model="item.COP_VB"
-              class="border-solid"
-            >
-          </span>
-        </td>
-        <td>
-          <span v-if="editIndex !== index">{{ item.credit_COP_VB }}</span>
-          <span v-if="editIndex === index">
-            <input
-              v-model="item.credit_COP_VB"
-              type="number"
-              class="border-solid"
-            >
-          </span>
-        </td>
-        <td>
-          <span v-if="editIndex !== index">{{ item.FC_COP_VB }}</span>
-          <span v-if="editIndex === index">
-            <input
-              v-model="item.FC_COP_VB"
-              class="border-solid"
-            >
-          </span>
-        </td>
-        <td>
-          <span v-if="editIndex !== index">
-            <VMenu
-              bottom
-              left
-              activator="parent"
-            >
-              <template #activator="{ on, attrs }">
-                <VBtn
-                  dark
-                  icon
-                  v-bind="attrs"
-                  :shaped="false"
-                  size="x-small"
-                  v-on="on"
-                >
-                  <VIcon>mdi-dots-horizontal</VIcon>
-                </VBtn>
-              </template>
-
-              <VList>
-                <VListItem
-                  link
-                  @click="edit(item, index)"
-                >
-                  <template #prepend>
-                    <VIcon
-                      class="me-2"
-                      icon="mdi-pencil"
-                      size="22"
-                    />
-                  </template>
-
-
-                  <VListItemTitle>
-                    Редагувати
-                  </VListItemTitle>
-                </VListItem>
-                <VListItem
-                  link
-                  @click="remove(item, index)"
-                >
-                  <template #prepend>
-                    <VIcon
-                      class="me-2"
-                      icon="mdi-trash-can"
-                      size="22"
-                    />
-                  </template>
-
-                  <VListItemTitle>
-                    Видалити
-                  </VListItemTitle>
-                </VListItem>
-              </VList>
-            </VMenu>
-          </span>
-          <span v-else>
-            <VMenu
-              bottom
-              left
-              activator="parent"
-            >
-              <template #activator="{ on, attrs }">
-                <VBtn
-                  dark
-                  icon
-                  v-bind="attrs"
-                  :shaped="false"
-                  size="x-small"
-                  v-on="on"
-                >
-                  <VIcon>mdi-dots-horizontal</VIcon>
-                </VBtn>
-              </template>
-
-              <VList>
-                <VListItem
-                  link
-                  @click="save(item)"
-                >
-                  <template #prepend>
-                    <VIcon
-                      class="me-2"
-                      icon="mdi-pencil"
-                      size="22"
-                    />
-                  </template>
-
-
-                  <VListItemTitle>
-                    Зберегти
-                  </VListItemTitle>
-                </VListItem>
-                <VListItem
-                  link
-                  @click="cancel(item)"
-                >
-                  <template #prepend>
-                    <VIcon
-                      class="me-2"
-                      icon="mdi-trash-can"
-                      size="22"
-                    />
-                  </template>
-
-                  <VListItemTitle>
-                    Відмінити
-                  </VListItemTitle>
-                </VListItem>
-              </VList>
-            </VMenu>
-          </span>
-        </td>
-      </tr>
-    </tbody>
-  </VTable>
   <VDialog
     v-model="dialogCreate"
     persistent
@@ -436,7 +240,7 @@
           <VSpacer />
           <VBtn
             text
-            @click="dialogCreate.value = false"
+            @click="changeDialog"
           >
             Відмінити
           </VBtn>
@@ -453,35 +257,44 @@
 </template>
 
 <script setup>
-const props = defineProps(['components', 'creditsInfo', 'eduProgId'] )
+import { reactive } from "vue"
+import { useRoute } from 'vue-router'
+import { useEduProgsStore } from '@/stores/eduProgs.js'
 
-const emit = defineEmits(['createComponent', 'deleteComponent','saveComponent'])
+const route = useRoute()
+const eduProgsStore = useEduProgsStore()
 
-const editIndex =  null
-const originalData = null
-const mandatoryComponents = ref(props.components.mandatory)
-const isDisabled = false
+const creditsInfo = eduProgsStore.creditsInfo
+const components = eduProgsStore.getEduProg.components
+
+const editIndex =  ref(null)
+const originalData = ref(null)
+const mandatoryComponents = ref(components.mandatory)
 const dialogCreate = ref(false)
-const eduprogId = 1
-const newComponent = {
-  code: String(props.components.mandatory.length + 1),
+const newComponent = reactive({
+  code: String(components.mandatory.length + 1),
   name: "",
   credits: 0,
   control_type: "",
   type: "ОК",
   sub_type: "н/д",
   category: "н/д",
-  eduprog_id: +props.eduProgId,
+  eduprog_id: +route.params.id,
+})
+
+function changeDialog() {
+  dialogCreate.value = !dialogCreate.value
 }
 
-
-function createComponent() {
-  emit('createComponent',  newComponent.value)
+async function createComponent() {
+  await eduProgsStore.createComponent(newComponent)
+  await eduProgsStore.findEduProgById(route.params.id)
   dialogCreate.value = false
 }
 
 function edit(item, index) {
   originalData.value = Object.assign({}, item)
+  console.log(originalData.value)
   editIndex.value = index
 }
 
@@ -491,108 +304,17 @@ function cancel(item) {
   originalData.value = null
 }
 
-function remove(id) {
-  emit('deleteComponent', id)
+async function remove(id) {
+  await eduProgsStore.deleteComponent(id)
+  await eduProgsStore.findEduProgById(route.params.id)
 }
 
-function save(item) {
+async function saveComponent(component) {
+  await eduProgsStore.editComponent(component.id, component)
   originalData.value = null
   editIndex.value = null
-}
-
-function saveComponent(component) {
-  console.log(props.creditsInfo.value)
-  emit('saveComponent', component)
-  originalData.value = null
-  editIndex.value = null
-  isDisabled.value = false
-}
-
-function deleteComponent(id) {
-  emit('deleteComponent', id)
-}
-
-function subtotal(item) {
-  return (item.credit_COP)
-}
-
-function add_VB() {
-  originalData.value = null
-  itemsVB.push({ COP_VB: '', credit_COP_VB: "0", FC_COP_VB: '' })
-  editIndex.value =  itemsVB.value.length - 1
 }
 </script>
-  //
-  // data() {
-  //   return {
-  //     editIndex: null,
-  //     originalData: null,
-  //     mandatoryComponents: this.components.mandatory,
-  //     isDisabled: false,
-  //     dialogCreate: false,
-  //     eduprogId: 1,
-  //     newComponent:{
-  //       code: String(this.components.mandatory.length+1),
-  //       name:"",
-  //       credits: 0,
-  //       control_type: "",
-  //       type: "ОК",
-  //       sub_type: "н/д",
-  //       category: "н/д",
-  //       eduprog_id: +this.eduProgId
-  //     }
-  //   }
-  // },
-  //
-  //
-  // methods: {
-  //   createComponent(){
-  //     this.$emit('createComponent', this.newComponent)
-  //     this.dialogCreate = false;
-  //   },
-  //   edit(item, index) {
-  //     this.originalData = Object.assign({}, item)
-  //     this.editIndex = index
-  //   },
-  //   cancel(item) {
-  //     this.editIndex = null
-  //     if (!this.originalData) {
-  //       this.itemsOP.splice(this.itemsOP.indexOf(item), 1)
-  //
-  //       return
-  //     }
-  //     Object.assign(item, this.originalData)
-  //     this.originalData = null
-  //   },
-  //   remove(id) {
-  //     this.$emit('deleteComponent', id)
-  //   },
-  //   save(item) {
-  //     this.originalData = null
-  //     this.editIndex = null
-  //   },
-  //   saveComponent(component) {
-  //     console.log(this.creditsInfo)
-  //     this.$emit('saveComponent', component)
-  //     this.originalData = null
-  //     this.editIndex = null
-  //     this.isDisabled = false
-  //   },
-  //   deleteComponent(id) {
-  //     this.$emit('deleteComponent', id)
-  //   },
-  //   subtotal(item) {
-  //     return (item.credit_COP)
-  //   },
-  //   add_VB(){
-  //     this.originalData = null
-  //     this.itemsVB.push({ COP_VB: '', credit_COP_VB: "0", FC_COP_VB: ''})
-  //     this.editIndex = this.itemsVB.length - 1
-  //   },
-  //
-  // },}
-
-
 
 <style>
 input[type="number"] {
