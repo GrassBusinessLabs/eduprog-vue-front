@@ -241,177 +241,9 @@
   </VRow>
 </template>
 
-<!-- <script> -->
-<!-- import draggable from 'vuedraggable' -->
-<!-- import MyComponent from './MyComponent.vue' -->
-<!-- export default { -->
-<!--  components: { -->
-<!--    draggable, -->
-<!--  }, -->
-<!--  props: ['scheme', 'components'], -->
-<!--  data() { -->
-<!--    return { -->
-<!--      editIndex: null, -->
-<!--      originalData: null, -->
-<!--      disciplines: [...new Set(this.scheme.map(e => e.discipline))], -->
-<!--      semesters: [...Array(8).keys()], -->
-<!--      changes: { -->
-<!--        subjects: [], -->
-<!--        semester: '', -->
-<!--        discipline: '', -->
-<!--      }, -->
-<!--      selected: {}, -->
-<!--      enabled: true, -->
-<!--      dragging: false, -->
-<!--    } -->
-<!--  }, -->
-<!--  mounted() { -->
-<!--    console.log('компоненты', this.components) -->
-<!--    this.initData() -->
-<!--  }, -->
-<!--  methods: { -->
-<!--    initData(){ -->
-<!--    this.selected={} -->
-<!--    this.disciplines.forEach(el => { -->
-<!--      this.selected[el] = [[], [], [], [], [], [], [], []] -->
-<!--    }) -->
-<!--      Object.keys(this.selected).map(key => { -->
-<!--      this.selected[key].forEach((semester, index) => { -->
-<!--        this.selected[key][index].push(...this.getComponentByDiscipline(key, index + 1)) -->
-<!--      }) -->
-<!--    }) -->
-<!--    }, -->
-<!--    checkPut(event) { -->
-<!--      console.log('Чекаем', event) -->
-<!--    }, -->
-<!--    addNewComponent(event, discipline, semester) { -->
-<!--      console.log("Ивент", event) -->
-<!--      const componentData = event.item.__draggable_context.element -->
-<!--      const newComponent = { -->
-<!--        discipline: discipline, -->
-<!--        semester_num: semester + 1, -->
-<!--        eduprog_id: componentData.eduprog_id, -->
-<!--        eduprogcomp_id: componentData.id, -->
-<!--        credits_per_semester: 10, -->
-<!--      } -->
-<!--      console.log(componentData) -->
-<!--      console.log(newComponent) -->
-<!--      this.$emit('addComponentToScheme', newComponent) -->
-<!--      console.log('Схема', this.scheme) -->
-<!--      this.initData() -->
-<!--    }, -->
-<!--    deleteComponent(event, element) { -->
-<!--      console.log(event, element) -->
-<!--      this.$emit('deleteComponentFromSheme', element.id) -->
-<!--    }, -->
-<!--    add() { -->
-<!--      // this.selected.forEach(element=>{ -->
-<!--      //   element.forEach(e =>{ -->
-<!--      //     if(getComponentByDiscipline(element, e+1)){ -->
-<!--      //       element[e].push(getComponentByDiscipline(element, e+1)) -->
-<!--      //     } -->
-<!--      //   }) -->
-<!--      // }) -->
-<!--      console.log(this.selected) -->
-<!--      this.originalData = null -->
-<!--      this.disciplines.push('') -->
-<!--      this.editIndex = this.disciplines.length -->
-<!--    }, -->
-<!--    edit(item, index) { -->
-<!--      this.originalData = Object.assign({}, item) -->
-<!--      this.editIndex = index -->
-<!--    }, -->
-<!--    cancel(item) { -->
-<!--      this.editIndex = null -->
-<!--      if (!this.originalData) { -->
-<!--        this.itemsS.splice(this.itemsS.indexOf(item), 1) -->
-
-<!--        return -->
-<!--      } -->
-<!--      Object.assign(item, this.originalData) -->
-<!--      this.originalData = null -->
-<!--    }, -->
-<!--    remove(item, index) { -->
-<!--      this.itemsS.splice(index, 1) -->
-<!--    }, -->
-<!--    save(item) { -->
-<!--      this.originalData = null -->
-<!--      this.editIndex = null -->
-<!--    }, -->
-<!--    getComponentByDiscipline(discipline, semestr) { -->
-<!--      let array = this.scheme.filter(e => { -->
-<!--        if (e.discipline === discipline && e.semester_num === semestr) { -->
-<!--          return e.eduprogcomp.name -->
-<!--        } -->
-<!--      }) -->
-<!--      array.map(e => { -->
-<!--        e.name = e.eduprogcomp.name -->
-<!--      }) -->
-<!--      console.log('Масив по дисицпление', array) -->
-<!--      return array -->
-<!--    }, -->
-<!--    getSubjects() { -->
-<!--      return this.components.mandatory.concat(this.components.selective) -->
-<!--    }, -->
-<!--    handleSubject(event, semester, discipline) { -->
-<!--      this.changes.subjects = event -->
-<!--      this.changes.semester = semester + 1 -->
-<!--      this.changes.discipline = discipline -->
-
-<!--      // console.log(event, discipline, semester+1) -->
-<!--      // const foundedSubjects = this.scheme.find(e => { -->
-<!--      //   console.log(e.semester_num, semester+1, e.discipline, discipline, e.eduprogcomp_id, event[event.length-1].id) -->
-<!--      //   if(e.semester_num === semester+1 && e.discipline===discipline && e.eduprogcomp_id===event.id){ -->
-<!--      //     return e -->
-<!--      //   } -->
-<!--      // }) -->
-<!--    }, -->
-<!--    closeCombobox() { -->
-<!--      console.log('селектед:', this.selected) -->
-<!--      const filteredScheme = this.scheme.filter(e => { -->
-<!--        if (e.semester_num === this.changes.semester && e.discipline === this.changes.discipline) { -->
-<!--          return e -->
-<!--        } -->
-<!--      }) -->
-<!--      console.log('Фильтрована схема', filteredScheme) -->
-<!--      const forAdd = [] -->
-<!--      const forDelete = [] -->
-
-<!--      this.changes.subjects.forEach(element => { -->
-<!--        if (!filteredScheme.find(e => element.id === e.eduprogcomp.id)) { -->
-<!--          forAdd.push(element) -->
-<!--        } -->
-<!--      }) -->
-<!--      filteredScheme.forEach(element => { -->
-<!--        if (!this.changes.subjects.find(e => e.id === element.eduprogcomp.id)) { -->
-<!--          forDelete.push(element) -->
-<!--        } -->
-<!--      }) -->
-
-<!--      forAdd.forEach(element => { -->
-<!--        const newComponent = { -->
-<!--          discipline: this.changes.discipline, -->
-<!--          semester_num: this.changes.semester, -->
-<!--          eduprog_id: element.eduprog_id, -->
-<!--          eduprogcomp_id: element.id, -->
-<!--          credits_per_semester: 10, -->
-<!--        } -->
-<!--        //console.log('Елемент для создания', newComponent) -->
-<!--        this.$emit('addComponentToScheme', newComponent) -->
-<!--      }) -->
-<!--      forDelete.forEach(element => { -->
-<!--        //console.log('Елемент для удаления', element) -->
-<!--        this.$emit('deleteComponentFromSheme', element.id) -->
-<!--      }) -->
-<!--      // console.log('Массив для добавления: ', forAdd) -->
-<!--      console.log('Массив для delete: ', forDelete) -->
-<!--      // console.log('Схема просто',this.scheme) -->
-<!--    }, -->
-<!--  }, -->
-<!-- } -->
-<!-- </script> -->
 <script setup>
 import draggable from 'vuedraggable'
+
 import { reactive } from 'vue'
 const props = defineProps(['scheme', 'components'])
 const emit = defineEmits(['deleteComponentFromSheme', 'addComponentToScheme'])
@@ -506,8 +338,10 @@ function getComponentByDiscipline(discipline, semestr) {
 
   return array
 }
+
 function getSubjects() {
-  return props.components.value.mandatory.concat(props.components.value.selective)
+
+  return props.components.mandatory.concat(props.components.selective)
 }
 
 function handleSubject(event, semester, discipline) {
