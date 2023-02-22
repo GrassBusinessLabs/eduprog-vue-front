@@ -243,19 +243,22 @@
 
 <script setup>
 import draggable from 'vuedraggable'
+import { useEduProgsStore } from '@/stores/eduProgs.js'
 
 import { reactive } from 'vue'
-const props = defineProps(['scheme', 'components'])
-const emit = defineEmits(['deleteComponentFromSheme', 'addComponentToScheme'])
-console.log('Схема', props.scheme)
-console.log('Компоненты', props.components)
+import { useRoute } from 'vue-router'
+const route = useRoute()
+
 onBeforeMount(() => {
   initData()
 })
+const eduProgsStore = useEduProgsStore()
+const components = eduProgsStore.getEduProg.components
+const scheme = eduProgsStore.getScheme
 
 const editIndex = ref(null)
 const originalData = ref(null)
-const disciplines = ref([...new Set(props.scheme.map(e => e.discipline))])
+const disciplines = ref([...new Set(scheme.map(e => e.discipline))])
 const semesters = ref([...Array(8).keys()])
 const changes = reactive({
   subjects: [],
@@ -281,7 +284,7 @@ function initData() {
 function changeDragging() {
   dragging.value = !dragging.value
 }
-function addNewComponent(event, discipline, semester) {
+async function addNewComponent(event, discipline, semester) {
   console.log('Ивент', event)
   const componentData = event.item.__draggable_context.element
   const newComponent = {
@@ -293,13 +296,15 @@ function addNewComponent(event, discipline, semester) {
   }
   console.log(componentData)
   console.log(newComponent)
-  emit('addComponentToScheme', newComponent)
-  console.log('Схема', props.scheme)
+  await eduProgsStore.setComponentToScheme(newComponent)
+  await eduProgsStore.fetchScheme(route.params.id)
+  console.log('Схема',  scheme)
   initData()
 }
-function deleteComponent(event, element) {
+async function deleteComponent(event, element) {
   console.log(event, element)
-  emit('deleteComponentFromSheme', element.id)
+  await eduProgsStore.deleteComponentFromSheme(element.id)
+  await eduProgsStore.fetchScheme(route.params.id)
 }
 function add() {
   console.log(selected.value)
@@ -317,16 +322,12 @@ function cancel(item) {
   originalData.value = null
 }
 
-// function remove(item, index) {
-//   this.itemsS.splice(index, 1)
-// }
-
 function save(item) {
   originalData.value = null
   editIndex.value = null
 }
 function getComponentByDiscipline(discipline, semestr) {
-  let array = props.scheme.filter(e => {
+  let array =  scheme.filter(e => {
     if (e.discipline === discipline && e.semester_num === semestr) {
       return e.eduprogcomp.name
     }
@@ -340,8 +341,9 @@ function getComponentByDiscipline(discipline, semestr) {
 }
 
 function getSubjects() {
+  console.log("asdfsfgsf",components.mandatory.concat(components.selective))
 
-  return props.components.mandatory.concat(props.components.selective)
+  return components.mandatory.concat(components.selective).value
 }
 
 function handleSubject(event, semester, discipline) {
@@ -349,51 +351,6 @@ function handleSubject(event, semester, discipline) {
   changes.semester = semester + 1
   changes.discipline = discipline
 }
-
-// function closeCombobox() {
-//   console.log('селектед:', selected.value)
-//   const filteredScheme = props.scheme.filter(e => {
-//     if (e.semester_num === changes.semester && e.discipline === changes.discipline) {
-//       return e
-//     }
-//   })
-//   console.log('Фильтрована схема', filteredScheme)
-//   const forAdd = []
-//   const forDelete = []
-//
-//   changes.subjects.forEach(element => {
-//     if (!filteredScheme.find(e => element.id === e.eduprogcomp.id)) {
-//       forAdd.push(element)
-//     }
-//   })
-//   filteredScheme.forEach(element => {
-//     if (!changes.subjects.find(e => e.id === element.eduprogcomp.id)) {
-//       forDelete.push(element)
-//     }
-//   })
-//
-//   forAdd.forEach(element => {
-//     const newComponent = {
-//       discipline: changes.discipline,
-//       semester_num: changes.semester,
-//       eduprog_id: element.eduprog_id,
-//       eduprogcomp_id: element.id,
-//       credits_per_semester: 10,
-//     }
-//
-//     //console.log('Елемент для создания', newComponent)
-//     this.$emit('addComponentToScheme', newComponent)
-//   })
-//   forDelete.forEach(element => {
-//     //console.log('Елемент для удаления', element)
-//     this.$emit('deleteComponentFromSheme', element.id)
-//   })
-//
-//   // console.log('Массив для добавления: ', forAdd)
-//   console.log('Массив для delete: ', forDelete)
-//
-//   // console.log('Схема просто',this.scheme)
-// }
 </script>
 
 <style scoped>
