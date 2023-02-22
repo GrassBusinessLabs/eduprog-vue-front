@@ -70,30 +70,14 @@
           </tr>
 
           <tr>
-            <th class="text-center">
-              1 семестр
-            </th>
-            <th class="text-center">
-              2 семестр
-            </th>
-            <th class="text-center">
-              3 семестр
-            </th>
-            <th class="text-center">
-              4 семестр
-            </th>
-            <th class="text-center">
-              5 семестр
-            </th>
-            <th class="text-center">
-              6 семестр
-            </th>
-            <th class="text-center">
-              7 семестр
-            </th>
-            <th class="text-center">
-              8 семестр
-            </th>
+            <th class="text-center">1 семестр</th>
+            <th class="text-center">2 семестр</th>
+            <th class="text-center">3 семестр</th>
+            <th class="text-center">4 семестр</th>
+            <th class="text-center">5 семестр</th>
+            <th class="text-center">6 семестр</th>
+            <th class="text-center">7 семестр</th>
+            <th class="text-center">8 семестр</th>
           </tr>
         </thead>
         <tbody>
@@ -108,7 +92,7 @@
                   <input
                     v-model="disciplines[index]"
                     class="border-solid"
-                  >
+                  />
                 </span>
               </div>
               <div style="text-align: center; margin-top: 5%; margin-bottom: 5%">
@@ -221,8 +205,8 @@
               :key="semester"
             >
               <Draggable
-                v-if="Object.keys(selected.value).length"
-                :list="selected.value[item][semester]"
+                v-if="Object.keys(selected).length"
+                :list="selected[item][semester]"
                 :disabled="!enabled"
                 item-key="name"
                 class="slot-for-components"
@@ -233,9 +217,8 @@
                     return from.el.children.length < 2 || true
                   },
                 }"
-                @change="checkPut(event)"
-                @start="dragging = true"
-                @end="dragging = false"
+                @start="changeDragging"
+                @end="changeDragging"
                 @add="addNewComponent($event, item, semester)"
               >
                 <template #item="{ element }">
@@ -429,82 +412,74 @@
 <!-- </script> -->
 <script setup>
 import draggable from 'vuedraggable'
-import { reactive } from "vue"
-import { useRoute } from 'vue-router'
-
-
+import { reactive } from 'vue'
 const props = defineProps(['scheme', 'components'])
 const emit = defineEmits(['deleteComponentFromSheme', 'addComponentToScheme'])
-const component = defineComponent([draggable])
-
-
+console.log('Схема', props.scheme)
+console.log('Компоненты', props.components)
+onBeforeMount(() => {
+  initData()
+})
 
 const editIndex = ref(null)
 const originalData = ref(null)
-const disciplines = ref([...new Set(props.scheme.value.map(e => e.discipline))])
+const disciplines = ref([...new Set(props.scheme.map(e => e.discipline))])
 const semesters = ref([...Array(8).keys()])
-const changes = reactive( {
+const changes = reactive({
   subjects: [],
   semester: '',
   discipline: '',
 })
-const selected = ref( {} )
+const selected = reactive({})
 const enabled = ref(true)
 const dragging = ref(false)
 
-
-
-onMounted( () => {
-  console.log('компоненты', props.components)
-  initData()
-})
-
-function initData(){
-  selected.value={}
+function initData() {
+  console.log('дисциплина', disciplines)
   disciplines.value.forEach(el => {
-    selected.value[el] = [[], [], [], [], [], [], [], []]
-  }) 
-  Object.keys(selected.value).map(key => {
-    selected.value[key].forEach((semester, index) => {
-      selected.value[key][index].push(...getComponentByDiscipline(key, index + 1))
-    }) 
-  }) 
-} 
-function checkPut(event) { 
-  console.log('Чекаем', event) 
-} 
-function addNewComponent(event, discipline, semester) { 
-  console.log("Ивент", event) 
-  const componentData = event.item.__draggable_context.element 
-  const newComponent = { 
-    discipline: discipline, 
-    semester_num: semester + 1, 
-    eduprog_id: componentData.eduprog_id, 
-    eduprogcomp_id: componentData.id, 
-    credits_per_semester: 10, 
-  } 
-  console.log(componentData) 
-  console.log(newComponent) 
+    selected[el] = [[], [], [], [], [], [], [], []]
+  })
+  Object.keys(selected).map(key => {
+    selected[key].forEach((semester, index) => {
+      selected[key][index].push(...getComponentByDiscipline(key, index + 1))
+    })
+  })
+  console.log(selected)
+}
+function changeDragging() {
+  dragging.value = !dragging.value
+}
+function addNewComponent(event, discipline, semester) {
+  console.log('Ивент', event)
+  const componentData = event.item.__draggable_context.element
+  const newComponent = {
+    discipline: discipline,
+    semester_num: semester + 1,
+    eduprog_id: componentData.eduprog_id,
+    eduprogcomp_id: componentData.id,
+    credits_per_semester: 10,
+  }
+  console.log(componentData)
+  console.log(newComponent)
   emit('addComponentToScheme', newComponent)
   console.log('Схема', props.scheme)
   initData()
-} 
-function deleteComponent(event, element) { 
-  console.log(event, element) 
+}
+function deleteComponent(event, element) {
+  console.log(event, element)
   emit('deleteComponentFromSheme', element.id)
-} 
-function add() { 
-
+}
+function add() {
   console.log(selected.value)
   originalData.value = null
   disciplines.value.push('')
   editIndex.value = disciplines.value.length
-} 
-function edit(item, index) { 
+}
+function edit(item, index) {
   originalData.value = Object.assign({}, item)
   editIndex.value = index
-} 
-function cancel(item) { 
+}
+function cancel(item) {
   editIndex.value = null
   Object.assign(item, originalData.value)
   originalData.value = null
@@ -514,30 +489,30 @@ function cancel(item) {
 //   this.itemsS.splice(index, 1)
 // }
 
-function save(item) { 
+function save(item) {
   originalData.value = null
   editIndex.value = null
-} 
-function getComponentByDiscipline(discipline, semestr) { 
+}
+function getComponentByDiscipline(discipline, semestr) {
   let array = props.scheme.filter(e => {
-    if (e.discipline === discipline && e.semester_num === semestr) { 
-      return e.eduprogcomp.name 
-    } 
-  }) 
-  array.map(e => { 
-    e.name = e.eduprogcomp.name 
-  }) 
-  console.log('Масив по дисицпление', array) 
-  
-  return array 
-} 
-function getSubjects() { 
+    if (e.discipline === discipline && e.semester_num === semestr) {
+      return e.eduprogcomp.name
+    }
+  })
+  array.map(e => {
+    e.name = e.eduprogcomp.name
+  })
+  console.log('Масив по дисицпление', array)
+
+  return array
+}
+function getSubjects() {
   return props.components.value.mandatory.concat(props.components.value.selective)
 }
 
-function handleSubject(event, semester, discipline) { 
-  changes.subjects = event 
-  changes.semester = semester + 1 
+function handleSubject(event, semester, discipline) {
+  changes.subjects = event
+  changes.semester = semester + 1
   changes.discipline = discipline
 }
 
@@ -586,7 +561,6 @@ function handleSubject(event, semester, discipline) {
 //   // console.log('Схема просто',this.scheme)
 // }
 </script>
-
 
 <style scoped>
 .slot-for-components {

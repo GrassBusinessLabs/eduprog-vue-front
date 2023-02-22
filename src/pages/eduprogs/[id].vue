@@ -89,7 +89,7 @@ const tabs = [
 
       <!-- Структурно логічна схема -->
       <VWindowItem value="sequence">
-        <EditDocumentSchema :scheme="eduProgsStore.getScheme" :components="eduProgsStore.getEduProg.components" @addComponentToScheme='addComponentToScheme' @deleteComponentFromSheme='deleteComponentFromSheme'/>
+        <EditDocumentSchema v-if="eduProgsStore.getScheme" :scheme="eduProgsStore.getScheme" :components="eduProgsStore.getEduProg.components" @addComponentToScheme='addComponentToScheme' @deleteComponentFromSheme='deleteComponentFromSheme'/>
       </VWindowItem>
     </VWindow>
   </div>

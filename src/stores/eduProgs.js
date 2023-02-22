@@ -40,7 +40,6 @@ export const useEduProgsStore = defineStore({
     },
     async fetchScheme(id){
       this.scheme = await getData('/eduprogs/scheme/byEduprogId/'+id);
-      console.log(this.scheme)
   },
   async findEduProgById(id){
     if (!this.loading) {
