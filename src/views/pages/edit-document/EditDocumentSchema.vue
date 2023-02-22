@@ -6,96 +6,96 @@
         class="mb-5"
       >
         <VCardText cols="12">
-          <draggable
+          <Draggable
             :list="getSubjects()"
             :disabled="!enabled"
             item-key="name"
             class="list-group"
             ghost-class="ghost"
             :group="{ name: 'people', pull: true, put: false }"
+            :sort="false"
             @start="dragging = true"
             @end="dragging = false"
-            :sort="false"
           >
             <template #item="{ element }">
               <div :class="{ 'not-draggable': !enabled }">
-                <v-chip class="mb-2">
+                <VChip class="mb-2">
                   {{ element.name }}
-                </v-chip>
+                </VChip>
               </div>
             </template>
-          </draggable>
+          </Draggable>
         </VCardText>
       </VCard>
     </VCol>
     <VCol>
       <VTable>
         <thead>
-          <tr>
-            <th
-              rowspan="2"
-              class="text-center"
-            >
-              <p>Дисципліни</p>
-              <VBtn
-                icon="mdi-plus"
-                size="x-small"
-                @click="add"
-              />
-            </th>
-            <th
-              colspan="2"
-              class="text-center"
-            >
-              1 курс
-            </th>
-            <th
-              colspan="2"
-              class="text-center"
-            >
-              2 курс
-            </th>
-            <th
-              colspan="2"
-              class="text-center"
-            >
-              3 курс
-            </th>
-            <th
-              colspan="2"
-              class="text-center"
-            >
-              4 курс
-            </th>
-          </tr>
+        <tr>
+          <th
+            rowspan="2"
+            class="text-center"
+          >
+            <p>Дисципліни</p>
+            <VBtn
+              icon="mdi-plus"
+              size="x-small"
+              @click="add"
+            />
+          </th>
+          <th
+            colspan="2"
+            class="text-center"
+          >
+            1 курс
+          </th>
+          <th
+            colspan="2"
+            class="text-center"
+          >
+            2 курс
+          </th>
+          <th
+            colspan="2"
+            class="text-center"
+          >
+            3 курс
+          </th>
+          <th
+            colspan="2"
+            class="text-center"
+          >
+            4 курс
+          </th>
+        </tr>
 
-          <tr>
-            <th class="text-center">1 семестр</th>
-            <th class="text-center">2 семестр</th>
-            <th class="text-center">3 семестр</th>
-            <th class="text-center">4 семестр</th>
-            <th class="text-center">5 семестр</th>
-            <th class="text-center">6 семестр</th>
-            <th class="text-center">7 семестр</th>
-            <th class="text-center">8 семестр</th>
-          </tr>
+        <tr>
+          <th class="text-center">1 семестр</th>
+          <th class="text-center">2 семестр</th>
+          <th class="text-center">3 семестр</th>
+          <th class="text-center">4 семестр</th>
+          <th class="text-center">5 семестр</th>
+          <th class="text-center">6 семестр</th>
+          <th class="text-center">7 семестр</th>
+          <th class="text-center">8 семестр</th>
+        </tr>
         </thead>
         <tbody>
-          <tr
-            v-for="(item, index) in disciplines"
-            :key="index"
-          >
-            <td>
-              <div style="text-align: center">
-                <span v-if="editIndex !== index">{{ item }}</span>
-                <span v-if="editIndex === index">
+        <tr
+          v-for="(item, index) in disciplines"
+          :key="index"
+        >
+          <td>
+            <div style="text-align: center">
+              <span v-if="editIndex !== index">{{ item }}</span>
+              <span v-if="editIndex === index">
                   <input
                     v-model="disciplines[index]"
                     class="border-solid"
                   />
                 </span>
-              </div>
-              <div style="text-align: center; margin-top: 5%; margin-bottom: 5%">
+            </div>
+            <div style="text-align: center; margin-top: 5%; margin-bottom: 5%">
                 <span v-if="editIndex !== index">
                   <VMenu
                     bottom
@@ -147,7 +147,7 @@
                     </VList>
                   </VMenu>
                 </span>
-                <span v-else>
+              <span v-else>
                   <VMenu
                     bottom
                     left
@@ -198,219 +198,370 @@
                     </VList>
                   </VMenu>
                 </span>
-              </div>
-            </td>
-            <td
-              v-for="semester in semesters"
-              :key="semester"
-            >
-              <draggable
-                v-if="Object.keys(this.selected).length"
-                :list="selected[item][semester]"
-                :disabled="!enabled"
-                item-key="name"
-                class="slot-for-components"
-                ghost-class="ghost"
-                :group="{
+            </div>
+          </td>
+          <td
+            v-for="semester in semesters"
+            :key="semester"
+          >
+            <Draggable
+              v-if="Object.keys(selected).length"
+              :list="selected[item][semester]"
+              :disabled="!enabled"
+              item-key="name"
+              class="slot-for-components"
+              ghost-class="ghost"
+              :group="{
                   name: 'people',
                   put: function (to, from) {
                     return from.el.children.length < 2 || true
                   },
                 }"
-                @change="checkPut(event)"
-                @start="dragging = true"
-                @end="dragging = false"
-                @add="addNewComponent($event, item, semester)"
-              >
-                <template #item="{ element }">
-                  <div :class="{ 'not-draggable': !enabled }">
-                    <v-chip
-                      class="my-2"
-                      closable
-                      @click:close="deleteComponent($event, element)"
-                    >
-                      {{ element.name }}
-                    </v-chip>
-                  </div>
-                </template>
-              </draggable>
-            </td>
-          </tr>
+              @start="changeDragging"
+              @end="changeDragging"
+              @add="addNewComponent($event, item, semester)"
+            >
+              <template #item="{ element }">
+                <div :class="{ 'not-draggable': !enabled }">
+                  <VChip
+                    class="my-2"
+                    closable
+                    @click:close="deleteComponent($event, element)"
+                  >
+                    {{ element.name }}
+                  </VChip>
+                </div>
+              </template>
+            </Draggable>
+          </td>
+        </tr>
         </tbody>
       </VTable>
     </VCol>
   </VRow>
 </template>
 
-<script>
+<!-- <script> -->
+<!-- import draggable from 'vuedraggable' -->
+<!-- import MyComponent from './MyComponent.vue' -->
+<!-- export default { -->
+<!--  components: { -->
+<!--    draggable, -->
+<!--  }, -->
+<!--  props: ['scheme', 'components'], -->
+<!--  data() { -->
+<!--    return { -->
+<!--      editIndex: null, -->
+<!--      originalData: null, -->
+<!--      disciplines: [...new Set(this.scheme.map(e => e.discipline))], -->
+<!--      semesters: [...Array(8).keys()], -->
+<!--      changes: { -->
+<!--        subjects: [], -->
+<!--        semester: '', -->
+<!--        discipline: '', -->
+<!--      }, -->
+<!--      selected: {}, -->
+<!--      enabled: true, -->
+<!--      dragging: false, -->
+<!--    } -->
+<!--  }, -->
+<!--  mounted() { -->
+<!--    console.log('компоненты', this.components) -->
+<!--    this.initData() -->
+<!--  }, -->
+<!--  methods: { -->
+<!--    initData(){ -->
+<!--    this.selected={} -->
+<!--    this.disciplines.forEach(el => { -->
+<!--      this.selected[el] = [[], [], [], [], [], [], [], []] -->
+<!--    }) -->
+<!--      Object.keys(this.selected).map(key => { -->
+<!--      this.selected[key].forEach((semester, index) => { -->
+<!--        this.selected[key][index].push(...this.getComponentByDiscipline(key, index + 1)) -->
+<!--      }) -->
+<!--    }) -->
+<!--    }, -->
+<!--    checkPut(event) { -->
+<!--      console.log('Чекаем', event) -->
+<!--    }, -->
+<!--    addNewComponent(event, discipline, semester) { -->
+<!--      console.log("Ивент", event) -->
+<!--      const componentData = event.item.__draggable_context.element -->
+<!--      const newComponent = { -->
+<!--        discipline: discipline, -->
+<!--        semester_num: semester + 1, -->
+<!--        eduprog_id: componentData.eduprog_id, -->
+<!--        eduprogcomp_id: componentData.id, -->
+<!--        credits_per_semester: 10, -->
+<!--      } -->
+<!--      console.log(componentData) -->
+<!--      console.log(newComponent) -->
+<!--      this.$emit('addComponentToScheme', newComponent) -->
+<!--      console.log('Схема', this.scheme) -->
+<!--      this.initData() -->
+<!--    }, -->
+<!--    deleteComponent(event, element) { -->
+<!--      console.log(event, element) -->
+<!--      this.$emit('deleteComponentFromSheme', element.id) -->
+<!--    }, -->
+<!--    add() { -->
+<!--      // this.selected.forEach(element=>{ -->
+<!--      //   element.forEach(e =>{ -->
+<!--      //     if(getComponentByDiscipline(element, e+1)){ -->
+<!--      //       element[e].push(getComponentByDiscipline(element, e+1)) -->
+<!--      //     } -->
+<!--      //   }) -->
+<!--      // }) -->
+<!--      console.log(this.selected) -->
+<!--      this.originalData = null -->
+<!--      this.disciplines.push('') -->
+<!--      this.editIndex = this.disciplines.length -->
+<!--    }, -->
+<!--    edit(item, index) { -->
+<!--      this.originalData = Object.assign({}, item) -->
+<!--      this.editIndex = index -->
+<!--    }, -->
+<!--    cancel(item) { -->
+<!--      this.editIndex = null -->
+<!--      if (!this.originalData) { -->
+<!--        this.itemsS.splice(this.itemsS.indexOf(item), 1) -->
+
+<!--        return -->
+<!--      } -->
+<!--      Object.assign(item, this.originalData) -->
+<!--      this.originalData = null -->
+<!--    }, -->
+<!--    remove(item, index) { -->
+<!--      this.itemsS.splice(index, 1) -->
+<!--    }, -->
+<!--    save(item) { -->
+<!--      this.originalData = null -->
+<!--      this.editIndex = null -->
+<!--    }, -->
+<!--    getComponentByDiscipline(discipline, semestr) { -->
+<!--      let array = this.scheme.filter(e => { -->
+<!--        if (e.discipline === discipline && e.semester_num === semestr) { -->
+<!--          return e.eduprogcomp.name -->
+<!--        } -->
+<!--      }) -->
+<!--      array.map(e => { -->
+<!--        e.name = e.eduprogcomp.name -->
+<!--      }) -->
+<!--      console.log('Масив по дисицпление', array) -->
+<!--      return array -->
+<!--    }, -->
+<!--    getSubjects() { -->
+<!--      return this.components.mandatory.concat(this.components.selective) -->
+<!--    }, -->
+<!--    handleSubject(event, semester, discipline) { -->
+<!--      this.changes.subjects = event -->
+<!--      this.changes.semester = semester + 1 -->
+<!--      this.changes.discipline = discipline -->
+
+<!--      // console.log(event, discipline, semester+1) -->
+<!--      // const foundedSubjects = this.scheme.find(e => { -->
+<!--      //   console.log(e.semester_num, semester+1, e.discipline, discipline, e.eduprogcomp_id, event[event.length-1].id) -->
+<!--      //   if(e.semester_num === semester+1 && e.discipline===discipline && e.eduprogcomp_id===event.id){ -->
+<!--      //     return e -->
+<!--      //   } -->
+<!--      // }) -->
+<!--    }, -->
+<!--    closeCombobox() { -->
+<!--      console.log('селектед:', this.selected) -->
+<!--      const filteredScheme = this.scheme.filter(e => { -->
+<!--        if (e.semester_num === this.changes.semester && e.discipline === this.changes.discipline) { -->
+<!--          return e -->
+<!--        } -->
+<!--      }) -->
+<!--      console.log('Фильтрована схема', filteredScheme) -->
+<!--      const forAdd = [] -->
+<!--      const forDelete = [] -->
+
+<!--      this.changes.subjects.forEach(element => { -->
+<!--        if (!filteredScheme.find(e => element.id === e.eduprogcomp.id)) { -->
+<!--          forAdd.push(element) -->
+<!--        } -->
+<!--      }) -->
+<!--      filteredScheme.forEach(element => { -->
+<!--        if (!this.changes.subjects.find(e => e.id === element.eduprogcomp.id)) { -->
+<!--          forDelete.push(element) -->
+<!--        } -->
+<!--      }) -->
+
+<!--      forAdd.forEach(element => { -->
+<!--        const newComponent = { -->
+<!--          discipline: this.changes.discipline, -->
+<!--          semester_num: this.changes.semester, -->
+<!--          eduprog_id: element.eduprog_id, -->
+<!--          eduprogcomp_id: element.id, -->
+<!--          credits_per_semester: 10, -->
+<!--        } -->
+<!--        //console.log('Елемент для создания', newComponent) -->
+<!--        this.$emit('addComponentToScheme', newComponent) -->
+<!--      }) -->
+<!--      forDelete.forEach(element => { -->
+<!--        //console.log('Елемент для удаления', element) -->
+<!--        this.$emit('deleteComponentFromSheme', element.id) -->
+<!--      }) -->
+<!--      // console.log('Массив для добавления: ', forAdd) -->
+<!--      console.log('Массив для delete: ', forDelete) -->
+<!--      // console.log('Схема просто',this.scheme) -->
+<!--    }, -->
+<!--  }, -->
+<!-- } -->
+<!-- </script> -->
+<script setup>
 import draggable from 'vuedraggable'
-import MyComponent from './MyComponent.vue'
-export default {
-  components: {
-    draggable,
-  },
-  props: ['scheme', 'components'],
-  data() {
-    return {
-      editIndex: null,
-      originalData: null,
-      disciplines: [...new Set(this.scheme.map(e => e.discipline))],
-      semesters: [...Array(8).keys()],
-      changes: {
-        subjects: [],
-        semester: '',
-        discipline: '',
-      },
-      selected: {},
-      enabled: true,
-      dragging: false,
-    }
-  },
-  mounted() {
-    console.log('компоненты', this.components)
-    this.initData()
-  },
-  methods: {
-    initData(){
-    this.selected={}
-    this.disciplines.forEach(el => {
-      this.selected[el] = [[], [], [], [], [], [], [], []]
+import { reactive } from 'vue'
+const props = defineProps(['scheme', 'components'])
+const emit = defineEmits(['deleteComponentFromSheme', 'addComponentToScheme'])
+console.log('Схема', props.scheme)
+console.log('Компоненты', props.components)
+onBeforeMount(() => {
+  initData()
+})
+
+const editIndex = ref(null)
+const originalData = ref(null)
+const disciplines = ref([...new Set(props.scheme.map(e => e.discipline))])
+const semesters = ref([...Array(8).keys()])
+const changes = reactive({
+  subjects: [],
+  semester: '',
+  discipline: '',
+})
+const selected = reactive({})
+const enabled = ref(true)
+const dragging = ref(false)
+
+function initData() {
+  console.log('дисциплина', disciplines)
+  disciplines.value.forEach(el => {
+    selected[el] = [[], [], [], [], [], [], [], []]
+  })
+  Object.keys(selected).map(key => {
+    selected[key].forEach((semester, index) => {
+      selected[key][index].push(...getComponentByDiscipline(key, index + 1))
     })
-      Object.keys(this.selected).map(key => {
-      this.selected[key].forEach((semester, index) => {
-        this.selected[key][index].push(...this.getComponentByDiscipline(key, index + 1))
-      })
-    })
-    },
-    checkPut(event) {
-      console.log('Чекаем', event)
-    },
-    addNewComponent(event, discipline, semester) {
-      console.log("Ивент", event)
-      const componentData = event.item.__draggable_context.element
-      const newComponent = {
-        discipline: discipline,
-        semester_num: semester + 1,
-        eduprog_id: componentData.eduprog_id,
-        eduprogcomp_id: componentData.id,
-        credits_per_semester: 10,
-      }
-      console.log(componentData)
-      console.log(newComponent)
-      this.$emit('addComponentToScheme', newComponent)
-      console.log('Схема', this.scheme)
-      this.initData()
-    },
-    deleteComponent(event, element) {
-      console.log(event, element)
-      this.$emit('deleteComponentFromSheme', element.id)
-    },
-    add() {
-      // this.selected.forEach(element=>{
-      //   element.forEach(e =>{
-      //     if(getComponentByDiscipline(element, e+1)){
-      //       element[e].push(getComponentByDiscipline(element, e+1))
-      //     }
-      //   })
-      // })
-      console.log(this.selected)
-      this.originalData = null
-      this.disciplines.push('')
-      this.editIndex = this.disciplines.length
-    },
-    edit(item, index) {
-      this.originalData = Object.assign({}, item)
-      this.editIndex = index
-    },
-    cancel(item) {
-      this.editIndex = null
-      if (!this.originalData) {
-        this.itemsS.splice(this.itemsS.indexOf(item), 1)
-
-        return
-      }
-      Object.assign(item, this.originalData)
-      this.originalData = null
-    },
-    remove(item, index) {
-      this.itemsS.splice(index, 1)
-    },
-    save(item) {
-      this.originalData = null
-      this.editIndex = null
-    },
-    getComponentByDiscipline(discipline, semestr) {
-      let array = this.scheme.filter(e => {
-        if (e.discipline === discipline && e.semester_num === semestr) {
-          return e.eduprogcomp.name
-        }
-      })
-      array.map(e => {
-        e.name = e.eduprogcomp.name
-      })
-      console.log('Масив по дисицпление', array)
-      return array
-    },
-    getSubjects() {
-      return this.components.mandatory.concat(this.components.selective)
-    },
-    handleSubject(event, semester, discipline) {
-      this.changes.subjects = event
-      this.changes.semester = semester + 1
-      this.changes.discipline = discipline
-
-      // console.log(event, discipline, semester+1)
-      // const foundedSubjects = this.scheme.find(e => {
-      //   console.log(e.semester_num, semester+1, e.discipline, discipline, e.eduprogcomp_id, event[event.length-1].id)
-      //   if(e.semester_num === semester+1 && e.discipline===discipline && e.eduprogcomp_id===event.id){
-      //     return e
-      //   }
-      // })
-    },
-    closeCombobox() {
-      console.log('селектед:', this.selected)
-      const filteredScheme = this.scheme.filter(e => {
-        if (e.semester_num === this.changes.semester && e.discipline === this.changes.discipline) {
-          return e
-        }
-      })
-      console.log('Фильтрована схема', filteredScheme)
-      const forAdd = []
-      const forDelete = []
-
-      this.changes.subjects.forEach(element => {
-        if (!filteredScheme.find(e => element.id === e.eduprogcomp.id)) {
-          forAdd.push(element)
-        }
-      })
-      filteredScheme.forEach(element => {
-        if (!this.changes.subjects.find(e => e.id === element.eduprogcomp.id)) {
-          forDelete.push(element)
-        }
-      })
-
-      forAdd.forEach(element => {
-        const newComponent = {
-          discipline: this.changes.discipline,
-          semester_num: this.changes.semester,
-          eduprog_id: element.eduprog_id,
-          eduprogcomp_id: element.id,
-          credits_per_semester: 10,
-        }
-        //console.log('Елемент для создания', newComponent)
-        this.$emit('addComponentToScheme', newComponent)
-      })
-      forDelete.forEach(element => {
-        //console.log('Елемент для удаления', element)
-        this.$emit('deleteComponentFromSheme', element.id)
-      })
-      // console.log('Массив для добавления: ', forAdd)
-      console.log('Массив для delete: ', forDelete)
-      // console.log('Схема просто',this.scheme)
-    },
-  },
+  })
+  console.log(selected)
 }
+function changeDragging() {
+  dragging.value = !dragging.value
+}
+function addNewComponent(event, discipline, semester) {
+  console.log('Ивент', event)
+  const componentData = event.item.__draggable_context.element
+  const newComponent = {
+    discipline: discipline,
+    semester_num: semester + 1,
+    eduprog_id: componentData.eduprog_id,
+    eduprogcomp_id: componentData.id,
+    credits_per_semester: 10,
+  }
+  console.log(componentData)
+  console.log(newComponent)
+  emit('addComponentToScheme', newComponent)
+  console.log('Схема', props.scheme)
+  initData()
+}
+function deleteComponent(event, element) {
+  console.log(event, element)
+  emit('deleteComponentFromSheme', element.id)
+}
+function add() {
+  console.log(selected.value)
+  originalData.value = null
+  disciplines.value.push('')
+  editIndex.value = disciplines.value.length
+}
+function edit(item, index) {
+  originalData.value = Object.assign({}, item)
+  editIndex.value = index
+}
+function cancel(item) {
+  editIndex.value = null
+  Object.assign(item, originalData.value)
+  originalData.value = null
+}
+
+// function remove(item, index) {
+//   this.itemsS.splice(index, 1)
+// }
+
+function save(item) {
+  originalData.value = null
+  editIndex.value = null
+}
+function getComponentByDiscipline(discipline, semestr) {
+  let array = props.scheme.filter(e => {
+    if (e.discipline === discipline && e.semester_num === semestr) {
+      return e.eduprogcomp.name
+    }
+  })
+  array.map(e => {
+    e.name = e.eduprogcomp.name
+  })
+  console.log('Масив по дисицпление', array)
+
+  return array
+}
+function getSubjects() {
+  return props.components.value.mandatory.concat(props.components.value.selective)
+}
+
+function handleSubject(event, semester, discipline) {
+  changes.subjects = event
+  changes.semester = semester + 1
+  changes.discipline = discipline
+}
+
+// function closeCombobox() {
+//   console.log('селектед:', selected.value)
+//   const filteredScheme = props.scheme.filter(e => {
+//     if (e.semester_num === changes.semester && e.discipline === changes.discipline) {
+//       return e
+//     }
+//   })
+//   console.log('Фильтрована схема', filteredScheme)
+//   const forAdd = []
+//   const forDelete = []
+//
+//   changes.subjects.forEach(element => {
+//     if (!filteredScheme.find(e => element.id === e.eduprogcomp.id)) {
+//       forAdd.push(element)
+//     }
+//   })
+//   filteredScheme.forEach(element => {
+//     if (!changes.subjects.find(e => e.id === element.eduprogcomp.id)) {
+//       forDelete.push(element)
+//     }
+//   })
+//
+//   forAdd.forEach(element => {
+//     const newComponent = {
+//       discipline: changes.discipline,
+//       semester_num: changes.semester,
+//       eduprog_id: element.eduprog_id,
+//       eduprogcomp_id: element.id,
+//       credits_per_semester: 10,
+//     }
+//
+//     //console.log('Елемент для создания', newComponent)
+//     this.$emit('addComponentToScheme', newComponent)
+//   })
+//   forDelete.forEach(element => {
+//     //console.log('Елемент для удаления', element)
+//     this.$emit('deleteComponentFromSheme', element.id)
+//   })
+//
+//   // console.log('Массив для добавления: ', forAdd)
+//   console.log('Массив для delete: ', forDelete)
+//
+//   // console.log('Схема просто',this.scheme)
+// }
 </script>
+
 <style scoped>
 .slot-for-components {
   height: 100%;

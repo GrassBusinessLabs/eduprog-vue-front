@@ -3,65 +3,65 @@
   <!-- Основний компонент -->
   <VTable>
     <thead class="thead-light">
-      <tr>
-        <th class="text-center">
-          <h3>Основний компонент ОП</h3>
-        </th>
-        <th />
-      </tr>
+    <tr>
+      <th class="text-center">
+        <h3>Основний компонент ОП</h3>
+      </th>
+      <th />
+    </tr>
     </thead>
   </VTable>
   <VTable>
     <thead class="thead-light">
-      <tr>
-        <th>Код <br> н/д</th>
-        <th>Компонент освітньої <br> програми</th>
-        <th>Кількість <br> кредитів</th>
-        <th>Форма підсумку <br> контролю</th>
-        <th>
-          <VBtn
-            icon="mdi-plus"
-            size="x-small"
-            @click="changeDialog"
-          />
-        </th>
-      </tr>
+    <tr>
+      <th>Код <br> н/д</th>
+      <th>Компонент освітньої <br> програми</th>
+      <th>Кількість <br> кредитів</th>
+      <th>Форма підсумку <br> контролю</th>
+      <th>
+        <VBtn
+          icon="mdi-plus"
+          size="x-small"
+          @click="changeDialog"
+        />
+      </th>
+    </tr>
     </thead>
     <tbody>
-      <tr
-        v-for="(item, index) in mandatoryComponents"
-        :key="index"
-      >
-        <td>{{ 'ОК ' + item.code }}</td>
-        <td>
-          <span v-if="editIndex !== index">{{ item.name }}</span>
-          <span v-if="editIndex === index">
+    <tr
+      v-for="(item, index) in mandatoryComponents"
+      :key="index"
+    >
+      <td>{{ 'ОК ' + item.code }}</td>
+      <td>
+        <span v-if="editIndex !== index">{{ item.name }}</span>
+        <span v-if="editIndex === index">
             <input
               v-model="item.name"
               class="border-solid"
             >
           </span>
-        </td>
-        <td>
-          <span v-if="editIndex !== index">{{ item.credits }}</span>
-          <span v-if="editIndex === index">
+      </td>
+      <td>
+        <span v-if="editIndex !== index">{{ item.credits }}</span>
+        <span v-if="editIndex === index">
             <input
               v-model="item.credits"
               type="number"
               class="border-solid"
             >
           </span>
-        </td>
-        <td>
-          <span v-if="editIndex !== index">{{ item.control_type }}</span>
-          <span v-if="editIndex === index">
+      </td>
+      <td>
+        <span v-if="editIndex !== index">{{ item.control_type }}</span>
+        <span v-if="editIndex === index">
             <input
               v-model="item.control_type"
               class="border-solid"
             >
           </span>
-        </td>
-        <td>
+      </td>
+      <td>
           <span v-if="editIndex !== index">
             <VMenu
               bottom
@@ -118,7 +118,7 @@
               </VList>
             </VMenu>
           </span>
-          <span v-else>
+        <span v-else>
             <VMenu
               bottom
               left
@@ -175,25 +175,25 @@
               </VList>
             </VMenu>
           </span>
-        </td>
-      </tr>
+      </td>
+    </tr>
     </tbody>
 
     <thead>
-      <tr>
-        <th colspan="5">
-          <div style="float: left">
-            Загальний обсяг обов’язкових компонентів:
-          </div>
-          <div style="float: left">
-            <input
-              class="text-right"
-              disabled
-              :value="creditsInfo.total_credits"
-            >/180 кредитів
-          </div>
-        </th>
-      </tr>
+    <tr>
+      <th colspan="5">
+        <div style="float: left">
+          Загальний обсяг обов’язкових компонентів:
+        </div>
+        <div style="float: left">
+          <input
+            class="text-right"
+            disabled
+            :value="creditsInfo.total_credits"
+          >/180 кредитів
+        </div>
+      </th>
+    </tr>
     </thead>
   </VTable>
   <VDialog
