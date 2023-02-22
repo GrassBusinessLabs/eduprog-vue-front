@@ -101,7 +101,7 @@
                 </VListItem>
                 <VListItem
                   link
-                  @click="deleteComponent(item.id)"
+                  @click="remove(item.id)"
                 >
                   <template #prepend>
                     <VIcon
