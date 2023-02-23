@@ -7,7 +7,7 @@ import TableFixedHeader from '@/views/user-interface/tables/TableFixedHeader.vue
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 import { computed } from 'vue-demi'
 import moment from 'moment'
-import router from '../router';
+import router from '../router'
 const eduProgsStore = useEduProgsStore()
 
 //return { eduProgs: useEduProgsStore.getEduProgs }
