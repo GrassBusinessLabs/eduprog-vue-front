@@ -5,8 +5,10 @@ import { useEduProgsStore } from '@/stores/eduProgs.js'
 import { reactive } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
-
-onBeforeMount(() => {
+const disciplines = ref([])
+onBeforeMount(async () => {
+  await eduProgsStore.fetchDisciplines(route.params.id)
+  disciplines.value = eduProgsStore.getDisciplines
   initData()
 })
 const eduProgsStore = useEduProgsStore()
@@ -15,7 +17,6 @@ const scheme = eduProgsStore.getScheme
 
 const editIndex = ref(null)
 const originalData = ref(null)
-const disciplines = ref([...new Set(scheme.map(e => e.discipline))])
 const semesters = ref([...Array(8).keys()])
 const changes = reactive({
   subjects: [],
@@ -25,6 +26,12 @@ const changes = reactive({
 const selected = reactive({})
 const enabled = ref(true)
 const dragging = ref(false)
+
+async function deleteDiscipline(id) {
+  await eduProgsStore.deleteDiscipline(id)
+  await eduProgsStore.fetchDisciplines(route.params.id)
+  disciplines.value = eduProgsStore.getDisciplines
+}
 
 function initData() {
   console.log('дисциплина', disciplines)
@@ -69,9 +76,7 @@ function edit(item, index) {
   editIndex.value = index
 }
 function cancel(item) {
-  editIndex.value = null
-  Object.assign(item, originalData.value)
-  originalData.value = null
+  console.log("fdsfs")
 }
 
 function save(item) {
@@ -115,13 +120,18 @@ const createDiscipline = function dialogg() {
 const dialogCreate = ref(false)
 const newDiscipline = reactive( {
   name:"",
-  eduprog_id: route.params.id,
+  eduprog_id: +route.params.id,
 })
 
 async function createNewDiscipline() {
-  
   await eduProgsStore.createDiscipline(newDiscipline)
-
+   await eduProgsStore.fetchDisciplines(route.params.id)
+  newDiscipline.name=''
+  disciplines.value = eduProgsStore.getDisciplines
+  dialogCreate.value=false
+}
+function cancelNewDiscipline() {
+  newDiscipline.name=''
   dialogCreate.value=false
 }
 </script>
@@ -156,7 +166,7 @@ async function createNewDiscipline() {
         <VBtn
           color="blue darken-1"
           text
-          @click="dialogCreate = false"
+          @click="cancelNewDiscipline"
         >
           Закрити
         </VBtn>
@@ -270,12 +280,12 @@ async function createNewDiscipline() {
         </thead>
         <tbody>
           <tr
-            v-for="(item, index) in disciplines"
-            :key="index"
+            v-for="item in disciplines"
+            :key="item.id"
           >
             <td>
               <div style="text-align: center">
-                <span v-if="editIndex !== index">{{ item }}</span>
+                <span v-if="editIndex !== index">{{ item.name }}</span>
                 <span v-if="editIndex === index">
                   <input
                     v-model="disciplines[index]"
@@ -320,7 +330,7 @@ async function createNewDiscipline() {
                       </VListItem>
                       <VListItem
                         link
-                        @click="remove(item, index)"
+                        @click="deleteDiscipline(item.id)"
                       >
                         <template #prepend>
                           <VIcon
