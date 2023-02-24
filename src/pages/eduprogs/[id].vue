@@ -98,4 +98,5 @@ const tabs = [
 <route lang="yaml">
 meta:
 navActiveLink: pages-account-settings-tab
+requiresAuth: true
 </route>
