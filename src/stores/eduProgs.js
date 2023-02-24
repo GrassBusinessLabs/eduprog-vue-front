@@ -68,8 +68,8 @@ export const useEduProgsStore = defineStore({
     const response = await getData('eduprogs/credits/'+payload.eduprog_id);
     this.creditsInfo = response
   },
-  async deleteComponent(id){
-    const response = await deleteData('eduprogs/comps/'+id);
+  async deleteComponent(payload){
+    await deleteData('eduprogs/comps/'+payload.id);
   },
     async setComponentToScheme(payload){
       const response = await postData('/eduprogs/scheme/setCompToSemester', payload);
