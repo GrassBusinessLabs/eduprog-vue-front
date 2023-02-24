@@ -16,12 +16,11 @@ const router = createRouter({
 router.beforeEach(async function(to, from, next){
   const userStore = useUserStore()
   await userStore.checkToken()
+  console.log(userStore.tokenIsValid)
   if(to.fullPath==="/"){
-    console.log("первый роут")
      next('/home')
   }
   if(to.meta.requiresUnAuth && userStore.tokenIsValid){
-    console.log("второй роут")
     next('/home')
   }
   else if(to.meta.requiresAuth && !userStore.tokenIsValid){
