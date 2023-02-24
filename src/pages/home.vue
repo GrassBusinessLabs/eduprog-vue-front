@@ -73,7 +73,8 @@ const deleteEduProgDialog= function dialogg(id) {
   dialogDelete.value=true
   currentEduProg = id
 }
-const editEduProg = function edit(id) {
+const editEduProg = function edit(event, id) {
+  console.log(event)
   router.replace('/eduprogs/'+id)
 }
 
@@ -201,7 +202,7 @@ const newEduProg = ref({
       <tr 
         v-for="item in eduProgs"
         :key="item.id"
-        @click="editEduProg(item.id)"
+        @click="editEduProg($event, item.id)"
       >
         <td>{{ item.name }}</td>
         <td class="text-center">
@@ -218,13 +219,13 @@ const newEduProg = ref({
             icon="mdi-pencil"
             size="x-small"
             style="margin-right:2% "
-            @click="renameEduProgDialog(item)"
+            @click.stop="renameEduProgDialog(item)"
           />
 
           <VBtn
             icon="mdi-trash-can"
             size="x-small"
-            @click="deleteEduProgDialog(item)"
+            @click.stop="deleteEduProgDialog(item)"
           />
         </td>
       </tr>
@@ -271,7 +272,8 @@ const newEduProg = ref({
           </VBtn>
           <VBtn
             text
-            @click="editNameEduProg(); dialogRename = false"
+            @click="editNameEduProg(); 
+            dialogRename = false"
           >
             Зберегти
           </VBtn>
