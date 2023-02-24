@@ -7,12 +7,14 @@ export const useUserStore = defineStore({
 
   state: () => ({
     token: localStorage.getItem('token'),
-    user: {}
+    user: {},
+    tokenValid: false,
   }),
 
   getters: {
     isUserAuth: state => !!state.token,
     getUserData: state => state.user,
+    tokenIsValid: state => state.tokenValid
   },
 
   actions: {
@@ -20,14 +22,24 @@ export const useUserStore = defineStore({
       this.token = token
       localStorage.setItem('token', token)
     },
-
-    setUserData(userData) {
-      this.user = userData
+    async checkToken(){
+      try{
+        const response = await getData('users');
+        if(response.id){
+          this.tokenValid=true;
+        }
+        else{
+          this.tokenValid = false;
+        }
+      }
+      catch(err){
+        this.tokenValid = false
+      }
+      
     },
-
     async fetchUserData() {
       const response = await getData('users');
-      this.setUserData(response)
+      this.user = response
       return response
     },
     async login(payload) {

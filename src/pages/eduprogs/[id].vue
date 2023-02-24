@@ -6,30 +6,10 @@ import EditDocumentSchema from '@/views/pages/edit-document/EditDocumentSchema.v
 import EditDocumentSequence from '@/views/pages/edit-document/EditDocumentSequence.vue'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 const eduProgsStore = useEduProgsStore()
-
 const route = useRoute()
 const activeTab = ref(route.params.tab)
 onMounted(async ()=>{
   await eduProgsStore.findEduProgById(route.params.id)
-  await eduProgsStore.fetchScheme(route.params.id)
-})
-const editComponent = ( async payload => {
-  await eduProgsStore.editComponent(payload.id, payload)
-})
-const createComponent = ( async payload => {
-  await eduProgsStore.createComponent(payload)
-  await eduProgsStore.findEduProgById(route.params.id)
-})
-const deleteComponent = ( async id => {
-  await eduProgsStore.deleteComponent(id)
-  await eduProgsStore.findEduProgById(route.params.id)
-})
-const addComponentToScheme = ( async payload => {
-  await eduProgsStore.setComponentToScheme(payload)
-  await eduProgsStore.fetchScheme(route.params.id)
-})
-const deleteComponentFromSheme = ( async id => {
-  await eduProgsStore.deleteComponentFromSheme(id)
   await eduProgsStore.fetchScheme(route.params.id)
 })
 
@@ -91,7 +71,7 @@ const tabs = [
 
       <!-- Перелік компонент -->
       <VWindowItem value="components">
-        <EditDocumentComponents :components="eduProgsStore.getEduProg.components" :creditsInfo="eduProgsStore.creditsInfo" :edu-prog-id="route.params.id" @saveComponent="editComponent" @deleteComponent="deleteComponent" @createComponent="createComponent" />
+        <EditDocumentComponents/>
       </VWindowItem>
 
       <!-- Структурно логічна послідовнсість -->
@@ -101,7 +81,7 @@ const tabs = [
 
       <!-- Структурно логічна схема -->
       <VWindowItem value="sequence">
-        <EditDocumentSchema :scheme="eduProgsStore.getScheme" :components="eduProgsStore.getEduProg.components" @addComponentToScheme='addComponentToScheme' @deleteComponentFromSheme='deleteComponentFromSheme'/>
+        <EditDocumentSchema  @addComponentToScheme='addComponentToScheme' @deleteComponentFromSheme='deleteComponentFromSheme'/>
       </VWindowItem>
     </VWindow>
   </div>

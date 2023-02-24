@@ -1,3 +1,5 @@
+
+import { useUserStore } from '@/stores/user'
 import { setupLayouts } from 'virtual:generated-layouts'
 import { createRouter, createWebHistory } from 'vue-router'
 import routes from '~pages'
@@ -11,11 +13,18 @@ const router = createRouter({
   },
 })
 
-router.beforeEach(function(to, from, next){
-  if(to.meta.requiresUnAuth && localStorage.getItem('token')){
-    next('/')
+router.beforeEach(async function(to, from, next){
+  const userStore = useUserStore()
+  await userStore.checkToken()
+  if(to.fullPath==="/"){
+    console.log("первый роут")
+     next('/home')
   }
-  else if(to.meta.requiresAuth && !localStorage.getItem('token')){
+  if(to.meta.requiresUnAuth && userStore.tokenIsValid){
+    console.log("второй роут")
+    next('/home')
+  }
+  else if(to.meta.requiresAuth && !userStore.tokenIsValid){
     next('/login')
   }
   else{

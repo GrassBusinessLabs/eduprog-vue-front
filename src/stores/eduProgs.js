@@ -9,7 +9,8 @@ export const useEduProgsStore = defineStore({
     loading: false,
     eduProgData: {},
     creditsInfo: {},
-    scheme:[]
+    scheme:[],
+    disciplines:[],
   }),
 
   getters: {
@@ -18,6 +19,7 @@ export const useEduProgsStore = defineStore({
     getEduProg: state => state.eduProgData,
     getCreditsInfo: state => state.creditsInfo,
     getScheme: state => state.scheme,
+    getDisciplines: state => state.disciplines,
   },
 
   actions: {
@@ -71,6 +73,17 @@ export const useEduProgsStore = defineStore({
   },
     async setComponentToScheme(payload){
       const response = await postData('/eduprogs/scheme/setCompToSemester', payload);
+    },
+    async createDiscipline(payload){
+      const response = await postData('/eduprogs/scheme/disciplines/create', payload);
+    },
+    async fetchDisciplines(id){
+      const response = await getData('/eduprogs/scheme/disciplines/getByEdId/'+id);
+      console.log("Респонс", response)
+      this.disciplines = response
+    },
+    async deleteDiscipline(id){
+      const response = await deleteData('/eduprogs/scheme/disciplines/'+id);
     },
     async deleteComponentFromSheme(id){
       const response = await deleteData('/eduprogs/scheme/'+id);
