@@ -189,7 +189,7 @@
           <input
             class="text-right"
             disabled
-            :value="creditsInfo.total_credits"
+            :value="creditsInfo.mandatory_credits"
           >/180 кредитів
         </div>
       </th>
