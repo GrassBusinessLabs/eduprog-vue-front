@@ -36,6 +36,7 @@ const createEduProg =( async() => {
   dialogCreate.value=false
   await eduProgsStore.fetchEduProgs()
 })
+
 // const createEduProg =( async() => {
 //   console.log(newEduProg)
 //   await eduProgsStore.createEduProg(newEduProg)
@@ -72,7 +73,8 @@ const deleteEduProgDialog= function dialogg(id) {
   dialogDelete.value=true
   currentEduProg = id
 }
-const editEduProg = function edit(id) {
+const editEduProg = function edit(event, id) {
+  console.log(event)
   router.replace('/eduprogs/'+id)
 }
 
@@ -200,6 +202,7 @@ const newEduProg = ref({
       <tr 
         v-for="item in eduProgs"
         :key="item.id"
+        @click="editEduProg($event, item.id)"
       >
         <td>{{ item.name }}</td>
         <td class="text-center">
@@ -212,78 +215,36 @@ const newEduProg = ref({
           {{ moment(item.updated_date).format('DD.MM.YYYY HH:mm:ss') }}
         </td>
         <td class="text-center">
-          <VMenu
-            bottom
-            left
-            activator="parent"
-          >
-            <template #activator="{ on, attrs }">
-              <VBtn
-                dark
-                icon
-                v-bind="attrs"
-                :shaped="false"
-                size="small"
-                v-on="on"
-              >
-                <VIcon>mdi-dots-horizontal</VIcon>
-              </VBtn>
-            </template>
+          <VBtn
+            icon="mdi-pencil"
+            size="x-small"
+            style="margin-right:2% "
+            @click.stop="renameEduProgDialog(item)"
+          />
 
-            <VList>
-               <VListItem link  @click="editEduProg(item.id)">
-                <template #prepend>
-                  <VIcon
-                    class="me-2"
-                    icon="mdi-file-edit"
-                    size="22"
-                  />
-                </template>
-
-                <VListItemTitle>
-                  Редагувати
-                </VListItemTitle>
-              </VListItem>
-              <VListItem link @click="renameEduProgDialog(item)">
-                <template #prepend>
-                  <VIcon
-                    class="me-2"
-                    icon="mdi-pencil"
-                    size="22"
-                  />
-                </template>
-
-                <VListItemTitle @click="renameEduProgDialog(item)">Перейменувати</VListItemTitle>
-              </VListItem>
-              <VListItem link  @click="deleteEduProgDialog(item)">
-                <template #prepend>
-                  <VIcon
-                    class="me-2"
-                    icon="mdi-trash-can"
-                    size="22"
-                  />
-                </template>
-
-                <VListItemTitle @click="deleteEduProgDialog(item)">Видалити</VListItemTitle>
-              </VListItem>
-            </VList>
-          </VMenu>
+          <VBtn
+            icon="mdi-trash-can"
+            size="x-small"
+            @click.stop="deleteEduProgDialog(item)"
+          />
         </td>
       </tr>
     </tbody>
   </VTable>
-  <v-alert
-  border="left"
-  text
-  type="info"
-  prominent
-  v-else
+  <VAlert
+    v-else
+    border="left"
+    text
+    type="info"
+    prominent
   >
-  Поки що не створено жодної освітньо-професійної програми.
-  </v-alert>
-  <VDialog v-model="dialogRename"
-            persistent
-           max-width="600">
+    Поки що не створено жодної освітньо-професійної програми.
+  </VAlert>
+  <VDialog
+    v-model="dialogRename"
+    persistent
+    max-width="600"
+  >
     <VCard>
       <VCardTitle>Перейменувати ОПП</VCardTitle>
       <VCardText>
@@ -311,7 +272,8 @@ const newEduProg = ref({
           </VBtn>
           <VBtn
             text
-            @click="editNameEduProg(); dialogRename = false"
+            @click="editNameEduProg(); 
+            dialogRename = false"
           >
             Зберегти
           </VBtn>
@@ -353,6 +315,7 @@ const newEduProg = ref({
     </VCard>
   </VDialog>
 </template>
+
 <route lang="yaml">
 meta:
   requiresAuth: true
