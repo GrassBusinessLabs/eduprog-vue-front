@@ -45,7 +45,7 @@ const vuetifyTheme = useTheme()
     />
     <VerticalNavLink
       :item="{
-        title: 'Налаштування профілю',
+        title: 'Профіль',
         to: 'account-settings',
         icon: { icon: 'mdi-account-cog-outline' }
       }"

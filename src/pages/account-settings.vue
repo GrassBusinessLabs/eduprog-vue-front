@@ -26,4 +26,5 @@ const activeTab = ref(route.params.tab)
 <route lang="yaml">
 meta:
   navActiveLink: pages-account-settings-tab
+  requiresAuth: true
 </route>
