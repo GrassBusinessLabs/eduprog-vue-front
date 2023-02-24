@@ -16,7 +16,6 @@ const router = createRouter({
 router.beforeEach(async function(to, from, next){
   const userStore = useUserStore()
   await userStore.checkToken()
-  console.log(userStore.tokenIsValid)
   if(to.fullPath==="/"){
      next('/home')
   }
