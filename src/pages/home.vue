@@ -200,6 +200,7 @@ const newEduProg = ref({
     </thead>
     <tbody>
       <tr 
+        class="eduprog-item"
         v-for="item in eduProgs"
         :key="item.id"
         @click="editEduProg($event, item.id)"

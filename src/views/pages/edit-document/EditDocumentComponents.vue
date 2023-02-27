@@ -114,7 +114,9 @@
               class="text-right"
               disabled
               :value="creditsInfo.mandatory_credits"
-            >/180 кредитів
+            >/<span>
+              {{creditsInfo.mandatory_credits+creditsInfo.mandatory_free_credits}}
+            </span>
           </div>
         </th>
       </tr>
@@ -234,7 +236,9 @@
               class="text-right"
               disabled
               :value="creditsInfo.selective_credits"
-            >/180 кредитів
+            >/<span>
+              {{creditsInfo.selective_credits+creditsInfo.selective_free_credits}}
+            </span>
           </div>
         </th>
       </tr>
@@ -366,7 +370,7 @@ import { useEduProgsStore } from '@/stores/eduProgs.js'
 const route = useRoute()
 const eduProgsStore = useEduProgsStore()
 
-const creditsInfo = eduProgsStore.creditsInfo
+const creditsInfo = reactive(eduProgsStore.creditsInfo)
 const components = eduProgsStore.getEduProg.components
 
 const editIndex =  ref(null)
@@ -391,10 +395,12 @@ function changeDialog() {
 
 async function createComponent() {
   if(dialogCreate.value){
+    newComponent.code = String(components.mandatory.length + 1)
     newComponent.type="ОК"
     dialogCreate.value = false
   }
   else if(dialogCreateSelective.value){
+    newComponent.code = String(components.selective.length + 1)
     newComponent.type="ВБ"
     dialogCreateSelective.value = false
   }
@@ -422,6 +428,9 @@ async function remove(component) {
 
 async function saveComponent(component) {
   await eduProgsStore.editComponent(component.id, component)
+  await eduProgsStore.findEduProgById(route.params.id)
+  console.log(eduProgsStore.creditsInfo)
+  console.log(creditsInfo)
   originalData.value = null
   editIndex.value = null
 }
@@ -430,5 +439,8 @@ async function saveComponent(component) {
 <style>
 input[type="number"] {
   text-align: right;
+}
+.eduprog-item{
+  cursor: pointer
 }
 </style>

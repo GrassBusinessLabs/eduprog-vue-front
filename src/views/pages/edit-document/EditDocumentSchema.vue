@@ -17,6 +17,7 @@ const scheme = eduProgsStore.getScheme
 
 const editIndex = ref(null)
 const originalData = ref(null)
+
 const semesters = ref([...Array(8).keys()])
 const changes = reactive({
   subjects: [],
@@ -71,17 +72,19 @@ async function deleteComponent(event, element) {
   await eduProgsStore.fetchScheme(route.params.id)
 }
 
-function edit(item, index) {
-  originalData.value = Object.assign({}, item)
-  editIndex.value = index
+function edit(item) {
+  editIndex.value = item.id
 }
 function cancel(item) {
-  console.log("fdsfs")
+  editIndex.value = null
+  Object.assign(item, originalData.value)
+  originalData.value = null
 }
 
 function save(item) {
   originalData.value = null
   editIndex.value = null
+  eduProgsStore.editDiscipline(item)
 }
 function getComponentByDiscipline(discipline, semestr) {
   let array =  scheme.filter(e => {
@@ -98,7 +101,7 @@ function getComponentByDiscipline(discipline, semestr) {
 }
 const getSubjectsD = ref([])
 
-const getSubjects = computed(() => getSubjectsD.value.length)
+const getSubjects =  computed(() => getSubjectsD.value.length)
 
 // const getSubjects = computed(() => components.mandatory.concat(components.selective))
 
@@ -125,7 +128,7 @@ const newDiscipline = reactive( {
 
 async function createNewDiscipline() {
   await eduProgsStore.createDiscipline(newDiscipline)
-   await eduProgsStore.fetchDisciplines(route.params.id)
+  await eduProgsStore.fetchDisciplines(route.params.id)
   newDiscipline.name=''
   disciplines.value = eduProgsStore.getDisciplines
   dialogCreate.value=false
@@ -189,7 +192,7 @@ function cancelNewDiscipline() {
       >
         <VCardText cols="12">
           <Draggable
-            :list="getSubjects"
+            :list="getSubjectsD"
             :disabled="!enabled"
             item-key="name"
             class="list-group"
@@ -285,16 +288,16 @@ function cancelNewDiscipline() {
           >
             <td>
               <div style="text-align: center">
-                <span v-if="editIndex !== index">{{ item.name }}</span>
-                <span v-if="editIndex === index">
-                  <input
-                    v-model="disciplines[index]"
-                    class="border-solid"
-                  >
+                <span v-if="editIndex !== item.id">{{ item.name }}</span>
+                <span v-if="editIndex === item.id">
+                  <VTextField
+                    class="my-3"
+                    v-model="item.name"
+                  />
                 </span>
               </div>
               <div style="text-align: center; margin-top: 5%; margin-bottom: 5%">
-                <span v-if="editIndex !== index">
+                <span v-if="editIndex !== item.id">
                   <VMenu
                     bottom
                     left
@@ -316,7 +319,7 @@ function cancelNewDiscipline() {
                     <VList>
                       <VListItem
                         link
-                        @click="edit(item, index)"
+                        @click="edit(item)"
                       >
                         <template #prepend>
                           <VIcon
