@@ -1,15 +1,15 @@
-<script>
-export default {
-  name: 'Uhuy',
-  props:['components'],
-  data() {
-    return {
-      prost:['Філософія','Математика','qwewqewqeqw','ewqeqwewq'],//З сервера має надходити массив з доступними предметами
-      mandatoryComponents: this.components.mandatory,
-    }
-  },
-}
+<script setup>
+import { useEduProgsStore } from '@/stores/eduProgs.js'
+import { reactive } from 'vue'
+const eduProgsStore = useEduProgsStore()
+const components = eduProgsStore.getEduProg.components
 
+const prost = ['Філософія','Математика','qwewqewqeqw','ewqeqwewq']
+const items = ref([])
+
+const mandatoryComponents = reactive(components.mandatory)
+console.log("mandatoryComponents",mandatoryComponents)
+console.log("components.mandatory",components.mandatory)
 </script>
 
 <template>
@@ -38,27 +38,19 @@ export default {
       <td>{{ 'ОК ' + item.code }}</td>
         <td >
           <span>{{ item.name }}</span>
-          <span></span>
-          
          </td> 
          <td>
-          <VContainer fluid>
-            <VRow>
-              <VCol cols="12">
-                <VCombobox
-                  v-model="prost"
-
+          <VContainer>
+                <v-combobox
+                  v-model="items"
+                  :items="prost"
                   multiple
-                  small-chips
-                />
-              </VCol>
-            </VRow>
+                  style='width: 300px'
+                ></v-combobox>
           </VContainer>
-          <!-- <VSelect class="my-5" label="select" :items="mandatoryComponents" persistent-hint multiple  ></VSelect>fix position Vselect, his ride on page -->
          </td>    
     </tr>
     </tbody>
   </VTable>
-
 </template>
 

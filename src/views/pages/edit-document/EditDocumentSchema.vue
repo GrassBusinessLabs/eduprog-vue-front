@@ -17,6 +17,7 @@ const scheme = eduProgsStore.getScheme
 
 const editIndex = ref(null)
 const originalData = ref(null)
+
 const semesters = ref([...Array(8).keys()])
 const changes = reactive({
   subjects: [],
@@ -76,7 +77,9 @@ function edit(item, index) {
   editIndex.value = index
 }
 function cancel(item) {
-  console.log("fdsfs")
+  editIndex.value = null
+  Object.assign(item, originalData.value)
+  originalData.value = null
 }
 
 function save(item) {
@@ -98,7 +101,7 @@ function getComponentByDiscipline(discipline, semestr) {
 }
 const getSubjectsD = ref([])
 
-const getSubjects = computed(() => getSubjectsD.value.length)
+const getSubjects =  computed(() => getSubjectsD.value.length)
 
 // const getSubjects = computed(() => components.mandatory.concat(components.selective))
 
@@ -125,7 +128,7 @@ const newDiscipline = reactive( {
 
 async function createNewDiscipline() {
   await eduProgsStore.createDiscipline(newDiscipline)
-   await eduProgsStore.fetchDisciplines(route.params.id)
+  await eduProgsStore.fetchDisciplines(route.params.id)
   newDiscipline.name=''
   disciplines.value = eduProgsStore.getDisciplines
   dialogCreate.value=false
@@ -189,7 +192,7 @@ function cancelNewDiscipline() {
       >
         <VCardText cols="12">
           <Draggable
-            :list="getSubjects"
+            :list="getSubjectsD"
             :disabled="!enabled"
             item-key="name"
             class="list-group"
@@ -287,10 +290,10 @@ function cancelNewDiscipline() {
               <div style="text-align: center">
                 <span v-if="editIndex !== index">{{ item.name }}</span>
                 <span v-if="editIndex === index">
-                  <input
-                    v-model="disciplines[index]"
-                    class="border-solid"
-                  >
+                  <VTextField
+                    class="my-3"
+                    v-model="item.name"
+                  />
                 </span>
               </div>
               <div style="text-align: center; margin-top: 5%; margin-bottom: 5%">
