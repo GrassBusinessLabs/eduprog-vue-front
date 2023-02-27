@@ -4,23 +4,29 @@ import { reactive } from 'vue'
 const eduProgsStore = useEduProgsStore()
 const components = eduProgsStore.getEduProg.components
 
-const prost = ['Філософія','Математика','qwewqewqeqw','ewqeqwewq']
-const items = ref([])
+const mandatoryComponents = reactive(components.mandatory.map(component => ({
+  ...component,
+  items: [], // добавляем пустой массив items для каждого компонента
+})))
 
-const mandatoryComponents = reactive(components.mandatory)
-console.log("mandatoryComponents",mandatoryComponents)
-console.log("components.mandatory",components.mandatory)
+const allComponents = ref(components.mandatory)
+
+// вычисляемое свойство для связывания v-combobox с соответствующим массивом items
+const getItems = component => computed({
+  get: () => component.items,
+  set: value => component.items = value,
+})
 </script>
 
 <template>
   <VTable>
     <thead class="thead-light">
-    <tr>
-      <th class="text-center">
-        Назва документу
-      </th>
-    </tr>
-  </thead>
+      <tr>
+        <th class="text-center">
+          Назва документу
+        </th>
+      </tr>
+    </thead>
   </VTable>
   <VTable>
     <thead class="thead-light">
@@ -32,24 +38,26 @@ console.log("components.mandatory",components.mandatory)
     </thead>
     <tbody>
       <tr
-        v-for="(item) in mandatoryComponents"
-        :key="item.id"
+        v-for="(component) in mandatoryComponents"
+        :key="component.id"
       >
-      <td>{{ 'ОК ' + item.code }}</td>
-        <td >
-          <span>{{ item.name }}</span>
-         </td> 
-         <td>
-          <VContainer>
-                <v-combobox
-                  v-model="items"
-                  :items="prost"
-                  multiple
-                  style='width: 300px'
-                ></v-combobox>
-          </VContainer>
-         </td>    
-    </tr>
+        >
+        <td>{{ 'ОК ' + component.code }}</td>
+        <td>
+          <span>{{ component.name }}</span>
+        </td> 
+        <td rowspan="1">
+          <VCombobox
+            v-model="getItems(component).value"
+            :items="allComponents.name"
+            multiple
+            chips
+            small-chips
+            class="ma-0"
+            style="max-width:500px"
+          />
+        </td>    
+      </tr>
     </tbody>
   </VTable>
 </template>
