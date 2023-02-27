@@ -26,14 +26,14 @@ const tabs = [
     tab: 'components',
   },
   {
+    title: 'Розподіл по семестрам',
+    icon: 'mdi-table',
+    tab: 'sequence',
+  },
+  {
     title: 'Структурно-логічна послідовність ОПП',
     icon: 'mdi-format-line-style',
     tab: 'schema',
-  },
-  {
-    title: 'Структурно логічна схема',
-    icon: 'mdi-table',
-    tab: 'sequence',
   },
 ]
 </script>
@@ -73,15 +73,13 @@ const tabs = [
       <VWindowItem value="components">
         <EditDocumentComponents/>
       </VWindowItem>
-
+  <!-- Структурно логічна схема -->
+      <VWindowItem value="sequence">
+        <EditDocumentSchema  @addComponentToScheme='addComponentToScheme' @deleteComponentFromSheme='deleteComponentFromSheme'/>
+      </VWindowItem>
       <!-- Структурно логічна послідовнсість -->
       <VWindowItem value="schema">
         <EditDocumentSequence  :components="eduProgsStore.getEduProg.components"/>
-      </VWindowItem>
-
-      <!-- Структурно логічна схема -->
-      <VWindowItem value="sequence">
-        <EditDocumentSchema  @addComponentToScheme='addComponentToScheme' @deleteComponentFromSheme='deleteComponentFromSheme'/>
       </VWindowItem>
     </VWindow>
   </div>

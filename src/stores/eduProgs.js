@@ -56,6 +56,9 @@ export const useEduProgsStore = defineStore({
       }
     }
 },
+async fetchCreditsInfo(id){
+  this.creditsInfo = await getData('/eduprogs/credits/'+id)
+},
   async editEduprog(payload){
     await editData('eduprogs/'+this.eduProgData.id, payload);
   },
@@ -79,14 +82,25 @@ export const useEduProgsStore = defineStore({
     },
     async fetchDisciplines(id){
       const response = await getData('/eduprogs/scheme/disciplines/getByEdId/'+id);
-      console.log("Респонс", response)
       this.disciplines = response
     },
     async deleteDiscipline(id){
       const response = await deleteData('/eduprogs/scheme/disciplines/'+id);
     },
+    async editDiscipline(discipline){
+      
+      const editedDiscipline ={
+        name: discipline.name,
+        eduprog_id: discipline.eduprog_id
+      }
+      await editData('/eduprogs/scheme/disciplines/'+discipline.id, editedDiscipline);
+    },
     async deleteComponentFromSheme(id){
       const response = await deleteData('/eduprogs/scheme/'+id);
+    },
+    async fetchPossibleRelations(eduId, compId){
+      const response = await getData('/eduprogs/compRelations/posRel/'+eduId+"/"+compId);
+      return response
     },
   },
 })

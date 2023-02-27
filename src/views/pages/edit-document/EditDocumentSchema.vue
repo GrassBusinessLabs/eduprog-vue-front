@@ -72,9 +72,8 @@ async function deleteComponent(event, element) {
   await eduProgsStore.fetchScheme(route.params.id)
 }
 
-function edit(item, index) {
-  originalData.value = Object.assign({}, item)
-  editIndex.value = index
+function edit(item) {
+  editIndex.value = item.id
 }
 function cancel(item) {
   editIndex.value = null
@@ -85,6 +84,7 @@ function cancel(item) {
 function save(item) {
   originalData.value = null
   editIndex.value = null
+  eduProgsStore.editDiscipline(item)
 }
 function getComponentByDiscipline(discipline, semestr) {
   let array =  scheme.filter(e => {
@@ -288,8 +288,8 @@ function cancelNewDiscipline() {
           >
             <td>
               <div style="text-align: center">
-                <span v-if="editIndex !== index">{{ item.name }}</span>
-                <span v-if="editIndex === index">
+                <span v-if="editIndex !== item.id">{{ item.name }}</span>
+                <span v-if="editIndex === item.id">
                   <VTextField
                     class="my-3"
                     v-model="item.name"
@@ -297,7 +297,7 @@ function cancelNewDiscipline() {
                 </span>
               </div>
               <div style="text-align: center; margin-top: 5%; margin-bottom: 5%">
-                <span v-if="editIndex !== index">
+                <span v-if="editIndex !== item.id">
                   <VMenu
                     bottom
                     left
@@ -319,7 +319,7 @@ function cancelNewDiscipline() {
                     <VList>
                       <VListItem
                         link
-                        @click="edit(item, index)"
+                        @click="edit(item)"
                       >
                         <template #prepend>
                           <VIcon
