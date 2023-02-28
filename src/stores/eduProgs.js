@@ -102,5 +102,17 @@ async fetchCreditsInfo(id){
       const response = await getData('/eduprogs/compRelations/posRel/'+eduId+"/"+compId);
       return response
     },
+    async fetchRelations(eduId){
+      const response = await getData('/eduprogs/compRelations/'+eduId);
+      return response
+    },
+    async createRelation(payload){
+      const response = await postData('/eduprogs/compRelations/create', payload);
+      return response
+    },
+    async deleteRelation(baseId, childId){
+      const response = await deleteData('/eduprogs/compRelations/'+baseId+'/'+childId);
+      return response
+    },
   },
 })

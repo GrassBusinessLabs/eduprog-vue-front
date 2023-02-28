@@ -39,6 +39,7 @@ const tabs = [
 </script>
 
 <template>
+
   <div v-if="!eduProgsStore.isLoading && eduProgsStore.getEduProg && eduProgsStore.getEduProg.id!=0" >
     <VTabs
       v-model="activeTab"
