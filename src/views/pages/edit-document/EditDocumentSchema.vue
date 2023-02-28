@@ -99,17 +99,8 @@ function getComponentByDiscipline(discipline, semestr) {
 
   return array
 }
-const getSubjectsD = ref([])
 
-const getSubjects =  computed(() => getSubjectsD.value.length)
-
-// const getSubjects = computed(() => components.mandatory.concat(components.selective))
-
-// function getSubjects() {
-//   console.log("asdfsfgsf",components.mandatory.concat(components.selective))
-//
-//   return components.mandatory.concat(components.selective).value
-// }
+const getSubjects =  computed(() => components.mandatory.concat(components.selective))
 
 function handleSubject(event, semester, discipline) {
   changes.subjects = event
@@ -192,7 +183,7 @@ function cancelNewDiscipline() {
       >
         <VCardText cols="12">
           <Draggable
-            :list="getSubjectsD"
+            :list="getSubjects"
             :disabled="!enabled"
             item-key="name"
             class="list-group"
