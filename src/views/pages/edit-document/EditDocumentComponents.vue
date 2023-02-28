@@ -113,9 +113,9 @@
             <input
               class="text-right"
               disabled
-              :value="creditsInfo.mandatory_credits"
+              :value="eduProgsStore.creditsInfo.mandatory_credits"
             >/<span>
-              {{creditsInfo.mandatory_credits+creditsInfo.mandatory_free_credits}}
+              {{eduProgsStore.creditsInfo.mandatory_credits+eduProgsStore.creditsInfo.mandatory_free_credits}}
             </span>
           </div>
         </th>
@@ -235,9 +235,9 @@
             <input
               class="text-right"
               disabled
-              :value="creditsInfo.selective_credits"
+              :value="eduProgsStore.creditsInfo.selective_credits"
             >/<span>
-              {{creditsInfo.selective_credits+creditsInfo.selective_free_credits}}
+              {{eduProgsStore.creditsInfo.selective_credits+eduProgsStore.creditsInfo.selective_free_credits}}
             </span>
           </div>
         </th>
@@ -370,8 +370,7 @@ import { useEduProgsStore } from '@/stores/eduProgs.js'
 const route = useRoute()
 const eduProgsStore = useEduProgsStore()
 
-const creditsInfo = reactive(eduProgsStore.creditsInfo)
-const components = eduProgsStore.getEduProg.components
+const components =  reactive(eduProgsStore.getEduProg.components)
 
 const editIndex =  ref(null)
 const originalData = ref(null)
@@ -393,21 +392,70 @@ function changeDialog() {
   dialogCreate.value = !dialogCreate.value
 }
 
+// async function createComponent() {
+//   if(dialogCreate.value){
+//     newComponent.code = String(components.mandatory.length + 1)
+//     newComponent.type="ОК"
+//     dialogCreate.value = false
+//     components.mandatory.push(newComponent)
+//   }
+//   else if(dialogCreateSelective.value){
+//     newComponent.code = String(components.selective.length + 1)
+//     newComponent.type="ВБ"
+//     dialogCreateSelective.value = false
+//     components.selective.push(newComponent)
+//   }
+//   console.log("sdhjiidfg",components.mandatory)
+//   await eduProgsStore.createComponent(newComponent)
+//
+//   // await eduProgsStore.findEduProgById(route.params.id)
+//
+// }
 async function createComponent() {
   if(dialogCreate.value){
-    newComponent.code = String(components.mandatory.length + 1)
-    newComponent.type="ОК"
+    const mandatoryComponent = {
+      code: String(components.mandatory.length + 1),
+      name: newComponent.name,
+      credits: newComponent.credits,
+      control_type: newComponent.control_type,
+      type: "ОК",
+      sub_type: newComponent.sub_type,
+      category: newComponent.category,
+      eduprog_id: newComponent.eduprog_id,
+    }
+    components.mandatory.push(mandatoryComponent)
+    await eduProgsStore.createComponent(mandatoryComponent)
+
     dialogCreate.value = false
-  }
-  else if(dialogCreateSelective.value){
-    newComponent.code = String(components.selective.length + 1)
-    newComponent.type="ВБ"
+
+  } else if(dialogCreateSelective.value){
+    const selectiveComponent = {
+      code: String(components.selective.length + 1),
+      name: newComponent.name,
+      credits: newComponent.credits,
+      control_type: newComponent.control_type,
+      type: "ВБ",
+      sub_type: newComponent.sub_type,
+      category: newComponent.category,
+      eduprog_id: newComponent.eduprog_id,
+    }
+
+    components.selective.push(selectiveComponent)
+    await eduProgsStore.createComponent(selectiveComponent)
+
     dialogCreateSelective.value = false
   }
-  console.log(newComponent)
-  await eduProgsStore.createComponent(newComponent)
-  await eduProgsStore.findEduProgById(route.params.id)
+  newComponent.code = 0
+  newComponent.name = ""
+  newComponent.credits = 0
+  newComponent.control_type = ""
+  newComponent.type = ""
+  newComponent.sub_type = "н/д"
+  newComponent.category = "н/д"
+  newComponent.eduprog_id = +route.params.id
 }
+
+
 
 function edit(item, index) {
   originalData.value = Object.assign({}, item)
@@ -423,14 +471,22 @@ function cancel(item) {
 
 async function remove(component) {
   await eduProgsStore.deleteComponent(component)
-  await eduProgsStore.findEduProgById(route.params.id)
+
+  const index =  mandatoryComponents.value.findIndex(item => item.id === component.id)
+  if (index !== -1) {
+    mandatoryComponents.value.splice(index, 1)
+  }
+
+  // await eduProgsStore.findEduProgById(route.params.id)
+
 }
 
 async function saveComponent(component) {
   await eduProgsStore.editComponent(component.id, component)
-  await eduProgsStore.findEduProgById(route.params.id)
+
+  // await eduProgsStore.findEduProgById(route.params.id)
+
   console.log(eduProgsStore.creditsInfo)
-  console.log(creditsInfo)
   originalData.value = null
   editIndex.value = null
 }
