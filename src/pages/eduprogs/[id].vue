@@ -5,6 +5,7 @@ import EditDocumentComponents from '@/views/pages/edit-document/EditDocumentComp
 import EditDocumentSchema from '@/views/pages/edit-document/EditDocumentSchema.vue'
 import EditDocumentSequence from '@/views/pages/edit-document/EditDocumentSequence.vue'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
+import axios from 'axios'
 const eduProgsStore = useEduProgsStore()
 const route = useRoute()
 const activeTab = ref(route.params.tab)
@@ -12,7 +13,6 @@ onMounted(async ()=>{
   await eduProgsStore.findEduProgById(route.params.id)
   await eduProgsStore.fetchScheme(route.params.id)
 })
-
 // tabs
 const tabs = [
   {
@@ -39,6 +39,14 @@ const tabs = [
 </script>
 
 <template>
+  <VBtn
+            class="my-3"
+            dark
+            @click="downloadFile"
+
+          >
+            Експортувати в excel
+  </VBtn>
   <div v-if="!eduProgsStore.isLoading && eduProgsStore.getEduProg && eduProgsStore.getEduProg.id!=0" >
     <VTabs
       v-model="activeTab"

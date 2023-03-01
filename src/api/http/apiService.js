@@ -48,4 +48,6 @@ const editData = async (url, payload) => {
   }
 }
 
+
 export { getData, postData, deleteData, editData, apiService }
+
