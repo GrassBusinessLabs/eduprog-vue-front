@@ -4,6 +4,7 @@ import EditDocumentCharacteristic from '@/views/pages/edit-document/EditDocument
 import EditDocumentComponents from '@/views/pages/edit-document/EditDocumentComponents.vue'
 import EditDocumentSchema from '@/views/pages/edit-document/EditDocumentSchema.vue'
 import EditDocumentSequence from '@/views/pages/edit-document/EditDocumentSequence.vue'
+import EditDocumentMatrix from '@/views/pages/edit-document/EditDocumentMatrix.vue'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 const eduProgsStore = useEduProgsStore()
 const route = useRoute()
@@ -34,6 +35,11 @@ const tabs = [
     title: 'Структурно-логічна послідовність ОПП',
     icon: 'mdi-format-line-style',
     tab: 'schema',
+  },
+  {
+    title: 'Матриця відповідностей',
+    icon: 'mdi-matrix',
+    tab: 'matrix',
   },
 ]
 </script>
@@ -80,6 +86,10 @@ const tabs = [
       <!-- Структурно логічна послідовнсість -->
       <VWindowItem value="schema">
         <EditDocumentSequence  :components="eduProgsStore.getEduProg.components"/>
+      </VWindowItem>
+      <!-- Матриця -->
+      <VWindowItem value="matrix">
+        <EditDocumentMatrix/>
       </VWindowItem>
     </VWindow>
   </div>
