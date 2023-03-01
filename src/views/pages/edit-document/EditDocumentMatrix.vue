@@ -28,9 +28,20 @@ const generalCompetencies = reactive([
   },
 ])
 const selected = reactive({})
-onMounted( ()=> {
+
+// onMounted( ()=> {
+//   Object.keys(generalCompetencies).forEach(el => {
+//     selected[el] = [components.mandatory.map(obj => obj.id)]
+//   })
+// })
+onMounted(() => {
   Object.keys(generalCompetencies).forEach(el => {
-    selected[el] = [components.mandatory.map(obj => obj.id)]
+    selected[el] = components.mandatory.forEach(obj => {
+      return {
+        id: obj.id,
+        value: false,
+      }
+    })
   })
 })
 console.log('sdfgsdfgsdf',selected)
