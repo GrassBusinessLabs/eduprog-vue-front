@@ -36,9 +36,9 @@ const selected = reactive({})
 // })
 onMounted(() => {
   Object.keys(generalCompetencies).forEach(el => {
-    selected[el] = components.mandatory.forEach(obj => {
+    selected[el] = components.mandatory.map(obj => {
       return {
-        id: obj.id,
+        id: obj.id ,
         value: false,
       }
     })
@@ -77,7 +77,7 @@ console.log('sdfgsdfgsdf',selected)
               :key=" component.id"
             >
               <VCheckbox style="margin-left: 45%"
-              v-model = selected[item][component]
+              v-model = selected[item.id][component.id]
               />
             </td>
           </tr>
