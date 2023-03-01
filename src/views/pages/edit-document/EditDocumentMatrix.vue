@@ -8,9 +8,8 @@ const route = useRoute()
 const eduProgsStore = useEduProgsStore()
 const components = eduProgsStore.getEduProg.components
 
-console.log('dfgdfgdf',components)
 const editIndex = ref(null)
-const generalCompetencies = ref([
+const generalCompetencies = reactive([
   {
     id:1,
     description:'jkkfjgjl',
@@ -28,42 +27,48 @@ const generalCompetencies = ref([
     description:'jhjikljk',
   },
 ])
+const selected = reactive({})
+onMounted( ()=> {
+  Object.keys(generalCompetencies).forEach(el => {
+    selected[el] = [components.mandatory.map(obj => obj.id)]
+  })
+})
+console.log('sdfgsdfgsdf',selected)
 </script>
 
 <template>
   <VRow>
     <VCol>
       <VTable>
-        <thead>
+        <tbody>
           <tr>
+            <th />
             <th
-              rowspan="2"
-              class="text-center"
-            />
-          </tr>
-
-          <tr>
-            <th
-              v-for="item in generalCompetencies"
-              :key="item.id"
+              v-for="component in components.mandatory"
+              :key="component.id"
             >
               <div style="text-align: center">
-                <span v-if="editIndex !== item.id">{{ 'ЗК' + item.id }}</span>
+                <span>{{ 'ОК' + component.code }}</span>
               </div>
             </th>
           </tr>
-        </thead>
-        <tbody>
           <tr
             v-for="item in generalCompetencies"
             :key="item.id"
           >
-            <td>
+            <td colspan="1">
               <div style="text-align: center">
-                <span v-if="editIndex !== item.id">{{ 'ЗК' + item.id }}</span>
+                <span>{{ 'ЗК' + item.id }}</span>
               </div>
             </td>
-            <td />
+            <td
+              v-for=" component in components.mandatory "
+              :key=" component.id"
+            >
+              <VCheckbox style="margin-left: 45%"
+              v-model = selected[item][component]
+              />
+            </td>
           </tr>
         </tbody>
       </VTable>
