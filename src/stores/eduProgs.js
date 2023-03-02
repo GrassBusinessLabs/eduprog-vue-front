@@ -11,6 +11,7 @@ export const useEduProgsStore = defineStore({
     creditsInfo: {},
     scheme:[],
     disciplines:[],
+    competencies: [],
   }),
 
   getters: {
@@ -20,6 +21,7 @@ export const useEduProgsStore = defineStore({
     getCreditsInfo: state => state.creditsInfo,
     getScheme: state => state.scheme,
     getDisciplines: state => state.disciplines,
+    getCompetencies: state => state.competencies,
   },
 
   actions: {
@@ -42,7 +44,6 @@ export const useEduProgsStore = defineStore({
     },
     async fetchScheme(id){
       this.scheme = await getData('/eduprogs/scheme/byEduprogId/'+id);
-      console.log(this.scheme)
   },
   async findEduProgById(id){
     if (!this.loading) {
@@ -63,7 +64,6 @@ async fetchCreditsInfo(id){
     await editData('eduprogs/'+this.eduProgData.id, payload);
   },
   async createComponent(payload){
-    console.log(payload)
     const response = await postData('eduprogs/comps/create', payload);
   },
   async editComponent(id, payload){
@@ -101,6 +101,21 @@ async fetchCreditsInfo(id){
     async fetchPossibleRelations(eduId, compId){
       const response = await getData('/eduprogs/compRelations/posRel/'+eduId+"/"+compId);
       return response
+    },
+    async fetchCompetencies(eduId){
+      const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId);
+      this.competencies = response
+    },
+    async createCompetencyRelation(eduprogId, componentId, competencyId){
+      const newRelation={
+        eduprog_id:eduprogId,
+        component_id: componentId,
+        competency_id: competencyId,
+      }
+      const response = await postData('/eduprogs/competenciesMatrix/create', newRelation);
+    },
+    async deleteCompetencyRelation(eduprogId, componentId, competencyId){
+      const response = await deleteData('/eduprogs/competenciesMatrix/'+componentId+'/'+competencyId);
     },
   },
 })

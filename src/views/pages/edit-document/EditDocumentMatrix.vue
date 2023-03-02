@@ -1,44 +1,34 @@
 <script setup>
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 
-import { reactive } from 'vue'
+import { onMounted, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 
 const eduProgsStore = useEduProgsStore()
 const components = eduProgsStore.getEduProg.components
-
-const editIndex = ref(null)
-const generalCompetencies = ref([
-  {
-    id:7,
-    description:'jkkfjgjl',
-  },
-  {
-    id:2,
-    description:'iogkkllv',
-  },
-  {
-    id:3,
-    description:'fjghjkhj',
-  },
-  {
-    id:4,
-    description:'jhjikljk',
-  },
-])
+const generalCompetencies =ref([])
 const selected = reactive({})
-generalCompetencies.value.forEach(el => {
+onBeforeMount(async () => {
+  await eduProgsStore.fetchCompetencies(route.params.id)
+  generalCompetencies.value = eduProgsStore.getCompetencies
+  generalCompetencies.value.forEach(el => {
     selected[el.id] = reactive({})
     components.mandatory.forEach(comp => {
       selected[el.id][comp.id] = false
-    })
+  })
 })
-console.log(selected)
+})
+const changeCheckbox = (e, componentId, competencyId)=>{
+  if(e){
+    eduProgsStore.createCompetencyRelation(+route.params.id, componentId, competencyId)
+  }else if(!e){
+    eduProgsStore.deleteCompetencyRelation(+route.params.id, componentId, competencyId)
+  }
+}
 </script>
 
 <template>
-<div></div><div></div><div></div><div></div><div></div>
   <VRow>
     <VCol>
       <VTable>
@@ -65,10 +55,11 @@ console.log(selected)
             </td>
             <td
               v-for=" component in components.mandatory "
-              :key=" component.id"
-            >
+              :key=" component.id"            >
               <VCheckbox style="margin-left: 45%"
-              v-model="selected[item.id][component.id]"/>
+              v-model="selected[item.id][component.id]"
+              @update:modelValue="changeCheckbox($event, item.id, component.id)"
+              />
             </td>
           </tr>
         </tbody>
