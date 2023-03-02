@@ -27,16 +27,19 @@ onBeforeMount(async () => {
     
     return acc;
 }, {});
+console.log(relations)
   generalCompetencies.value = eduProgsStore.getCompetencies
   generalCompetencies.value.forEach(el => {
     selected[el.id] = reactive({})
     valuesZK[el.id] = 0
     components.mandatory.forEach(comp => {
-      if(relations[el.id][comp.id]){
-        valuesZK[el.id]++
-        selected[el.id][comp.id] = true
+      try{
+        if(relations[el.id][comp.id]){
+          valuesZK[el.id]++
+          selected[el.id][comp.id] = true
+        }
       }
-      else{
+      catch{
         selected[el.id][comp.id] = false
       }
     })
@@ -44,8 +47,10 @@ onBeforeMount(async () => {
 })
 const changeCheckbox = (e, componentId, competencyId)=>{
   if(e){
+    valuesZK[competencyId]++
     eduProgsStore.createCompetencyRelation(+route.params.id, componentId, competencyId)
   }else if(!e){
+    valuesZK[competencyId]--
     eduProgsStore.deleteCompetencyRelation(+route.params.id, componentId, competencyId)
   }
 }
@@ -88,7 +93,7 @@ console.log(valuesZK)
                   {{ item.redefinition }}
                 </span>
                 <VProgressLinear
-
+                  v-model="valuesZK[item.id]"
                   :max="maxValue"
                   :buffer-value="value"
                   :color="progressColor"
