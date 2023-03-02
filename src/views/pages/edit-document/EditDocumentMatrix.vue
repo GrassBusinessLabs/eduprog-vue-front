@@ -9,28 +9,36 @@ const eduProgsStore = useEduProgsStore()
 const components = eduProgsStore.getEduProg.components
 const generalCompetencies =ref([])
 const selected = reactive({})
-const value = ref(10)
-const progressColor = ref('primary')
+const valuesZK = reactive({})
+const maxValue = ref(10)
+const progressColor = ref('primary') 
 
-watch(value, newValue => {
-  if (newValue < 25) {
-    progressColor.value = 'error'
-  } else if (newValue < 50) {
-    progressColor.value = 'warning'
-  } else if (newValue < 75) {
-    progressColor.value = 'info'
-  } else {
-    progressColor.value = 'success'
-  }
-})
 
 onBeforeMount(async () => {
   await eduProgsStore.fetchCompetencies(route.params.id)
+  await eduProgsStore.fetchCompetencyRelations(route.params.id)
+  const relations = eduProgsStore.getCompetencyRelations.reduce((acc, cur) => {
+    const competency_id = cur.competency_id;
+    const component_id = cur.component_id;
+    if (!acc[competency_id]) {
+        acc[competency_id] = {};
+    }
+    acc[competency_id][component_id] = true;
+    
+    return acc;
+}, {});
   generalCompetencies.value = eduProgsStore.getCompetencies
   generalCompetencies.value.forEach(el => {
     selected[el.id] = reactive({})
+    valuesZK[el.id] = 0
     components.mandatory.forEach(comp => {
-      selected[el.id][comp.id] = false
+      if(relations[el.id][comp.id]){
+        valuesZK[el.id]++
+        selected[el.id][comp.id] = true
+      }
+      else{
+        selected[el.id][comp.id] = false
+      }
     })
   })
 })
@@ -41,7 +49,7 @@ const changeCheckbox = (e, componentId, competencyId)=>{
     eduProgsStore.deleteCompetencyRelation(+route.params.id, componentId, competencyId)
   }
 }
-console.log('sdfgdfgdf',components)
+console.log(valuesZK)
 </script>
 
 <template>
@@ -80,7 +88,8 @@ console.log('sdfgdfgdf',components)
                   {{ item.redefinition }}
                 </span>
                 <VProgressLinear
-                  v-model="value"
+
+                  :max="maxValue"
                   :buffer-value="value"
                   :color="progressColor"
                 />
@@ -93,7 +102,7 @@ console.log('sdfgdfgdf',components)
               <VCheckbox
                 v-model="selected[item.id][component.id]"
                 style="margin-left: 47%"
-                @update:modelValue="changeCheckbox($event, item.id, component.id)"
+                @update:modelValue="changeCheckbox($event, component.id, item.id)"
               />
             </td>
           </tr>

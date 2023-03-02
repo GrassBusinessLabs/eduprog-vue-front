@@ -12,6 +12,7 @@ export const useEduProgsStore = defineStore({
     scheme: [],
     disciplines: [],
     competencies: [],
+    competencyRelations: [],
   }),
 
   getters: {
@@ -22,6 +23,7 @@ export const useEduProgsStore = defineStore({
     getScheme: state => state.scheme,
     getDisciplines: state => state.disciplines,
     getCompetencies: state => state.competencies,
+    getCompetencyRelations: state => state.competencyRelations,
   },
 
   actions: {
@@ -115,6 +117,10 @@ export const useEduProgsStore = defineStore({
     },
     async deleteCompetencyRelation(eduprogId, componentId, competencyId) {
       const response = await deleteData('/eduprogs/competenciesMatrix/' + componentId + '/' + competencyId)
+    },
+    async fetchCompetencyRelations(eduId) {
+      const response = await getData('/eduprogs/competenciesMatrix/'+eduId+'?type=ZK')
+      this.competencyRelations = response
     },
   },
 })
