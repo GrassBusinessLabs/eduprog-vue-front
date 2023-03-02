@@ -23,6 +23,16 @@ const getData = async (url) => {
     return Promise.reject(e)
   }
 }
+const getFile = async (url) => {
+  try {
+    const response = await apiService.get(url, {
+      responseType: 'blob'
+    })
+    return response
+  } catch (e) {
+    return Promise.reject(e)
+  }
+}
 const postData = async (url, payload) => {
   try {
     const response = await apiService.post(url, { ...payload })
@@ -48,4 +58,5 @@ const editData = async (url, payload) => {
   }
 }
 
-export { getData, postData, deleteData, editData, apiService }
+export { getData, postData, deleteData, editData, getFile, apiService }
+

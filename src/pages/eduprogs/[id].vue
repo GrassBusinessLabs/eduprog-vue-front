@@ -9,11 +9,13 @@ import { useEduProgsStore } from '@/stores/eduProgs.js'
 const eduProgsStore = useEduProgsStore()
 const route = useRoute()
 const activeTab = ref(route.params.tab)
-onMounted(async ()=>{
+onMounted(async () => {
   await eduProgsStore.findEduProgById(route.params.id)
   await eduProgsStore.fetchScheme(route.params.id)
 })
-
+const exportToExcel = () =>{
+  eduProgsStore.exportToExcel(route.params.id)
+}
 // tabs
 const tabs = [
   {
@@ -45,7 +47,18 @@ const tabs = [
 </script>
 
 <template>
-  <div v-if="!eduProgsStore.isLoading && eduProgsStore.getEduProg && eduProgsStore.getEduProg.id!=0" >
+  <VRow
+    justify="end"
+    class="mb-3"
+  >
+    <VBtn
+      dark
+      @click="exportToExcel"
+    >
+      Експортувати
+    </VBtn>
+  </VRow>
+  <div v-if="!eduProgsStore.isLoading && eduProgsStore.getEduProg && eduProgsStore.getEduProg.id != 0">
     <VTabs
       v-model="activeTab"
       show-arrows
@@ -72,34 +85,38 @@ const tabs = [
     >
       <!-- Головна -->
       <VWindowItem value="characteristic">
-        <EditDocumentCharacteristic :edu-prog="eduProgsStore.getEduProg"/>
+        <EditDocumentCharacteristic :edu-prog="eduProgsStore.getEduProg" />
       </VWindowItem>
 
       <!-- Перелік компонент -->
       <VWindowItem value="components">
-        <EditDocumentComponents/>
+        <EditDocumentComponents />
       </VWindowItem>
-  <!-- Структурно логічна схема -->
+      <!-- Структурно логічна схема -->
       <VWindowItem value="sequence">
-        <EditDocumentSchema  @addComponentToScheme='addComponentToScheme' @deleteComponentFromSheme='deleteComponentFromSheme'/>
+        <EditDocumentSchema
+          @addComponentToScheme="addComponentToScheme"
+          @deleteComponentFromSheme="deleteComponentFromSheme"
+        />
       </VWindowItem>
       <!-- Структурно логічна послідовнсість -->
       <VWindowItem value="schema">
-        <EditDocumentSequence  :components="eduProgsStore.getEduProg.components"/>
+        <EditDocumentSequence :components="eduProgsStore.getEduProg.components" />
       </VWindowItem>
       <!-- Матриця -->
       <VWindowItem value="matrix">
-        <EditDocumentMatrix/>
+        <EditDocumentMatrix />
       </VWindowItem>
     </VWindow>
   </div>
-  <v-alert v-if="eduProgsStore.getEduProg.id==0"
-      border="bottom"
-      colored-border
-      type="warning"
-      elevation="2"
-    >
-      ОПП з таким id не знайдено.
+  <v-alert
+    v-if="eduProgsStore.getEduProg.id == 0"
+    border="bottom"
+    colored-border
+    type="warning"
+    elevation="2"
+  >
+    ОПП з таким id не знайдено.
   </v-alert>
 </template>
 

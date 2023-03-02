@@ -1,4 +1,4 @@
-import { deleteData, editData, getData, postData } from '@/api/http/apiService'
+import { deleteData, editData, getData, getFile, postData } from '@/api/http/apiService'
 import { defineStore } from 'pinia'
 import router from '../router'
 export const useEduProgsStore = defineStore({
@@ -121,6 +121,16 @@ export const useEduProgsStore = defineStore({
     async fetchCompetencyRelations(eduId) {
       const response = await getData('/eduprogs/competenciesMatrix/'+eduId+'?type=ZK')
       this.competencyRelations = response
+    },
+    async exportToExcel(eduId) {
+      await getFile('/eduprogs/toExcel/'+eduId).then(response => {
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'ОПП '+eduId+'.xlsx');
+        document.body.appendChild(link);
+        link.click();
+      })
     },
   },
 })
