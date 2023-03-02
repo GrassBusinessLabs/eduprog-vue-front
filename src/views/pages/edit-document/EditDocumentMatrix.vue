@@ -9,9 +9,9 @@ const eduProgsStore = useEduProgsStore()
 const components = eduProgsStore.getEduProg.components
 
 const editIndex = ref(null)
-const generalCompetencies = reactive([
+const generalCompetencies = ref([
   {
-    id:1,
+    id:7,
     description:'jkkfjgjl',
   },
   {
@@ -28,26 +28,17 @@ const generalCompetencies = reactive([
   },
 ])
 const selected = reactive({})
-
-// onMounted( ()=> {
-//   Object.keys(generalCompetencies).forEach(el => {
-//     selected[el] = [components.mandatory.map(obj => obj.id)]
-//   })
-// })
-onMounted(() => {
-  Object.keys(generalCompetencies).forEach(el => {
-    selected[el] = components.mandatory.forEach(obj => {
-      return {
-        id: obj.id,
-        value: false,
-      }
+generalCompetencies.value.forEach(el => {
+    selected[el.id] = reactive({})
+    components.mandatory.forEach(comp => {
+      selected[el.id][comp.id] = false
     })
-  })
 })
-console.log('sdfgsdfgsdf',selected)
+console.log(selected)
 </script>
 
 <template>
+<div></div><div></div><div></div><div></div><div></div>
   <VRow>
     <VCol>
       <VTable>
@@ -77,8 +68,7 @@ console.log('sdfgsdfgsdf',selected)
               :key=" component.id"
             >
               <VCheckbox style="margin-left: 45%"
-              v-model = selected[item][component]
-              />
+              v-model="selected[item.id][component.id]"/>
             </td>
           </tr>
         </tbody>
@@ -86,4 +76,5 @@ console.log('sdfgsdfgsdf',selected)
     </VCol>
   </VRow>
 </template>
-
+<style scoped>
+</style>
