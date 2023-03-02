@@ -9,6 +9,21 @@ const eduProgsStore = useEduProgsStore()
 const components = eduProgsStore.getEduProg.components
 const generalCompetencies =ref([])
 const selected = reactive({})
+const value = ref(10)
+const progressColor = ref('primary')
+
+watch(value, newValue => {
+  if (newValue < 25) {
+    progressColor.value = 'error'
+  } else if (newValue < 50) {
+    progressColor.value = 'warning'
+  } else if (newValue < 75) {
+    progressColor.value = 'info'
+  } else {
+    progressColor.value = 'success'
+  }
+})
+
 onBeforeMount(async () => {
   await eduProgsStore.fetchCompetencies(route.params.id)
   generalCompetencies.value = eduProgsStore.getCompetencies
@@ -16,8 +31,8 @@ onBeforeMount(async () => {
     selected[el.id] = reactive({})
     components.mandatory.forEach(comp => {
       selected[el.id][comp.id] = false
+    })
   })
-})
 })
 const changeCheckbox = (e, componentId, competencyId)=>{
   if(e){
@@ -26,6 +41,7 @@ const changeCheckbox = (e, componentId, competencyId)=>{
     eduProgsStore.deleteCompetencyRelation(+route.params.id, componentId, competencyId)
   }
 }
+console.log('sdfgdfgdf',components)
 </script>
 
 <template>
@@ -40,6 +56,12 @@ const changeCheckbox = (e, componentId, competencyId)=>{
               :key="component.id"
             >
               <div style="text-align: center">
+                <VTooltip
+                  activator="parent"
+                  location="top"
+                >
+                  {{ component.name }}
+                </VTooltip>
                 <span>{{ 'ОК' + component.code }}</span>
               </div>
             </th>
@@ -48,17 +70,30 @@ const changeCheckbox = (e, componentId, competencyId)=>{
             v-for="item in generalCompetencies"
             :key="item.id"
           >
-            <td colspan="1">
+            <td
+              colspan="1"
+              style="width: 30%"
+            >
               <div style="text-align: center">
-                <span>{{ 'ЗК' + item.id }}</span>
+                <span><h3>
+                        {{ 'ЗК' + item.id }}</h3>
+                  {{ item.redefinition }}
+                </span>
+                <VProgressLinear
+                  v-model="value"
+                  :buffer-value="value"
+                  :color="progressColor"
+                />
               </div>
             </td>
             <td
               v-for=" component in components.mandatory "
-              :key=" component.id"            >
-              <VCheckbox style="margin-left: 45%"
-              v-model="selected[item.id][component.id]"
-              @update:modelValue="changeCheckbox($event, item.id, component.id)"
+              :key=" component.id"
+            >
+              <VCheckbox
+                v-model="selected[item.id][component.id]"
+                style="margin-left: 47%"
+                @update:modelValue="changeCheckbox($event, item.id, component.id)"
               />
             </td>
           </tr>
@@ -67,5 +102,6 @@ const changeCheckbox = (e, componentId, competencyId)=>{
     </VCol>
   </VRow>
 </template>
+
 <style scoped>
 </style>
