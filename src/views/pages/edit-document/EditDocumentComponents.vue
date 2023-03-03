@@ -394,22 +394,45 @@ async function updateCredits(){
   await eduProgsStore.fetchCreditsInfo(route.params.id)
   creditsInfo.value = eduProgsStore.getCreditsInfo
 }
+
 async function createComponent() {
   if(dialogCreate.value){
-    newComponent.code = String(components.mandatory.concat(components.selective).length+1)
-    newComponent.type="ОК"
-    newComponent.id = await eduProgsStore.createComponent(newComponent)
+    const mandatoryComponent = {
+      code: String(components.mandatory.length + 1),
+      name: newComponent.name,
+      credits: newComponent.credits,
+      control_type: newComponent.control_type,
+      type: "ОК",
+      sub_type: newComponent.sub_type,
+      category: newComponent.category,
+      eduprog_id: newComponent.eduprog_id,
+    }
+    components.mandatory.push(mandatoryComponent)
+    await eduProgsStore.createComponent(mandatoryComponent)
     dialogCreate.value = false
-    components.mandatory.push(newComponent)
-  }
-  else if(dialogCreateSelective.value){
-    newComponent.code = String(components.mandatory.concat(components.selective).length+1)
-    newComponent.type="ВБ"
-    newComponent.id = await eduProgsStore.createComponent(newComponent)
-    components.selective.push(newComponent)
+  } else if(dialogCreateSelective.value){
+    const selectiveComponent = {
+      code: String(components.selective.length + 1),
+      name: newComponent.name,
+      credits: newComponent.credits,
+      control_type: newComponent.control_type,
+      type: "ВБ",
+      sub_type: newComponent.sub_type,
+      category: newComponent.category,
+      eduprog_id: newComponent.eduprog_id,
+    }
+    components.selective.push(selectiveComponent)
+    await eduProgsStore.createComponent(selectiveComponent)
     dialogCreateSelective.value = false
   }
-  
+  newComponent.code = 0
+  newComponent.name = ""
+  newComponent.credits = 0
+  newComponent.control_type = ""
+  newComponent.type = ""
+  newComponent.sub_type = "н/д"
+  newComponent.category = "н/д"
+  newComponent.eduprog_id = +route.params.id
 }
 
 function edit(item, index) {
@@ -429,7 +452,9 @@ async function remove(component, type) {
   await eduProgsStore.deleteComponent(component)
   components[type]=components[type].filter(obj => obj.id !== component.id)
   console.log(components[type])
+
  // components = components.filter(obj => obj.id !== component.id)
+
   updateCredits()
 }
 

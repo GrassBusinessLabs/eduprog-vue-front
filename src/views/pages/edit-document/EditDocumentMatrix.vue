@@ -11,23 +11,22 @@ const generalCompetencies =ref([])
 const selected = reactive({})
 const valuesZK = reactive({})
 const maxValue = ref(6)
-const progressColor = ref('primary') 
 
 
 onBeforeMount(async () => {
   await eduProgsStore.fetchCompetencies(route.params.id)
   await eduProgsStore.fetchCompetencyRelations(route.params.id)
   const relations = eduProgsStore.getCompetencyRelations.reduce((acc, cur) => {
-    const competency_id = cur.competency_id;
-    const component_id = cur.component_id;
+    const competency_id = cur.competency_id
+    const component_id = cur.component_id
     if (!acc[competency_id]) {
-        acc[competency_id] = {};
+      acc[competency_id] = {}
     }
-    acc[competency_id][component_id] = true;
+    acc[competency_id][component_id] = true
     
-    return acc;
-}, {});
-console.log(relations)
+    return acc
+  }, {})
+  console.log(relations)
   generalCompetencies.value = eduProgsStore.getCompetencies
   generalCompetencies.value.forEach(el => {
     selected[el.id] = reactive({})
@@ -54,7 +53,31 @@ const changeCheckbox = (e, componentId, competencyId)=>{
     eduProgsStore.deleteCompetencyRelation(+route.params.id, componentId, competencyId)
   }
 }
-console.log(valuesZK)
+const progressColor = ref({})
+
+
+
+
+const updateObjectColors = obj => {
+  const newObject = {}
+  for (const [key, value] of Object.entries(obj)) {
+    if (value < 3) {
+      newObject[key] = 'error'
+    } else if (value < 6) {
+      newObject[key] = 'success'
+    } else {
+      newObject[key] = 'warning'
+    }
+  }
+  
+  return newObject
+}
+
+watch(valuesZK, newValue => {
+  progressColor.value = updateObjectColors(newValue)
+})
+
+console.log('progressColor',progressColor)
 </script>
 
 <template>
@@ -92,32 +115,39 @@ console.log(valuesZK)
                         {{ 'ЗК' + item.id }}</h3>
                   {{ item.redefinition }}
                 </span>
-                <VRow justify="start" align="center" no-gutters>
-                  <VCol cols="1" class="p-0">
-                  {{valuesZK[item.id]}}
+                <VRow
+                  justify="start"
+                  align="center"
+                  no-gutters
+                >
+                  <VCol
+                    cols="1"
+                    class="p-0"
+                  >
+                    {{ valuesZK[item.id] }}
                   </VCol>
                   <VCol>
-                  <VProgressLinear
-                    v-model="valuesZK[item.id]"
-                    :max="maxValue"
-                    :buffer-value="value"
-                    :color="progressColor"
-                    :height="10"
-                    rounded
-                  />
+                    <VProgressLinear
+                      v-model="valuesZK[item.id]"
+                      :max="maxValue"
+                      :buffer-value="value"
+                      :color="progressColor[item.id]"
+                      :height="10"
+                      rounded
+                    />
                   </VCol>
-                  </VRow>
+                </VRow>
               </div>
             </td>
             <td
               v-for=" component in components.mandatory "
               :key=" component.id"
             >
-            <VRow justify="center">
-              <VCheckbox
-                v-model="selected[item.id][component.id]"
-                @update:modelValue="changeCheckbox($event, component.id, item.id)"
-              />
+              <VRow justify="center">
+                <VCheckbox
+                  v-model="selected[item.id][component.id]"
+                  @update:modelValue="changeCheckbox($event, component.id, item.id)"
+                />
               </VRow>
             </td>
           </tr>
