@@ -48,7 +48,7 @@ const tabs = [
 
 <template>
   <VRow
-    justify="end"
+    justify="start"
     class="mb-3"
   >
     <VBtn

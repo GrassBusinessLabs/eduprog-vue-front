@@ -10,7 +10,7 @@ const components = eduProgsStore.getEduProg.components
 const generalCompetencies =ref([])
 const selected = reactive({})
 const valuesZK = reactive({})
-const maxValue = ref(10)
+const maxValue = ref(6)
 const progressColor = ref('primary') 
 
 
@@ -92,23 +92,33 @@ console.log(valuesZK)
                         {{ 'ЗК' + item.id }}</h3>
                   {{ item.redefinition }}
                 </span>
-                <VProgressLinear
-                  v-model="valuesZK[item.id]"
-                  :max="maxValue"
-                  :buffer-value="value"
-                  :color="progressColor"
-                />
+                <VRow justify="start" align="center" no-gutters>
+                  <VCol cols="1" class="p-0">
+                  {{valuesZK[item.id]}}
+                  </VCol>
+                  <VCol>
+                  <VProgressLinear
+                    v-model="valuesZK[item.id]"
+                    :max="maxValue"
+                    :buffer-value="value"
+                    :color="progressColor"
+                    :height="10"
+                    rounded
+                  />
+                  </VCol>
+                  </VRow>
               </div>
             </td>
             <td
               v-for=" component in components.mandatory "
               :key=" component.id"
             >
+            <VRow justify="center">
               <VCheckbox
                 v-model="selected[item.id][component.id]"
-                style="margin-left: 47%"
                 @update:modelValue="changeCheckbox($event, component.id, item.id)"
               />
+              </VRow>
             </td>
           </tr>
         </tbody>
