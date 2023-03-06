@@ -282,113 +282,37 @@ function cancelNewDiscipline() {
                 <span v-if="editIndex !== item.id">{{ item.name }}</span>
                 <span v-if="editIndex === item.id">
                   <VTextField
-                    class="my-3"
                     v-model="item.name"
+                    class="my-3"
                   />
                 </span>
               </div>
               <div style="text-align: center; margin-top: 5%; margin-bottom: 5%">
                 <span v-if="editIndex !== item.id">
-                  <VMenu
-                    bottom
-                    left
-                    activator="parent"
-                  >
-                    <template #activator="{ on, attrs }">
-                      <VBtn
-                        dark
-                        icon
-                        v-bind="attrs"
-                        :shaped="false"
-                        size="x-small"
-                        v-on="on"
-                      >
-                        <VIcon>mdi-dots-horizontal</VIcon>
-                      </VBtn>
-                    </template>
-
-                    <VList>
-                      <VListItem
-                        link
-                        @click="edit(item)"
-                      >
-                        <template #prepend>
-                          <VIcon
-                            class="me-2"
-                            icon="mdi-pencil"
-                            size="22"
-                          />
-                        </template>
-
-                        <VListItemTitle> Редагувати </VListItemTitle>
-                      </VListItem>
-                      <VListItem
-                        link
-                        @click="deleteDiscipline(item.id)"
-                      >
-                        <template #prepend>
-                          <VIcon
-                            class="me-2"
-                            icon="mdi-trash-can"
-                            size="22"
-                          />
-                        </template>
-
-                        <VListItemTitle> Видалити </VListItemTitle>
-                      </VListItem>
-                    </VList>
-                  </VMenu>
+                  <VBtn
+                    icon="mdi-pencil"
+                    size="x-small"
+                    style="margin-right:2% "
+                    @click="edit(item)"
+                  />
+                  <VBtn
+                    icon="mdi-trash-can"
+                    size="x-small"
+                    @click="deleteDiscipline(item.id)"
+                  />
                 </span>
                 <span v-else>
-                  <VMenu
-                    bottom
-                    left
-                    activator="parent"
-                  >
-                    <template #activator="{ on, attrs }">
-                      <VBtn
-                        dark
-                        icon
-                        v-bind="attrs"
-                        :shaped="false"
-                        size="x-small"
-                        v-on="on"
-                      >
-                        <VIcon>mdi-dots-horizontal</VIcon>
-                      </VBtn>
-                    </template>
-
-                    <VList>
-                      <VListItem
-                        link
-                        @click="save(item)"
-                      >
-                        <template #prepend>
-                          <VIcon
-                            class="me-2"
-                            icon="mdi-pencil"
-                            size="22"
-                          />
-                        </template>
-
-                        <VListItemTitle> Зберегти </VListItemTitle>
-                      </VListItem>
-                      <VListItem
-                        link
-                        @click="cancel(item)"
-                      >
-                        <template #prepend>
-                          <VIcon
-                            class="me-2"
-                            icon="mdi-trash-can"
-                            size="22"
-                          />
-                        </template>
-
-                        <VListItemTitle> Відмінити </VListItemTitle>
-                      </VListItem>
-                    </VList>
-                  </VMenu>
+                  <VBtn
+                    icon="mdi-check-bold"
+                    size="x-small"
+                    style="margin-right:2% "
+                    @click="save(item)"
+                  />
+                  <VBtn
+                    icon="mdi-close-thick"
+                    size="x-small"
+                    @click="cancel(item)"
+                  />
                 </span>
               </div>
             </td>
