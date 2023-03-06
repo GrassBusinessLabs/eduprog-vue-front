@@ -81,7 +81,8 @@ console.log('progressColor',progressColor)
 </script>
 
 <template>
-  <VRow>
+
+  <VRow >
     <VCol>
       <VTable>
         <tbody>
