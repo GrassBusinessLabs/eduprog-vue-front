@@ -81,10 +81,9 @@ console.log('progressColor',progressColor)
 </script>
 
 <template>
-
   <VRow >
     <VCol>
-      <VTable>
+      <VTable  v-if="components.mandatory.length>0">
         <tbody>
           <tr>
             <th />
@@ -154,9 +153,15 @@ console.log('progressColor',progressColor)
           </tr>
         </tbody>
       </VTable>
+      <VAlert
+        v-else
+        border="left"
+        text
+        type="info"
+        prominent
+      >
+        Поки що не додано жодного освітнього компонента до схеми.
+      </VAlert>
     </VCol>
   </VRow>
 </template>
-
-<style scoped>
-</style>
