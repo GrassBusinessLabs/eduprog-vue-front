@@ -259,6 +259,7 @@
             >
               <VTextField
                 v-model="newComponent.name"
+                @input="check"
                 label="Назва компонента"
                 required
               />
@@ -394,45 +395,36 @@ async function updateCredits(){
   await eduProgsStore.fetchCreditsInfo(route.params.id)
   creditsInfo.value = eduProgsStore.getCreditsInfo
 }
-
 async function createComponent() {
+  const createdComponent = Object.assign({}, newComponent);
   if(dialogCreate.value){
-    const mandatoryComponent = {
-      code: String(components.mandatory.length + 1),
-      name: newComponent.name,
-      credits: newComponent.credits,
-      control_type: newComponent.control_type,
-      type: "ОК",
-      sub_type: newComponent.sub_type,
-      category: newComponent.category,
-      eduprog_id: newComponent.eduprog_id,
+    createdComponent.type= "ОК"
+    if(components.mandatory.length){
+      createdComponent.code=String(+components.mandatory[components.mandatory.length-1].code+1)
+    }else{
+      createdComponent.code="1"
     }
-    components.mandatory.push(mandatoryComponent)
-    await eduProgsStore.createComponent(mandatoryComponent)
+    console.log(createdComponent)
+    createdComponent.id = await eduProgsStore.createComponent(createdComponent)
+    components.mandatory.push(createdComponent)
     dialogCreate.value = false
-  } else if(dialogCreateSelective.value){
-    const selectiveComponent = {
-      code: String(components.selective.length + 1),
-      name: newComponent.name,
-      credits: newComponent.credits,
-      control_type: newComponent.control_type,
-      type: "ВБ",
-      sub_type: newComponent.sub_type,
-      category: newComponent.category,
-      eduprog_id: newComponent.eduprog_id,
+  } 
+  else if(dialogCreateSelective.value){
+    console.log(createdComponent)
+    createdComponent.type= "ВБ"
+    if(components.selective.length){
+      createdComponent.code=String(+components.selective[components.selective.length-1].code+1)
+    }else{
+      createdComponent.code="1"
     }
-    components.selective.push(selectiveComponent)
-    await eduProgsStore.createComponent(selectiveComponent)
+    createdComponent.id = await eduProgsStore.createComponent(createdComponent)
+    components.selective.push(createdComponent)
     dialogCreateSelective.value = false
   }
-  newComponent.code = 0
-  newComponent.name = ""
-  newComponent.credits = 0
-  newComponent.control_type = ""
-  newComponent.type = ""
-  newComponent.sub_type = "н/д"
-  newComponent.category = "н/д"
-  newComponent.eduprog_id = +route.params.id
+  newComponent.name=""
+  newComponent.credits=0
+  newComponent.control_type=""
+  await updateCredits()
 }
 
 function edit(item, index) {
