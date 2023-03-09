@@ -24,6 +24,7 @@ export const useEduProgsStore = defineStore({
     getDisciplines: state => state.disciplines,
     getCompetencies: state => state.competencies,
     getCompetencyRelations: state => state.competencyRelations,
+    getCompetencyAllRelations: state => state.competencyAllRelations,
   },
 
   actions: {
@@ -122,6 +123,21 @@ export const useEduProgsStore = defineStore({
     async fetchCompetencyRelations(eduId) {
       const response = await getData('/eduprogs/competenciesMatrix/'+eduId+'?type=ZK')
       this.competencyRelations = response
+    },
+    async fetchCompetencyAllRelations(eduId) {
+      const response = await getData('/eduprogs/baseCompetencies/list')
+      this.competencyAllRelations = response
+    },
+    async createRelationToEduprog(eduprogId, competencyId) {
+      const newRelation = {
+        competency_id:competencyId,
+        eduprog_id: eduprogId,
+        redefinition:"",
+      }
+      const response = await postData('/eduprogs/competencies/add', newRelation)
+    },
+    async deleteRelationToEduprog(competencyId) {
+      const response = await deleteData('/eduprogs/competencies/' + competencyId)
     },
     async exportToExcel(eduId) {
       await getFile('/eduprogs/toExcel/'+eduId).then(response => {

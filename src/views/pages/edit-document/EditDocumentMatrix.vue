@@ -11,11 +11,13 @@ const generalCompetencies =ref([])
 const selected = reactive({})
 const valuesZK = reactive({})
 const maxValue = ref(6)
-
+const allRelations = ref([])
+const progressColor = ref({})
 
 onBeforeMount(async () => {
   await eduProgsStore.fetchCompetencies(route.params.id)
   await eduProgsStore.fetchCompetencyRelations(route.params.id)
+  await eduProgsStore.fetchCompetencyAllRelations(route.params.id)
   const relations = eduProgsStore.getCompetencyRelations.reduce((acc, cur) => {
     const competency_id = cur.competency_id
     const component_id = cur.component_id
@@ -27,6 +29,7 @@ onBeforeMount(async () => {
     return acc
   }, {})
   console.log(relations)
+  allRelations.value = eduProgsStore.getCompetencyAllRelations
   generalCompetencies.value = eduProgsStore.getCompetencies
   generalCompetencies.value.forEach(el => {
     selected[el.id] = reactive({})
@@ -44,6 +47,7 @@ onBeforeMount(async () => {
     })
   })
 })
+
 const changeCheckbox = (e, componentId, competencyId)=>{
   if(e){
     valuesZK[competencyId]++
@@ -53,10 +57,6 @@ const changeCheckbox = (e, componentId, competencyId)=>{
     eduProgsStore.deleteCompetencyRelation(+route.params.id, componentId, competencyId)
   }
 }
-const progressColor = ref({})
-
-
-
 
 const updateObjectColors = obj => {
   const newObject = {}
@@ -69,21 +69,23 @@ const updateObjectColors = obj => {
       newObject[key] = 'warning'
     }
   }
-  
+
+  // console.log('eduProgsStore.getCompetencies', allRelations.value)
+  // console.log('progressColor',selectedZK.value)
+  // console.log('eduProgsStore.getCompetencies',eduProgsStore.getCompetencies)
+
   return newObject
 }
 
 watch(valuesZK, newValue => {
   progressColor.value = updateObjectColors(newValue)
 })
-
-console.log('progressColor',progressColor)
 </script>
 
 <template>
-  <VRow >
+  <VRow>
     <VCol>
-      <VTable  v-if="components.mandatory.length>0">
+      <VTable v-if="components.mandatory.length>0">
         <tbody>
           <tr>
             <th />
@@ -112,7 +114,7 @@ console.log('progressColor',progressColor)
             >
               <div style="text-align: center">
                 <span><h3>
-                        {{ 'ЗК' + item.id }}</h3>
+                        {{ 'ЗК' + item.competency_id }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
                   {{ item.redefinition }}
                 </span>
                 <VRow
@@ -120,12 +122,7 @@ console.log('progressColor',progressColor)
                   align="center"
                   no-gutters
                 >
-                  <VCol
-                    cols="1"
-                    class="p-0"
-                  >
-                    {{ valuesZK[item.id] }}
-                  </VCol>
+                  <br>
                   <VCol>
                     <VProgressLinear
                       v-model="valuesZK[item.id]"
@@ -165,3 +162,4 @@ console.log('progressColor',progressColor)
     </VCol>
   </VRow>
 </template>
+
