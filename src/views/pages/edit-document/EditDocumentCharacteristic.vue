@@ -9,82 +9,34 @@ const saveChanges = async () => {
   await eduProgsStore.editEduprog(eduProgData)
 }
 const eduProgData = props.eduProg
-const selectedZK = ref({})
 const allRelations = ref([])
-const generalCompetencies =ref([])
-
-const lastGeneralCompetencies = ref([])
+const selectedCompetencies =ref([])
+const selectedCompetenciesInDB = ref([])
 
 onBeforeMount(async () => {
   await eduProgsStore.fetchCompetencies(route.params.id)
   await eduProgsStore.fetchCompetencyRelations(route.params.id)
   await eduProgsStore.fetchCompetencyAllRelations(route.params.id)
-  const relations = eduProgsStore.getCompetencyRelations.reduce((acc, cur) => {
-    const competency_id = cur.competency_id
-    const component_id = cur.component_id
-    if (!acc[competency_id]) {
-      acc[competency_id] = {}
-    }
-    acc[competency_id][component_id] = true
-
-    return acc
-  }, {})
-  lastGeneralCompetencies.value = eduProgsStore.getCompetencies
+  selectedCompetenciesInDB.value = eduProgsStore.getCompetencies
+  selectedCompetencies.value = eduProgsStore.getCompetencies
   allRelations.value = eduProgsStore.getCompetencyAllRelations
-  generalCompetencies.value = eduProgsStore.getCompetencies
-
+  allRelations.value.forEach(obj =>{
+    obj.competency_id=obj.id
+  })
+  console.log(allRelations)
 })
 
-const addRelation = (e, competencyId)=>{
-  console.log('dfgd',competencyId)
-  console.log('fyfghjgh',e)
-  console.log('generalCompetencies',generalCompetencies)
-  console.log('allRelations.value',allRelations.value)
-  console.log('lastGeneralCompetencies.value',lastGeneralCompetencies.value)
-
-
-  if (e) {
-    console.log('e',e)
-    selectedZK[competencyId]++
-    eduProgsStore.createRelationToEduprog(+route.params.id, competencyId)
-  }   else if (!e) {
-    console.log('e',e)
-    selectedZK[competencyId]--
-    eduProgsStore.deleteRelationToEduprog(competencyId)
+const updateZk = (e)=>{
+  console.log(e[e.length-1].id)
+  if(!selectedCompetenciesInDB.value.find(obj => obj.competency_id === e[e.length-1].competency_id)){
+    eduProgsStore.addCompetencyToEduprog(+route.params.id, e[e.length-1].id)
+    console.log("добавляем")
   }
-}
-const addRelationn = ()=>{
-  const diff = ref(lastGeneralCompetencies.value.filter(obj1 => !generalCompetencies.value.find(obj2 => obj1.id === obj2.id)))
-  console.log('diff',diff.value)
-  console.log('lastGeneralCompetencies',lastGeneralCompetencies.value)
-  console.log('generalCompetencies',generalCompetencies.value)
+  else if(!selectedCompetencies.value.find(obj => obj.competency_id === selectedCompetenciesInDB.value[selectedCompetenciesInDB.value.length-1].competency_id)){
 
-  const element = ref(lastGeneralCompetencies.value.includes(diff.value))
-
-  console.log('element',diff.value.competency_id)
-
-  diff.value.forEach(obj => {
-    diff.value = obj.competency_id
-    console.log('competency_id:', obj.competency_id)
-  })
-  console.log('element',diff.value)
-
-  if (element) {
-    console.log('iouiuiu',element.value)
-    eduProgsStore.createRelationToEduprog(+route.params.id, diff.value)
-  }   else if (!element) {
-    eduProgsStore.deleteRelationToEduprog(diff.value)
+    console.log("Удаляем", selectedCompetenciesInDB.value[selectedCompetenciesInDB.value.length-1].id)
   }
-}
-const updateSelectedZK = (selected, id) => {
-  if (selected.length > selectedZK[id].length) {
-    const addedZK = selected.find(zk => !selectedZK[id].includes(zk))
-    eduProgsStore.createRelationToEduprog(+route.params.id, addedZK.id)
-  } else {
-    const removedZK = selectedZK[id].find(zk => !selected.includes(zk))
-    eduProgsStore.deleteRelationToEduprog(removedZK.id)
-  }
-  selectedZK[id] = selected
+  console.log(selectedCompetencies)
 }
 </script>
 
@@ -140,13 +92,14 @@ const updateSelectedZK = (selected, id) => {
           </VCol>
           <VCol cols="12">
             <VCombobox
-              v-model="generalCompetencies"
-              :items="allRelations.map(item => item.id)"
+              v-model="selectedCompetencies"
+              :items="allRelations"
+              item-value="competency_id"
               item-title="competency_id"
               label="Виберіть ЗК"
               multiple
               chips
-              @update:modelValue="addRelationn"
+              @update:modelValue="updateZk"
             />
           </VCol>
         </VRow>

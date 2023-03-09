@@ -125,10 +125,10 @@ export const useEduProgsStore = defineStore({
       this.competencyRelations = response
     },
     async fetchCompetencyAllRelations(eduId) {
-      const response = await getData('/eduprogs/baseCompetencies/list')
+      const response = await getData('/eduprogs/baseCompetencies/ZK_list')
       this.competencyAllRelations = response
     },
-    async createRelationToEduprog(eduprogId, competencyId) {
+    async addCompetencyToEduprog(eduprogId, competencyId) {
       const newRelation = {
         competency_id:competencyId,
         eduprog_id: eduprogId,
@@ -136,8 +136,8 @@ export const useEduProgsStore = defineStore({
       }
       const response = await postData('/eduprogs/competencies/add', newRelation)
     },
-    async deleteRelationToEduprog(competencyId) {
-      const response = await deleteData('/eduprogs/competencies/' + competencyId)
+    async deleteCompetencyInEduprog(competencyId) {
+      await deleteData('/eduprogs/competencies/' + competencyId)
     },
     async exportToExcel(eduId) {
       await getFile('/eduprogs/toExcel/'+eduId).then(response => {
@@ -147,7 +147,7 @@ export const useEduProgsStore = defineStore({
         link.setAttribute('download', 'ОПП '+eduId+'.xlsx');
         document.body.appendChild(link);
         link.click();
-      })
+      })},
     async fetchRelations(eduId){
       const response = await getData('/eduprogs/compRelations/'+eduId);
       return response
