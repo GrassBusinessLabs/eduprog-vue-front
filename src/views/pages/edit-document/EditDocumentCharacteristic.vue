@@ -27,16 +27,23 @@ onBeforeMount(async () => {
 })
 
 const updateZk = (e)=>{
-  console.log(e[e.length-1].id)
-  if(!selectedCompetenciesInDB.value.find(obj => obj.competency_id === e[e.length-1].competency_id)){
+  console.log(e)
+  if(!e.length){
+    console.log("Ласт", selectedCompetenciesInDB.value[0].id)
+    const deleteCompetency = selectedCompetenciesInDB.value[0]
+    eduProgsStore.deleteCompetencyInEduprog(deleteCompetency.id)
+  }
+  else if(!selectedCompetenciesInDB.value.find(obj => obj.competency_id === e[e.length-1].competency_id)){
     eduProgsStore.addCompetencyToEduprog(+route.params.id, e[e.length-1].id)
-    console.log("добавляем")
+    console.log("добавляем", e[e.length-1])
+    selectedCompetenciesInDB.value = eduProgsStore.getCompetencies
   }
-  else if(!selectedCompetencies.value.find(obj => obj.competency_id === selectedCompetenciesInDB.value[selectedCompetenciesInDB.value.length-1].competency_id)){
-
-    console.log("Удаляем", selectedCompetenciesInDB.value[selectedCompetenciesInDB.value.length-1].id)
+  else if(selectedCompetenciesInDB.value.find(obj1 => !e.some(obj2 => obj2.competency_id === obj1.competency_id))){
+    const deleteCompetency = selectedCompetenciesInDB.value.find(obj1 => !e.some(obj2 => obj2.competency_id === obj1.competency_id))
+    console.log("Удаляем", deleteCompetency)
+    eduProgsStore.deleteCompetencyInEduprog(deleteCompetency.id)
+    selectedCompetenciesInDB.value = eduProgsStore.getCompetencies
   }
-  console.log(selectedCompetencies)
 }
 </script>
 
