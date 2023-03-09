@@ -6,6 +6,7 @@ import EditDocumentSchema from '@/views/pages/edit-document/EditDocumentSchema.v
 import EditDocumentSequence from '@/views/pages/edit-document/EditDocumentSequence.vue'
 import EditDocumentMatrix from '@/views/pages/edit-document/EditDocumentMatrix.vue'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
+import axios from 'axios'
 const eduProgsStore = useEduProgsStore()
 const route = useRoute()
 const activeTab = ref(route.params.tab)
