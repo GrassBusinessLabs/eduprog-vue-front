@@ -7,98 +7,51 @@ import { useRoute } from 'vue-router'
 import { getData } from '@/api/http/apiService'
 const eduProgsStore = useEduProgsStore()
 
-const allRelations = ref([])
-const selectedCompetencies =ref([])
-const result = ref([])
-const map = new Map()
-
+const ZKCompetencies = ref([])
+ console.log(ZKCompetencies)
+const selectedCompetencies = eduProgsStore.getSelectedCompetencies
 onBeforeMount(async () => {
   await eduProgsStore.fetchCompetencies(route.params.id)
-  await eduProgsStore.fetchCompetencyRelations(route.params.id)
-  await eduProgsStore.fetchCompetencyAllRelations(route.params.id)
-  selectedCompetencies.value = eduProgsStore.getCompetencies
-  allRelations.value = eduProgsStore.getCompetencyAllRelations
-  allRelations.value.forEach(obj =>{
-    obj.competency_id=obj.id
-  })
-  for (const item of  selectedCompetencies.value) {
-    map.set(item.competency_id, true)
-  }
-  for (const item of allRelations.value) {
-    result.value.push(map.has(item.competency_id))
-  }
-  result.value = Object.entries(result.value).reduce((acc, [key, value], index) => {
-    acc[index + 1] = value
-
-    return acc
-  }, {})
+  ZKCompetencies.value=eduProgsStore.getZKCompetencies
+  console.log(ZKCompetencies)
 })
 
-const changeCheckbox = async (e, competencyId)=>{
-  if(e){
-    const result = await eduProgsStore.addCompetencyToEduprog(+route.params.id, competencyId)
-    console.log('Add', result)
-  }else if(!e){
-
-    console.log( ' selectedCompetencies.value',selectedCompetencies.value)
-    const obj =  selectedCompetencies.value.find(item => item.competency_id === competencyId)
-    await  eduProgsStore.deleteCompetencyInEduprog(obj.id)
-  }
-}
 </script>
 
 <template>
-  <VTable>
-    <body>
+    <VTable>
+    <thead class="thead-light">
       <tr>
-        <th class="table-cell table-header">
-          Компонент ЗК
-        </th>
-        <th class="table-cell table-header">
-          Опис
-        </th>
-        <th class="table-cell table-header">
-          Вибрано:
-        </th>
+        <th class="text-center">Загальні компетентності</th>
       </tr>
+    </thead>
+  </VTable>
+  <VTable>
+    <thead class="thead-light">
+      <tr>
+        <th>Код</th>
+        <th>Опис</th>
+        <th>Обрано</th>
+      </tr>
+    </thead>
+    <tbody>
       <tr
-        v-for="item in allRelations"
+        v-for="item in eduProgsStore.getZKCompetencies"
         :key="item.id"
       >
-        <td
-          class="table-cell"
-          style="text-align: center;"
-        >
-          {{ item.competency_id + " " + item.type }}
-        </td>
-        <td class="table-cell">
+        <td style="white-space:nowrap">{{ item.type+" "+item.id }}</td>
+        <td class="py-4">
           {{ item.definition }}
         </td>
-        <td
-          class="table-cell"
-          style="text-align: center;"
-        >
-          <VRow style="margin-left: 40%">
-            <VCheckbox
-              v-model="result[item.competency_id]"
+        <td rowspan="1">
+        <VRow justify="center">
+         <VCheckbox
+              v-model="competencies[item.competency_id]"
               @update:modelValue="changeCheckbox($event,item.competency_id)"
             />
-          </VRow>
+        </VRow>
         </td>
       </tr>
-    </body>
+    </tbody>
   </VTable>
 </template>
-
-<style>
-.table-cell {
-  border: 1px solid #ccc;
-  padding: 5px;
-  text-align: center;
-  vertical-align: middle;
-}
-
-.table-header {
-  font-weight: bold;
-}
-</style>

@@ -13,9 +13,6 @@ const eduProgData = props.eduProg
 
 
 onBeforeMount(async () => {
-  await eduProgsStore.fetchCompetencies(route.params.id)
-  await eduProgsStore.fetchCompetencyRelations(route.params.id)
-  await eduProgsStore.fetchCompetencyAllRelations(route.params.id)
 })
 </script>
 

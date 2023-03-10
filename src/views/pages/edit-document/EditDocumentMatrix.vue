@@ -7,7 +7,7 @@ const route = useRoute()
 
 const eduProgsStore = useEduProgsStore()
 const components = eduProgsStore.getEduProg.components
-const generalCompetencies =ref([])
+const generalCompetencies = ref([])
 const selected = reactive({})
 const valuesZK = reactive({})
 const maxValue = ref(6)
@@ -25,7 +25,7 @@ onBeforeMount(async () => {
       acc[competency_id] = {}
     }
     acc[competency_id][component_id] = true
-    
+
     return acc
   }, {})
   console.log(relations)
@@ -35,24 +35,23 @@ onBeforeMount(async () => {
     selected[el.id] = reactive({})
     valuesZK[el.id] = 0
     components.mandatory.forEach(comp => {
-      try{
-        if(relations[el.id][comp.id]){
+      try {
+        if (relations[el.id][comp.id]) {
           valuesZK[el.id]++
           selected[el.id][comp.id] = true
         }
-      }
-      catch{
+      } catch {
         selected[el.id][comp.id] = false
       }
     })
   })
 })
 
-const changeCheckbox = (e, componentId, competencyId)=>{
-  if(e){
+const changeCheckbox = (e, componentId, competencyId) => {
+  if (e) {
     valuesZK[competencyId]++
     eduProgsStore.createCompetencyRelation(+route.params.id, componentId, competencyId)
-  }else if(!e){
+  } else if (!e) {
     valuesZK[competencyId]--
     eduProgsStore.deleteCompetencyRelation(+route.params.id, componentId, competencyId)
   }
@@ -85,7 +84,7 @@ watch(valuesZK, newValue => {
 <template>
   <VRow>
     <VCol>
-      <VTable v-if="components.mandatory.length>0">
+      <VTable v-if="components.mandatory.length > 0">
         <tbody>
           <tr>
             <th />
@@ -113,8 +112,8 @@ watch(valuesZK, newValue => {
               style="width: 30%"
             >
               <div style="text-align: center">
-                <span><h3>
-                        {{ 'ЗК' + item.competency_id }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
+                <span
+                  ><h3>{{ 'ЗК' + item.competency_id }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
                   {{ item.redefinition }}
                 </span>
                 <VRow
@@ -122,7 +121,7 @@ watch(valuesZK, newValue => {
                   align="center"
                   no-gutters
                 >
-                  <br>
+                  <br />
                   <VCol>
                     <VProgressLinear
                       v-model="valuesZK[item.id]"
@@ -137,8 +136,8 @@ watch(valuesZK, newValue => {
               </div>
             </td>
             <td
-              v-for=" component in components.mandatory "
-              :key=" component.id"
+              v-for="component in components.mandatory"
+              :key="component.id"
             >
               <VRow justify="center">
                 <VCheckbox
@@ -162,4 +161,3 @@ watch(valuesZK, newValue => {
     </VCol>
   </VRow>
 </template>
-

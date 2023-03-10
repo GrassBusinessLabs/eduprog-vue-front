@@ -11,8 +11,8 @@ export const useEduProgsStore = defineStore({
     creditsInfo: {},
     scheme: [],
     disciplines: [],
-    competencies: [],
-    competencyRelations: [],
+    selectedCompetencies:[],
+    ZKCompetencies:[],
   }),
 
   getters: {
@@ -22,9 +22,8 @@ export const useEduProgsStore = defineStore({
     getCreditsInfo: state => state.creditsInfo,
     getScheme: state => state.scheme,
     getDisciplines: state => state.disciplines,
-    getCompetencies: state => state.competencies,
-    getCompetencyRelations: state => state.competencyRelations,
-    getCompetencyAllRelations: state => state.competencyAllRelations,
+    getZKCompetencies: state => state.ZKCompetencies,
+    getSelectedCompetencies: state => state.selectedCompetencies,
   },
 
   actions: {
@@ -124,9 +123,12 @@ export const useEduProgsStore = defineStore({
       const response = await getData('/eduprogs/competenciesMatrix/'+eduId+'?type=ZK')
       this.competencyRelations = response
     },
-    async fetchCompetencyAllRelations(eduId) {
+    async fetchCompetencies(eduId) {
       const response = await getData('/eduprogs/baseCompetencies/ZK_list')
-      this.competencyAllRelations = response
+      console.log(response)
+      this.ZKCompetencies= response
+      const responseSelected = await getData('/eduprogs/competencies/byEduprogId/'+eduId)
+      this.selectedCompetencies = responseSelected
     },
     async addCompetencyToEduprog(eduprogId, competencyId) {
       const newRelation = {
