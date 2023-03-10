@@ -36,12 +36,14 @@ onBeforeMount(async () => {
 
 const changeCheckbox = async (e, competencyId)=>{
   if(e){
-    const result = await eduProgsStore.addCompetencyToEduprog(+route.params.id, competencyId)
-    console.log('Add', result)
+    const newCompetency = await eduProgsStore.addCompetencyToEduprog(+route.params.id, competencyId)
+    selectedCompetencies.value.push(newCompetency)
+    console.log('Add', selectedCompetencies.value)
   }else if(!e){
-
     console.log( ' selectedCompetencies.value',selectedCompetencies.value)
     const obj =  selectedCompetencies.value.find(item => item.competency_id === competencyId)
+    selectedCompetencies.value=selectedCompetencies.value.filter(comp => comp.id!=obj.id)
+    console.log("Собираемся удалять",obj)
     await  eduProgsStore.deleteCompetencyInEduprog(obj.id)
   }
 }
