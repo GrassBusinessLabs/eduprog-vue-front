@@ -135,6 +135,9 @@ export const useEduProgsStore = defineStore({
         redefinition:"",
       }
       const response = await postData('/eduprogs/competencies/add', newRelation)
+      console.log('response',response)
+
+      return response.id
     },
     async deleteCompetencyInEduprog(competencyId) {
       await deleteData('/eduprogs/competencies/' + competencyId)
