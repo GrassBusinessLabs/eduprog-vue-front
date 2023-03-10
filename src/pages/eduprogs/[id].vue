@@ -5,6 +5,8 @@ import EditDocumentComponents from '@/views/pages/edit-document/EditDocumentComp
 import EditDocumentSchema from '@/views/pages/edit-document/EditDocumentSchema.vue'
 import EditDocumentSequence from '@/views/pages/edit-document/EditDocumentSequence.vue'
 import EditDocumentMatrix from '@/views/pages/edit-document/EditDocumentMatrix.vue'
+import EditDocumentZK from '@/views/pages/edit-document/EditDocumentZK.vue'
+
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 import axios from 'axios'
 const eduProgsStore = useEduProgsStore()
@@ -38,6 +40,11 @@ const tabs = [
     title: 'Структурно-логічна послідовність ОПП',
     icon: 'mdi-format-line-style',
     tab: 'schema',
+  },
+  {
+    title: 'Вибір компонентів ЗК',
+    icon: 'mdi-archive-check-outline',
+    tab: 'compZK',
   },
   {
     title: 'Матриця відповідностей',
@@ -104,6 +111,12 @@ const tabs = [
       <VWindowItem value="schema">
         <EditDocumentSequence :components="eduProgsStore.getEduProg.components" />
       </VWindowItem>
+
+      <!--   Компоненти ЗК   -->
+      <VWindowItem value="compZK">
+        <EditDocumentZK />
+      </VWindowItem>
+
       <!-- Матриця -->
       <VWindowItem value="matrix">
         <EditDocumentMatrix />
