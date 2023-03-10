@@ -7,6 +7,7 @@ const route = useRoute()
 
 const eduProgsStore = useEduProgsStore()
 const components = eduProgsStore.getEduProg.components
+
 const generalCompetencies =ref([])
 const selected = reactive({})
 const valuesZK = reactive({})
@@ -47,7 +48,10 @@ onBeforeMount(async () => {
     })
   })
 })
-
+onUpdated(async () =>{
+  console.log("Обновл",eduProgsStore.getCompetencies)
+  generalCompetencies.value = eduProgsStore.getCompetencies
+})
 const changeCheckbox = (e, componentId, competencyId)=>{
   if(e){
     valuesZK[competencyId]++
@@ -85,7 +89,7 @@ watch(valuesZK, newValue => {
 <template>
   <VRow>
     <VCol>
-      <VTable v-if="components.mandatory.length>0">
+      <VTable v-if="components.mandatory.length>0 && eduProgsStore.getCompetencies.length>0">
         <tbody>
           <tr>
             <th />
@@ -114,7 +118,7 @@ watch(valuesZK, newValue => {
             >
               <div style="text-align: center">
                 <span><h3>
-                        {{ 'ЗК' + item.competency_id }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
+                        {{ 'ЗК' + item.code }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
                   {{ item.redefinition }}
                 </span>
                 <VRow
@@ -157,7 +161,7 @@ watch(valuesZK, newValue => {
         type="info"
         prominent
       >
-        Поки що не додано жодного освітнього компонента до схеми.
+        Для того щоб заповнити матрицю відповідностей, в ОПП повинен бути хоча б один компонент та компонентів
       </VAlert>
     </VCol>
   </VRow>

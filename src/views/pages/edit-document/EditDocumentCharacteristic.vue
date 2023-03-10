@@ -25,25 +25,29 @@ onBeforeMount(async () => {
   })
   console.log(allRelations)
 })
-
-const updateZk = (e)=>{
+const findDifference = (array1, array2) =>{
+  return array1.find(obj1 => !array2.some(obj2 => obj2.id === obj1.id));
+}
+const updateZk = async(e)=>{
   console.log(e)
   if(!e.length){
     console.log("Ласт", selectedCompetenciesInDB.value[0].id)
     const deleteCompetency = selectedCompetenciesInDB.value[0]
-    eduProgsStore.deleteCompetencyInEduprog(deleteCompetency.id)
+    await eduProgsStore.deleteCompetencyInEduprog(deleteCompetency.id)
   }
   else if(!selectedCompetenciesInDB.value.find(obj => obj.competency_id === e[e.length-1].competency_id)){
-    eduProgsStore.addCompetencyToEduprog(+route.params.id, e[e.length-1].id)
-    console.log("добавляем", e[e.length-1])
+    const lastSelected =selectedCompetencies.value.length-1
+    selectedCompetencies.value[lastSelected].id = await eduProgsStore.addCompetencyToEduprog(+route.params.id, e[e.length-1].id)
     selectedCompetenciesInDB.value = eduProgsStore.getCompetencies
   }
-  else if(selectedCompetenciesInDB.value.find(obj1 => !e.some(obj2 => obj2.competency_id === obj1.competency_id))){
-    const deleteCompetency = selectedCompetenciesInDB.value.find(obj1 => !e.some(obj2 => obj2.competency_id === obj1.competency_id))
-    console.log("Удаляем", deleteCompetency)
-    eduProgsStore.deleteCompetencyInEduprog(deleteCompetency.id)
+  selectedCompetenciesInDB.value.forEach(async(element) =>{
+  if (!selectedCompetencies.value.find(e => e.competency_id=== element.competency_id)){
+    await eduProgsStore.deleteCompetencyInEduprog(element.id)
     selectedCompetenciesInDB.value = eduProgsStore.getCompetencies
   }
+  })
+  console.log(eduProgsStore.getCompetencies)
+  await eduProgsStore.fetchCompetencies(route.params.id)
 }
 </script>
 
