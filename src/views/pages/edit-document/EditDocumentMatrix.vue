@@ -114,7 +114,7 @@ watch(valuesZK, newValue => {
             >
               <div style="text-align: center">
                 <span><h3>
-                        {{ 'ЗК' + item.competency_id }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
+                        {{ item.type +  '' + item.competency_id }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
                   {{ item.redefinition }}
                 </span>
                 <VRow

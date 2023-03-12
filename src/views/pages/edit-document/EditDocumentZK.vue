@@ -8,6 +8,8 @@ import { getData } from '@/api/http/apiService'
 const eduProgsStore = useEduProgsStore()
 
 const allRelations = ref([])
+const allZkRelations = ref([])
+const allFkRelations = ref([])
 const selectedCompetencies =ref([])
 const result = ref([])
 const map = new Map()
@@ -16,8 +18,11 @@ onBeforeMount(async () => {
   await eduProgsStore.fetchCompetencies(route.params.id)
   await eduProgsStore.fetchCompetencyRelations(route.params.id)
   await eduProgsStore.fetchCompetencyAllRelations(route.params.id)
+  await eduProgsStore.fetchCompetencyFkAllRelations(route.params.id)
   selectedCompetencies.value = eduProgsStore.getCompetencies
-  allRelations.value = eduProgsStore.getCompetencyAllRelations
+  allZkRelations.value = eduProgsStore.getCompetencyAllRelations
+  allFkRelations.value = eduProgsStore.getCompetencyFkAllRelations
+  allRelations.value = allZkRelations.value.concat(allFkRelations.value)
   allRelations.value.forEach(obj =>{
     obj.competency_id=obj.id
   })
@@ -39,6 +44,7 @@ const changeCheckbox = async (e, competencyId)=>{
     const newCompetency = await eduProgsStore.addCompetencyToEduprog(+route.params.id, competencyId)
     selectedCompetencies.value.push(newCompetency)
     console.log('Add', selectedCompetencies.value)
+    console.log(' allFkRelations',  allRelations.value)
   }else if(!e){
     console.log( ' selectedCompetencies.value',selectedCompetencies.value)
     const obj =  selectedCompetencies.value.find(item => item.competency_id === competencyId)
@@ -54,7 +60,7 @@ const changeCheckbox = async (e, competencyId)=>{
     <body>
       <tr>
         <th class="table-cell table-header">
-          Компонент ЗК
+          Код
         </th>
         <th class="table-cell table-header">
           Опис
@@ -71,7 +77,7 @@ const changeCheckbox = async (e, competencyId)=>{
           class="table-cell"
           style="text-align: center; width: 12%"
         >
-          {{ item.competency_id + " " + item.type }}
+          {{ item.type + " " + item.competency_id }}
         </td>
         <td class="table-cell" >
           {{ item.definition }}
@@ -95,7 +101,7 @@ const changeCheckbox = async (e, competencyId)=>{
 <style>
 .table-cell {
   border-bottom: 1px solid #ccc;
-  padding-bottom:5px ;
+  padding:1% ;
   text-align: center;
   vertical-align: middle;
 }
