@@ -60,7 +60,7 @@ const changeCheckbox = async (e, competencyId)=>{
           Опис
         </th>
         <th class="table-cell table-header">
-          Вибрано:
+          Вибрано
         </th>
       </tr>
       <tr
@@ -69,18 +69,18 @@ const changeCheckbox = async (e, competencyId)=>{
       >
         <td
           class="table-cell"
-          style="text-align: center;"
+          style="text-align: center; width: 12%"
         >
           {{ item.competency_id + " " + item.type }}
         </td>
-        <td class="table-cell">
+        <td class="table-cell" >
           {{ item.definition }}
         </td>
         <td
           class="table-cell"
-          style="text-align: center;"
+          style="text-align: center; width: 10%"
         >
-          <VRow style="margin-left: 40%">
+          <VRow style="margin-left: 45%; width: 15%" justify="center" >
             <VCheckbox
               v-model="result[item.competency_id]"
               @update:modelValue="changeCheckbox($event,item.competency_id)"
@@ -94,8 +94,8 @@ const changeCheckbox = async (e, competencyId)=>{
 
 <style>
 .table-cell {
-  border: 1px solid #ccc;
-  padding: 5px;
+  border-bottom: 1px solid #ccc;
+  padding-bottom:5px ;
   text-align: center;
   vertical-align: middle;
 }
