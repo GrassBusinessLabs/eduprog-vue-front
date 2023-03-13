@@ -15,7 +15,7 @@ const allRelations = ref([])
 const progressColor = ref({})
 
 onBeforeMount(async () => {
-  await eduProgsStore.fetchCompetencies(route.params.id)
+  await eduProgsStore.fetchCompetencyFkAllRelations(route.params.id)
   await eduProgsStore.fetchCompetencyRelations(route.params.id)
   await eduProgsStore.fetchCompetencyAllRelations(route.params.id)
   const relations = eduProgsStore.getCompetencyRelations.reduce((acc, cur) => {
@@ -114,7 +114,7 @@ watch(valuesZK, newValue => {
             >
               <div style="text-align: center">
                 <span><h3>
-                        {{ item.type +  '' + item.competency_id }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
+                        {{ item.type +  '' + item.code }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
                   {{ item.redefinition }}
                 </span>
                 <VRow

@@ -56,37 +56,37 @@ const changeCheckbox = async (e, competencyId)=>{
 </script>
 
 <template>
-  <VTable>
-    <body>
+<VTable>
+    <thead class="thead-light">
       <tr>
-        <th class="table-cell table-header">
-          Код
+        <th class="text-center">
+          <h3>Загальні компетентності</h3>
         </th>
-        <th class="table-cell table-header">
+      </tr>
+    </thead>
+  </VTable>
+  <VTable>
+    <thead class="thead-light">
+      <tr >
+        <th style="text-align: center">
           Опис
         </th>
-        <th class="table-cell table-header">
+        <th style="text-align: center">
           Вибрано
         </th>
       </tr>
+    </thead>
+      <tbody>
       <tr
-        v-for="item in allRelations"
+        v-for="item in allZkRelations"
         :key="item.id"
       >
-        <td
-          class="table-cell"
-          style="text-align: center; width: 12%"
-        >
-          {{ item.type + " " + item.competency_id }}
-        </td>
-        <td class="table-cell" >
+        <td class="py-3">
           {{ item.definition }}
         </td>
         <td
-          class="table-cell"
-          style="text-align: center; width: 10%"
         >
-          <VRow style="margin-left: 45%; width: 15%" justify="center" >
+          <VRow justify="center" >
             <VCheckbox
               v-model="result[item.competency_id]"
               @update:modelValue="changeCheckbox($event,item.competency_id)"
@@ -94,19 +94,49 @@ const changeCheckbox = async (e, competencyId)=>{
           </VRow>
         </td>
       </tr>
-    </body>
+    </tbody>
+  </VTable>
+  <VTable class="mt-10">
+    <thead class="thead-light">
+      <tr>
+        <th class="text-center">
+          <h3>Фахові компетентності</h3>
+        </th>
+      </tr>
+    </thead>
+  </VTable>
+  <VTable>
+    <thead class="thead-light">
+      <tr >
+        <th style="text-align: center">
+          Опис
+        </th>
+        <th style="text-align: center">
+          Вибрано
+        </th>
+      </tr>
+    </thead>
+      <tbody>
+      <tr
+        v-for="item in allFkRelations"
+        :key="item.id"
+      >
+        <td class="py-3">
+          {{ item.definition }}
+        </td>
+        <td
+        >
+          <VRow justify="center" >
+            <VCheckbox
+              v-model="result[item.competency_id]"
+              @update:modelValue="changeCheckbox($event,item.competency_id)"
+            />
+          </VRow>
+        </td>
+      </tr>
+    </tbody>
   </VTable>
 </template>
 
 <style>
-.table-cell {
-  border-bottom: 1px solid #ccc;
-  padding:1% ;
-  text-align: center;
-  vertical-align: middle;
-}
-
-.table-header {
-  font-weight: bold;
-}
 </style>

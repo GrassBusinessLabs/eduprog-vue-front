@@ -42,7 +42,7 @@ const tabs = [
     tab: 'schema',
   },
   {
-    title: 'Вибір компонентів ЗК',
+    title: 'Вибір компетентностей',
     icon: 'mdi-archive-check-outline',
     tab: 'compZK',
   },
