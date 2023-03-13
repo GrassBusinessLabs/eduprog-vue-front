@@ -119,7 +119,6 @@ const closeCombobox = async () =>{
         <td rowspan="1">
           <VCombobox
             v-if="possibleComponents[component.id]?.length"
-            @click="call"
             v-model="selectedComponents[component.id]"
             :items="possibleComponents[component.id]"
             item-title="name"

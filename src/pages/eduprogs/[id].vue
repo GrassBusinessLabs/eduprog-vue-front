@@ -4,15 +4,21 @@ import EditDocumentCharacteristic from '@/views/pages/edit-document/EditDocument
 import EditDocumentComponents from '@/views/pages/edit-document/EditDocumentComponents.vue'
 import EditDocumentSchema from '@/views/pages/edit-document/EditDocumentSchema.vue'
 import EditDocumentSequence from '@/views/pages/edit-document/EditDocumentSequence.vue'
+import EditDocumentMatrix from '@/views/pages/edit-document/EditDocumentMatrix.vue'
+import EditDocumentZK from '@/views/pages/edit-document/EditDocumentZK.vue'
+
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 import axios from 'axios'
 const eduProgsStore = useEduProgsStore()
 const route = useRoute()
 const activeTab = ref(route.params.tab)
-onMounted(async ()=>{
+onMounted(async () => {
   await eduProgsStore.findEduProgById(route.params.id)
   await eduProgsStore.fetchScheme(route.params.id)
 })
+const exportToExcel = () =>{
+  eduProgsStore.exportToExcel(route.params.id)
+}
 // tabs
 const tabs = [
   {
@@ -35,19 +41,32 @@ const tabs = [
     icon: 'mdi-format-line-style',
     tab: 'schema',
   },
+  {
+    title: 'Вибір компетентностей',
+    icon: 'mdi-archive-check-outline',
+    tab: 'compZK',
+  },
+  {
+    title: 'Матриця відповідностей',
+    icon: 'mdi-matrix',
+    tab: 'matrix',
+  },
 ]
 </script>
 
 <template>
-  <VBtn
-            class="my-3"
-            dark
-            @click="downloadFile"
-
-          >
-            Експортувати в excel
-  </VBtn>
-  <div v-if="!eduProgsStore.isLoading && eduProgsStore.getEduProg && eduProgsStore.getEduProg.id!=0" >
+  <VRow
+    justify="start"
+    class="mb-3"
+  >
+    <VBtn
+      dark
+      @click="exportToExcel"
+    >
+      Експортувати
+    </VBtn>
+  </VRow>
+  <div v-if="!eduProgsStore.isLoading && eduProgsStore.getEduProg && eduProgsStore.getEduProg.id != 0">
     <VTabs
       v-model="activeTab"
       show-arrows
@@ -74,30 +93,44 @@ const tabs = [
     >
       <!-- Головна -->
       <VWindowItem value="characteristic">
-        <EditDocumentCharacteristic :edu-prog="eduProgsStore.getEduProg"/>
+        <EditDocumentCharacteristic :edu-prog="eduProgsStore.getEduProg" />
       </VWindowItem>
 
       <!-- Перелік компонент -->
       <VWindowItem value="components">
-        <EditDocumentComponents/>
+        <EditDocumentComponents />
       </VWindowItem>
-  <!-- Структурно логічна схема -->
+      <!-- Структурно логічна схема -->
       <VWindowItem value="sequence">
-        <EditDocumentSchema  @addComponentToScheme='addComponentToScheme' @deleteComponentFromSheme='deleteComponentFromSheme'/>
+        <EditDocumentSchema
+          @addComponentToScheme="addComponentToScheme"
+          @deleteComponentFromSheme="deleteComponentFromSheme"
+        />
       </VWindowItem>
       <!-- Структурно логічна послідовнсість -->
       <VWindowItem value="schema">
-        <EditDocumentSequence  :components="eduProgsStore.getEduProg.components"/>
+        <EditDocumentSequence :components="eduProgsStore.getEduProg.components" />
+      </VWindowItem>
+
+      <!--   Компоненти ЗК   -->
+      <VWindowItem value="compZK">
+        <EditDocumentZK />
+      </VWindowItem>
+
+      <!-- Матриця -->
+      <VWindowItem value="matrix">
+        <EditDocumentMatrix />
       </VWindowItem>
     </VWindow>
   </div>
-  <v-alert v-if="eduProgsStore.getEduProg.id==0"
-      border="bottom"
-      colored-border
-      type="warning"
-      elevation="2"
-    >
-      ОПП з таким id не знайдено.
+  <v-alert
+    v-if="eduProgsStore.getEduProg.id == 0"
+    border="bottom"
+    colored-border
+    type="warning"
+    elevation="2"
+  >
+    ОПП з таким id не знайдено.
   </v-alert>
 </template>
 

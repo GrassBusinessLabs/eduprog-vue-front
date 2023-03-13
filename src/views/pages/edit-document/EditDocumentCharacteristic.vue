@@ -1,3 +1,25 @@
+<script setup>
+import { useEduProgsStore } from '@/stores/eduProgs.js'
+const props = defineProps(['eduProg'])
+const route = useRoute()
+import { reactive } from 'vue'
+import { useRoute } from 'vue-router'
+const eduProgsStore = useEduProgsStore()
+const saveChanges = async () => {
+  await eduProgsStore.editEduprog(eduProgData)
+}
+const eduProgData = props.eduProg
+
+
+
+onBeforeMount(async () => {
+  await eduProgsStore.fetchCompetencies(route.params.id)
+  await eduProgsStore.fetchCompetencyRelations(route.params.id)
+  await eduProgsStore.fetchCompetencyAllRelations(route.params.id)
+})
+</script>
+
+
 <template>
   <VCard>
     <VCardText>
@@ -7,44 +29,44 @@
             cols="12"
           >
             <VTextField
+              v-model="eduProgData.name"
               label="Назва документу "
               required
-              v-model="eduProgData.name"
             />
           </VCol>
           <VCol
             cols="12"
           >
             <VTextField
-              label="Освітній рівень"
               v-model="eduProgData.education_level"
+              label="Освітній рівень"
             />
           </VCol>
           <VCol
             cols="12"
           >
             <VTextField
+              v-model="eduProgData.stage"
               label="Освітній ступінь"
               required
-              v-model="eduProgData.stage"
             />
           </VCol>
           <VCol
             cols="12"
           >
             <VTextField
+              v-model="eduProgData.speciality"
               label="Спеціальність"
               required
-              v-model="eduProgData.speciality"
             />
           </VCol>
           <VCol
             cols="12"
           >
             <VTextField
+              v-model="eduProgData.knowledge_field"
               label="Галузь знань"
               required
-              v-model="eduProgData.knowledge_field"
             />
           </VCol>
         </VRow>
@@ -61,13 +83,5 @@
     </VCardText>
   </VCard>
 </template>
-<script setup>
-import { useEduProgsStore } from '@/stores/eduProgs.js'
-const props = defineProps(['eduProg'])
-const eduProgsStore = useEduProgsStore()
-const saveChanges = async () => {
-  await eduProgsStore.editEduprog(eduProgData)
-}
-const eduProgData = props.eduProg
-</script>
+
 
