@@ -11,8 +11,10 @@ const generalCompetencies =ref([])
 const selected = reactive({})
 const valuesZK = reactive({})
 const maxValue = ref(6)
-const allRelations = ref([])
 const progressColor = ref({})
+const massZk = ref([])
+const massFk = ref([])
+
 
 onBeforeMount(async () => {
   await eduProgsStore.fetchCompetencyFkAllRelations(route.params.id)
@@ -25,11 +27,10 @@ onBeforeMount(async () => {
       acc[competency_id] = {}
     }
     acc[competency_id][component_id] = true
-    
+
     return acc
   }, {})
   console.log(relations)
-  allRelations.value = eduProgsStore.getCompetencyAllRelations
   generalCompetencies.value = eduProgsStore.getCompetencies
   generalCompetencies.value.forEach(el => {
     selected[el.id] = reactive({})
@@ -45,6 +46,14 @@ onBeforeMount(async () => {
         selected[el.id][comp.id] = false
       }
     })
+  })
+
+  generalCompetencies.value.forEach(object => {
+    if (object.type === 'ЗК') {
+      massZk.value.push(object)
+    } else if (object.type === 'ФК') {
+      massFk.value.push(object)
+    }
   })
 })
 
@@ -70,10 +79,6 @@ const updateObjectColors = obj => {
     }
   }
 
-  // console.log('eduProgsStore.getCompetencies', allRelations.value)
-  // console.log('progressColor',selectedZK.value)
-  // console.log('eduProgsStore.getCompetencies',eduProgsStore.getCompetencies)
-
   return newObject
 }
 
@@ -85,6 +90,15 @@ watch(valuesZK, newValue => {
 <template>
   <VRow>
     <VCol>
+      <VTable class="mt-10">
+        <thead class="thead-light">
+        <tr>
+          <th class="text-center">
+            <h3>Загальні компетентності</h3>
+          </th>
+        </tr>
+        </thead>
+      </VTable>
       <VTable v-if="components.mandatory.length>0">
         <tbody>
           <tr>
@@ -105,7 +119,7 @@ watch(valuesZK, newValue => {
             </th>
           </tr>
           <tr
-            v-for="item in generalCompetencies"
+            v-for="item in massZk"
             :key="item.id"
           >
             <td
@@ -114,7 +128,7 @@ watch(valuesZK, newValue => {
             >
               <div style="text-align: center">
                 <span><h3>
-                        {{ item.type +  '' + item.code }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
+                        {{ item.type + '' + item.code }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
                   {{ item.redefinition }}
                 </span>
                 <VRow
@@ -159,6 +173,84 @@ watch(valuesZK, newValue => {
       >
         Поки що не додано жодного освітнього компонента до схеми.
       </VAlert>
+    </VCol>
+  </VRow>
+      <VRow>
+        <VCol>
+          <VTable class="mt-10">
+            <thead class="thead-light">
+            <tr>
+              <th class="text-center">
+                <h3>Фахові компетентності</h3>
+              </th>
+            </tr>
+            </thead>
+          </VTable>
+      <VTable v-if="components.mandatory.length>0">
+        <tbody>
+          <tr>
+            <th />
+            <th
+              v-for="component in components.mandatory"
+              :key="component.id"
+            >
+              <div style="text-align: center">
+                <VTooltip
+                  activator="parent"
+                  location="top"
+                >
+                  {{ component.name }}
+                </VTooltip>
+                <span>{{ 'ОК' + component.code }}</span>
+              </div>
+            </th>
+          </tr>
+          <tr
+            v-for="item in massFk"
+            :key="item.id"
+          >
+            <td
+              colspan="1"
+              style="width: 30%"
+            >
+              <div style="text-align: center">
+                <span><h3>
+                        {{ item.type + '' + item.code }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
+                  {{ item.redefinition }}
+                </span>
+                <VRow
+                  justify="start"
+                  align="center"
+                  no-gutters
+                >
+                  <br>
+                  <VCol>
+                    <VProgressLinear
+                      v-model="valuesZK[item.id]"
+                      :max="maxValue"
+                      :buffer-value="value"
+                      :color="progressColor[item.id]"
+                      :height="10"
+                      rounded
+                    />
+                  </VCol>
+                </VRow>
+              </div>
+            </td>
+            <td
+              v-for=" component in components.mandatory "
+              :key=" component.id"
+            >
+              <VRow justify="center">
+                <VCheckbox
+                  v-model="selected[item.id][component.id]"
+                  @update:modelValue="changeCheckbox($event, component.id, item.id)"
+                />
+              </VRow>
+            </td>
+          </tr>
+        </tbody>
+      </VTable>
     </VCol>
   </VRow>
 </template>
