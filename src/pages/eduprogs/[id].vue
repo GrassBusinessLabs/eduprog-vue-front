@@ -1,5 +1,5 @@
 <script setup>
-import { useRoute } from 'vue-router'
+import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import EditDocumentCharacteristic from '@/views/pages/edit-document/EditDocumentCharacteristic.vue'
 import EditDocumentComponents from '@/views/pages/edit-document/EditDocumentComponents.vue'
 import EditDocumentSchema from '@/views/pages/edit-document/EditDocumentSchema.vue'
@@ -19,7 +19,7 @@ onMounted(async () => {
 const exportToExcel = () =>{
   eduProgsStore.exportToExcel(route.params.id)
 }
-// tabs
+
 const tabs = [
   {
     title: 'Загальна Характеристика',
@@ -52,6 +52,9 @@ const tabs = [
     tab: 'matrix',
   },
 ]
+onBeforeRouteUpdate((to, from) => {
+  activeTab.value = to.params.tab
+})
 </script>
 
 <template>
@@ -96,7 +99,7 @@ const tabs = [
         <EditDocumentCharacteristic :edu-prog="eduProgsStore.getEduProg" />
       </VWindowItem>
 
-      <!-- Перелік компонент -->
+      <!-- Перелік компонентів -->
       <VWindowItem value="components">
         <EditDocumentComponents />
       </VWindowItem>
@@ -119,11 +122,13 @@ const tabs = [
 
       <!-- Матриця -->
       <VWindowItem value="matrix">
-        <EditDocumentMatrix />
+        <template v-if="activeTab === 'matrix'">
+          <EditDocumentMatrix />
+        </template>
       </VWindowItem>
     </VWindow>
   </div>
-  <v-alert
+  <VAlert
     v-if="eduProgsStore.getEduProg.id == 0"
     border="bottom"
     colored-border
@@ -131,7 +136,7 @@ const tabs = [
     elevation="2"
   >
     ОПП з таким id не знайдено.
-  </v-alert>
+  </VAlert>
 </template>
 
 <route lang="yaml">

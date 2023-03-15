@@ -11,7 +11,6 @@ const saveChanges = async () => {
 const eduProgData = props.eduProg
 
 
-
 </script>
 
 
