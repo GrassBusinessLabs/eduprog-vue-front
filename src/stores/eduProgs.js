@@ -126,11 +126,11 @@ export const useEduProgsStore = defineStore({
       this.competencyRelations = response
     },
     async fetchZkCompetencies(eduId) {
-      const response = await getData('/eduprogs/baseCompetencies/ZK_list')
+      const response = await getData('/eduprogs/baseCompetencies/byType?type=ZK')
       this.competenciesZk = response
     },
     async fetchFkCompetencies(eduId) {
-      const response = await getData('/eduprogs/baseCompetencies/FK_list')
+      const response = await getData('/eduprogs/baseCompetencies/byType?type=FK')
       this.competenciesFk = response
     },
     async addCompetencyToEduprog(eduprogId, competencyId) {
@@ -146,6 +146,9 @@ export const useEduProgsStore = defineStore({
     },
     async deleteCompetencyInEduprog(competencyId) {
       await deleteData('/eduprogs/competencies/' + competencyId)
+    },
+    async addCustomCompetency(payload) {
+      await postData('/eduprogs/competencies/addCustom', payload)
     },
     async exportToExcel(eduId) {
       await getFile('/eduprogs/toExcel/'+eduId).then(response => {
@@ -168,5 +171,6 @@ export const useEduProgsStore = defineStore({
       const response = await deleteData('/eduprogs/compRelations/'+baseId+'/'+childId);
       return response
     },
+
   },
 })

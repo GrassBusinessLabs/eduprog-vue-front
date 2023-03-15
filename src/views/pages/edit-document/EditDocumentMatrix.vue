@@ -1,7 +1,7 @@
 <script setup>
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 
-import { onMounted, reactive } from 'vue'
+import { onActivated, onMounted, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 
