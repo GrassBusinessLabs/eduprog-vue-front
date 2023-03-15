@@ -6,10 +6,10 @@ import { useRoute } from 'vue-router'
 const eduProgsStore = useEduProgsStore()
 
 const allRelations = ref([])
-const allZkRel = ref([])
-const allFkRel = ref([])
+const allZkComp = ref([])
+const allFkComp = ref([])
 const selectedCompetencies =ref([])
-const result = ref([])
+const valueComp = ref([])
 const map = new Map()
 
 onBeforeMount(async () => {
@@ -18,9 +18,9 @@ onBeforeMount(async () => {
   await eduProgsStore.fetchZkCompetencies(route.params.id)
   await eduProgsStore.fetchFkCompetencies(route.params.id)
   selectedCompetencies.value = eduProgsStore.getCompetencies
-  allZkRel.value = eduProgsStore.getCompetenciesZk
-  allFkRel.value = eduProgsStore. getCompetenciesFk
-  allRelations.value = allZkRel.value.concat(allFkRel.value)
+  allZkComp.value = eduProgsStore.getCompetenciesZk
+  allFkComp.value = eduProgsStore. getCompetenciesFk
+  allRelations.value = allZkComp.value.concat(allFkComp.value)
   allRelations.value.forEach(obj =>{
     obj.competency_id=obj.id
   })
@@ -28,9 +28,9 @@ onBeforeMount(async () => {
     map.set(item.competency_id, true)
   }
   for (const item of allRelations.value) {
-    result.value.push(map.has(item.competency_id))
+    valueComp.value.push(map.has(item.competency_id))
   }
-  result.value = Object.entries(result.value).reduce((acc, [key, value], index) => {
+  valueComp.value = Object.entries(valueComp.value).reduce((acc, [key, value], index) => {
     acc[index + 1] = value
 
     return acc
@@ -76,7 +76,7 @@ const changeCheckbox = async (e, competencyId)=>{
     </thead>
     <tbody>
       <tr
-        v-for="item in allZkRel"
+        v-for="item in allZkComp"
         :key="item.id"
       >
         <td class="py-3">
@@ -85,7 +85,7 @@ const changeCheckbox = async (e, competencyId)=>{
         <td>
           <VRow justify="center">
             <VCheckbox
-              v-model="result[item.competency_id]"
+              v-model="valueComp[item.competency_id]"
               @update:modelValue="changeCheckbox($event,item.competency_id)"
             />
           </VRow>
@@ -115,7 +115,7 @@ const changeCheckbox = async (e, competencyId)=>{
     </thead>
     <tbody>
       <tr
-        v-for="item in allFkRel"
+        v-for="item in allFkComp"
         :key="item.id"
       >
         <td class="py-3">
@@ -124,7 +124,7 @@ const changeCheckbox = async (e, competencyId)=>{
         <td>
           <VRow justify="center">
             <VCheckbox
-              v-model="result[item.competency_id]"
+              v-model="valueComp[item.competency_id]"
               @update:modelValue="changeCheckbox($event,item.competency_id)"
             />
           </VRow>

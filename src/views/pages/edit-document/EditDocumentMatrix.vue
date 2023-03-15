@@ -3,6 +3,7 @@ import { useEduProgsStore } from '@/stores/eduProgs.js'
 
 import { onMounted, reactive } from 'vue'
 import { useRoute } from 'vue-router'
+
 const route = useRoute()
 
 const eduProgsStore = useEduProgsStore()
@@ -15,11 +16,11 @@ const progressColor = ref({})
 const massZk = ref([])
 const massFk = ref([])
 
-
 onBeforeMount(async () => {
   await eduProgsStore.fetchFkCompetencies(route.params.id)
   await eduProgsStore.fetchCompetencyRelations(route.params.id)
   await eduProgsStore.fetchZkCompetencies(route.params.id)
+  await eduProgsStore.fetchCompetencies(route.params.id)
   const relations = eduProgsStore.getCompetencyRelations.reduce((acc, cur) => {
     const competency_id = cur.competency_id
     const component_id = cur.component_id
@@ -47,7 +48,6 @@ onBeforeMount(async () => {
       }
     })
   })
-
   generalCompetencies.value.forEach(object => {
     if (object.type === 'ЗК') {
       massZk.value.push(object)
@@ -56,6 +56,9 @@ onBeforeMount(async () => {
     }
   })
 })
+
+console.log(eduProgsStore.getCompetencies)
+console.log(massZk.value)
 
 const changeCheckbox = (e, componentId, competencyId)=>{
   if(e){
