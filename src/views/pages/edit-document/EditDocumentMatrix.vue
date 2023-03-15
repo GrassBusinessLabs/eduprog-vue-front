@@ -20,7 +20,9 @@ onBeforeMount(async () => {
   await eduProgsStore.fetchFkCompetencies(route.params.id)
   await eduProgsStore.fetchCompetencyRelations(route.params.id)
   await eduProgsStore.fetchZkCompetencies(route.params.id)
+  await eduProgsStore.fetchVfkCompetencies(route.params.id)
   await eduProgsStore.fetchCompetencies(route.params.id)
+  
   const relations = eduProgsStore.getCompetencyRelations.reduce((acc, cur) => {
     const competency_id = cur.competency_id
     const component_id = cur.component_id
@@ -55,6 +57,7 @@ onBeforeMount(async () => {
       massFk.value.push(object)
     }
   })
+  massFk.value=massFk.value.concat(eduProgsStore.getCompetenciesVfk)
 })
 
 console.log(eduProgsStore.getCompetencies)

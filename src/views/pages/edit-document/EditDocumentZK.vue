@@ -10,6 +10,7 @@ const allZkComp = ref([])
 const allFkComp = ref([])
 const selectedCompetencies =ref([])
 const valueComp = ref([])
+const allVfkComp = ref([])
 const map = new Map()
 const allSelect = ref(false)
 const dialogSpecialComp =ref(false)
@@ -22,15 +23,25 @@ const createCompetency = async() =>{
   await eduProgsStore.addCustomCompetency(newCompetency)
   newCompetency.redefinition=""
   dialogSpecialComp.value=false
+  await eduProgsStore.fetchVfkCompetencies(route.params.id)
+  allVfkComp.value = eduProgsStore.getCompetenciesVfk
+}
+const deleteCustomCompetency = async (id) =>{
+  await eduProgsStore.deleteCompetencyInEduprog(id)
+  await eduProgsStore.fetchVfkCompetencies(route.params.id)
+  allVfkComp.value = eduProgsStore.getCompetenciesVfk
 }
 onBeforeMount(async () => {
+
   await eduProgsStore.fetchCompetencies(route.params.id)
   await eduProgsStore.fetchCompetencyRelations(route.params.id)
   await eduProgsStore.fetchZkCompetencies(route.params.id)
   await eduProgsStore.fetchFkCompetencies(route.params.id)
+  await eduProgsStore.fetchVfkCompetencies(route.params.id)
   selectedCompetencies.value = eduProgsStore.getCompetencies
   allZkComp.value = eduProgsStore.getCompetenciesZk
-  allFkComp.value = eduProgsStore. getCompetenciesFk
+  allFkComp.value = eduProgsStore.getCompetenciesFk
+  allVfkComp.value = eduProgsStore.getCompetenciesVfk
   allRelations.value = allZkComp.value.concat(allFkComp.value)
   allRelations.value.forEach(obj =>{
     obj.competency_id=obj.id
@@ -206,11 +217,11 @@ const selectAll = async (event, type) => {
     </thead>
     <tbody>
       <tr
-        v-for="item in allFkComp"
+        v-for="item in allVfkComp"
         :key="item.id"
       >
         <td class="py-3">
-          {{ item.definition }}
+          {{ item.redefinition }}
         </td>
         <td >
           <VRow no-gutters  justify="center" >
@@ -226,7 +237,7 @@ const selectAll = async (event, type) => {
             <VBtn
               icon="mdi-trash-can"
               size="x-small"
-              @click="remove(item, 'selective')"
+              @click="deleteCustomCompetency(item.id)"
             />
             </VCol>
           </VRow>
