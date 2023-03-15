@@ -8,8 +8,8 @@ import { getData } from '@/api/http/apiService'
 const eduProgsStore = useEduProgsStore()
 
 const allRelations = ref([])
-const allZkRelations = ref([])
-const allFkRelations = ref([])
+const allZkRel = ref([])
+const allFkRel = ref([])
 const selectedCompetencies =ref([])
 const result = ref([])
 const map = new Map()
@@ -17,12 +17,12 @@ const map = new Map()
 onBeforeMount(async () => {
   await eduProgsStore.fetchCompetencies(route.params.id)
   await eduProgsStore.fetchCompetencyRelations(route.params.id)
-  await eduProgsStore.fetchCompetencyAllRelations(route.params.id)
-  await eduProgsStore.fetchCompetencyFkAllRelations(route.params.id)
+  await eduProgsStore.fetchZkCompetencies(route.params.id)
+  await eduProgsStore.fetchFkCompetencies(route.params.id)
   selectedCompetencies.value = eduProgsStore.getCompetencies
-  allZkRelations.value = eduProgsStore.getCompetencyAllRelations
-  allFkRelations.value = eduProgsStore.getCompetencyFkAllRelations
-  allRelations.value = allZkRelations.value.concat(allFkRelations.value)
+  allZkRel.value = eduProgsStore.getCompetenciesZk
+  allFkRel.value = eduProgsStore. getCompetenciesFk
+  allRelations.value = allZkRel.value.concat(allFkRel.value)
   allRelations.value.forEach(obj =>{
     obj.competency_id=obj.id
   })
@@ -56,7 +56,7 @@ const changeCheckbox = async (e, competencyId)=>{
 </script>
 
 <template>
-<VTable>
+  <VTable>
     <thead class="thead-light">
       <tr>
         <th class="text-center">
@@ -67,7 +67,7 @@ const changeCheckbox = async (e, competencyId)=>{
   </VTable>
   <VTable>
     <thead class="thead-light">
-      <tr >
+      <tr>
         <th style="text-align: center">
           Опис
         </th>
@@ -76,17 +76,16 @@ const changeCheckbox = async (e, competencyId)=>{
         </th>
       </tr>
     </thead>
-      <tbody>
+    <tbody>
       <tr
-        v-for="item in allZkRelations"
+        v-for="item in allZkRel"
         :key="item.id"
       >
         <td class="py-3">
           {{ item.definition }}
         </td>
-        <td
-        >
-          <VRow justify="center" >
+        <td>
+          <VRow justify="center">
             <VCheckbox
               v-model="result[item.competency_id]"
               @update:modelValue="changeCheckbox($event,item.competency_id)"
@@ -107,7 +106,7 @@ const changeCheckbox = async (e, competencyId)=>{
   </VTable>
   <VTable>
     <thead class="thead-light">
-      <tr >
+      <tr>
         <th style="text-align: center">
           Опис
         </th>
@@ -116,17 +115,16 @@ const changeCheckbox = async (e, competencyId)=>{
         </th>
       </tr>
     </thead>
-      <tbody>
+    <tbody>
       <tr
-        v-for="item in allFkRelations"
+        v-for="item in allFkRel"
         :key="item.id"
       >
         <td class="py-3">
           {{ item.definition }}
         </td>
-        <td
-        >
-          <VRow justify="center" >
+        <td>
+          <VRow justify="center">
             <VCheckbox
               v-model="result[item.competency_id]"
               @update:modelValue="changeCheckbox($event,item.competency_id)"
@@ -137,6 +135,3 @@ const changeCheckbox = async (e, competencyId)=>{
     </tbody>
   </VTable>
 </template>
-
-<style>
-</style>

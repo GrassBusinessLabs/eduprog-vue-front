@@ -17,9 +17,9 @@ const massFk = ref([])
 
 
 onBeforeMount(async () => {
-  await eduProgsStore.fetchCompetencyFkAllRelations(route.params.id)
+  await eduProgsStore.fetchFkCompetencies(route.params.id)
   await eduProgsStore.fetchCompetencyRelations(route.params.id)
-  await eduProgsStore.fetchCompetencyAllRelations(route.params.id)
+  await eduProgsStore.fetchZkCompetencies(route.params.id)
   const relations = eduProgsStore.getCompetencyRelations.reduce((acc, cur) => {
     const competency_id = cur.competency_id
     const component_id = cur.component_id
@@ -92,11 +92,11 @@ watch(valuesZK, newValue => {
     <VCol>
       <VTable class="mt-10">
         <thead class="thead-light">
-        <tr>
-          <th class="text-center">
-            <h3>Загальні компетентності</h3>
-          </th>
-        </tr>
+          <tr>
+            <th class="text-center">
+              <h3>Загальні компетентності</h3>
+            </th>
+          </tr>
         </thead>
       </VTable>
       <VTable v-if="components.mandatory.length>0">
@@ -175,17 +175,17 @@ watch(valuesZK, newValue => {
       </VAlert>
     </VCol>
   </VRow>
-      <VRow>
-        <VCol>
-          <VTable class="mt-10">
-            <thead class="thead-light">
-            <tr>
-              <th class="text-center">
-                <h3>Фахові компетентності</h3>
-              </th>
-            </tr>
-            </thead>
-          </VTable>
+  <VRow>
+    <VCol>
+      <VTable class="mt-10">
+        <thead class="thead-light">
+          <tr>
+            <th class="text-center">
+              <h3>Фахові компетентності</h3>
+            </th>
+          </tr>
+        </thead>
+      </VTable>
       <VTable v-if="components.mandatory.length>0">
         <tbody>
           <tr>
