@@ -2,9 +2,7 @@
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 const props = defineProps(['eduProg'])
 const route = useRoute()
-import { reactive } from 'vue'
 import { useRoute } from 'vue-router'
-import { getData } from '@/api/http/apiService'
 const eduProgsStore = useEduProgsStore()
 
 const allRelations = ref([])
