@@ -16,6 +16,10 @@ export const useEduProgsStore = defineStore({
     competenciesZk:[],
     competenciesFk:[],
     competenciesVfk:[],
+    selectedZk:[],
+    getSelectedFk:[],
+    getSelectedPr:[],
+    getSelectedVpr:[],
   }),
 
   getters: {
@@ -30,6 +34,10 @@ export const useEduProgsStore = defineStore({
     getCompetenciesZk: state => state.competenciesZk,
     getCompetenciesFk: state => state.competenciesFk,
     getCompetenciesVfk: state => state.competenciesVfk,
+    getSelectedZk: state => state.selectedZk,
+    getSelectedFk: state => state.selectedFk,
+    getSelectedPr: state => state.selectedPr,
+    getSelectedVpr: state => state.selectedVpr,
   },
 
   actions: {
@@ -137,10 +145,28 @@ export const useEduProgsStore = defineStore({
       const response = await getData('/eduprogs/baseCompetencies/byType?type=FK')
       this.competenciesFk = response
     },
+
     async fetchVfkCompetencies(eduId) {
       const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId+'/byType?type=VFK')
       this.competenciesVfk = response
     },
+    async fetchSelectedZk(eduId) {
+      const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId+'/byType?type=ZK')
+      this.selectedZk = response
+    },
+    async fetchSelectedFk(eduId) {
+      const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId+'/byType?type=FK')
+      this.selectedFk = response
+    },
+    async fetchSelectedPr(eduId) {
+      const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId+'/byType?type=PR')
+      this.selectedPr = response
+    },
+    async fetchSelectedVpr(eduId) {
+      const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId+'/byType?type=VPR')
+      this.selectedVpr = response
+    },
+
     async addCompetencyToEduprog(eduprogId, competencyId) {
       const newRelation = {
         competency_id:competencyId,
