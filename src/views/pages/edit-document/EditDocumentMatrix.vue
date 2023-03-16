@@ -71,6 +71,7 @@ const changeCheckbox = (e, componentId, competencyId)=>{
     valuesZK[competencyId]--
     eduProgsStore.deleteCompetencyRelation(+route.params.id, componentId, competencyId)
   }
+  console.log(massZk.value)
 }
 
 const updateObjectColors = obj => {
