@@ -110,7 +110,7 @@ export const useEduProgsStore = defineStore({
       const response = await getData('/eduprogs/compRelations/posRel/' + eduId + '/' + compId)
       return response
     },
-    async fetchCompetencies(eduId) {
+    async fetchAllCompetencies(eduId) {
       const response = await getData('/eduprogs/competencies/byEduprogId/' + eduId)
       this.competencies = response
     },
@@ -128,6 +128,15 @@ export const useEduProgsStore = defineStore({
     async fetchCompetencyRelations(eduId) {
       const response = await getData('/eduprogs/competenciesMatrix/'+eduId+'?type=ZK')
       this.competencyRelations = response
+    },
+    async fetchSelectedCompetencies(eduId, type) {
+      const response = await getData(`/eduprogs/competencies/byEduprogId/${eduId}/byType?type=${type}`)
+      return response
+    },
+    async fetchCompetencies(type) {
+      console.log("равботет", type)
+      const response = await getData(`/eduprogs/baseCompetencies/byType?type=${type}`)
+      return response
     },
     async fetchZkCompetencies(eduId) {
       const response = await getData('/eduprogs/baseCompetencies/byType?type=ZK')
@@ -152,11 +161,23 @@ export const useEduProgsStore = defineStore({
 
       return response
     },
+    async addAllCompetencies(eduprogId, type) {
+      await postData(`/eduprogs/competencies/addAll/${eduprogId}/type?type=${type}`)
+    },
+    async deleteAllCompetencies(eduprogId, type) {
+      await deleteData(`/eduprogs/competencies/delAll/${eduprogId}/type?type=${type}`)
+    },
     async deleteCompetencyInEduprog(competencyId) {
       await deleteData('/eduprogs/competencies/' + competencyId)
     },
     async addCustomCompetency(payload) {
       await postData('/eduprogs/competencies/addCustom', payload)
+    },
+    async editCustomCompetency(id, payload) {
+      const newDefinition={
+        definition: payload
+      }
+      await editData('/eduprogs/competencies/'+id, newDefinition)
     },
     async exportToExcel(eduId) {
       await getFile('/eduprogs/toExcel/'+eduId).then(response => {

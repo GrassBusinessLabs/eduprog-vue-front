@@ -21,7 +21,7 @@ onBeforeMount(async () => {
   await eduProgsStore.fetchCompetencyRelations(route.params.id)
   await eduProgsStore.fetchZkCompetencies(route.params.id)
   await eduProgsStore.fetchVfkCompetencies(route.params.id)
-  await eduProgsStore.fetchCompetencies(route.params.id)
+  await eduProgsStore.fetchAllCompetencies(route.params.id)
   
   const relations = eduProgsStore.getCompetencyRelations.reduce((acc, cur) => {
     const competency_id = cur.competency_id
@@ -136,7 +136,7 @@ watch(valuesZK, newValue => {
               <div style="text-align: center">
                 <span><h3>
                         {{ item.type + '' + item.code }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
-                  {{ item.redefinition }}
+                  {{ item.definition }}
                 </span>
                 <VRow
                   justify="start"
@@ -223,7 +223,7 @@ watch(valuesZK, newValue => {
               <div style="text-align: center">
                 <span><h3>
                         {{ item.type + '' + item.code }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
-                  {{ item.redefinition }}
+                  {{ item.definition }}
                 </span>
                 <VRow
                   justify="start"
