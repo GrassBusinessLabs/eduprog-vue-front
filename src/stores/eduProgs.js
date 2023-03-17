@@ -201,7 +201,8 @@ export const useEduProgsStore = defineStore({
       await deleteData('/eduprogs/competencies/' + competencyId)
     },
     async addCustomCompetency(payload) {
-      await postData('/eduprogs/competencies/addCustom', payload)
+      const respone = await postData('/eduprogs/competencies/addCustom', payload)
+      return respone
     },
     async editCustomCompetency(id, payload) {
       const newDefinition={

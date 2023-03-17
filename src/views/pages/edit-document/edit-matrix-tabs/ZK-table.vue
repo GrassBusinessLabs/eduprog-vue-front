@@ -53,7 +53,9 @@ onBeforeMount(async () => {
   selZk.value = eduProgsStore.getSelectedZk
 })
 
-
+onUnmounted (()=>{
+  console.log("ОТВЯЗАЛИСЧЬ")
+})
 
 
 const changeCheckbox = (e, componentId, competencyId)=>{
@@ -87,7 +89,7 @@ watch(valuesZK, newValue => {
 </script>
 
 <template>
-  <VRow v-if='selZk'>
+  <VRow v-if='selZk>0'>
     <VCol>
       <VTable class="mt-10">
         <thead class="thead-light">
