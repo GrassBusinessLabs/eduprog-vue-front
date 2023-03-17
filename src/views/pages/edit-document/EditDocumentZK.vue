@@ -1,7 +1,7 @@
 <script setup>
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 import { reactive } from 'vue'
-import EditZkCompetencies from '@/views/pages/edit-document/edit-competency-tabs/EditZkCompetecnies.vue'
+import EditZkCompetencies from '@/views/pages/edit-document/edit-competency-tabs/EditZkCompetencies.vue'
 const props = defineProps(['eduProg'])
 const route = useRoute()
 import { useRoute } from 'vue-router'
