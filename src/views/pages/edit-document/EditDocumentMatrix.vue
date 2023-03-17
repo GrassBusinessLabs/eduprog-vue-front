@@ -1,10 +1,11 @@
 <script setup>
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 
-import { onActivated, onMounted, reactive } from 'vue'
+import { onMounted, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
+
 
 const eduProgsStore = useEduProgsStore()
 const components = eduProgsStore.getEduProg.components
@@ -13,16 +14,22 @@ const selected = reactive({})
 const valuesZK = reactive({})
 const maxValue = ref(6)
 const progressColor = ref({})
-const massZk = ref([])
-const massFk = ref([])
+const selZk = ref([])
+const selFk = ref([])
+const selPr = ref([])
+const selVpr = ref([])
+const selVfk = ref([])
+
 
 onBeforeMount(async () => {
-  await eduProgsStore.fetchFkCompetencies(route.params.id)
   await eduProgsStore.fetchCompetencyRelations(route.params.id)
-  await eduProgsStore.fetchZkCompetencies(route.params.id)
-  await eduProgsStore.fetchVfkCompetencies(route.params.id)
   await eduProgsStore.fetchAllCompetencies(route.params.id)
-  
+  await eduProgsStore.fetchSelectedVfk(route.params.id)
+  await eduProgsStore.fetchSelectedZk(route.params.id)
+  await eduProgsStore.fetchSelectedFk(route.params.id)
+  await eduProgsStore.fetchSelectedPr(route.params.id)
+  await eduProgsStore.fetchSelectedVpr(route.params.id)
+
   const relations = eduProgsStore.getCompetencyRelations.reduce((acc, cur) => {
     const competency_id = cur.competency_id
     const component_id = cur.component_id
@@ -33,7 +40,7 @@ onBeforeMount(async () => {
 
     return acc
   }, {})
-  console.log(relations)
+
   generalCompetencies.value = eduProgsStore.getCompetencies
   generalCompetencies.value.forEach(el => {
     selected[el.id] = reactive({})
@@ -50,18 +57,15 @@ onBeforeMount(async () => {
       }
     })
   })
-  generalCompetencies.value.forEach(object => {
-    if (object.type === 'ЗК') {
-      massZk.value.push(object)
-    } else if (object.type === 'ФК') {
-      massFk.value.push(object)
-    }
-  })
-  massFk.value=massFk.value.concat(eduProgsStore.getCompetenciesVfk)
+  selZk.value = eduProgsStore.getSelectedZk
+  selFk.value = eduProgsStore.getSelectedFk
+  selPr.value = eduProgsStore.getSelectedPr
+  selVpr.value = eduProgsStore.getSelectedVpr
+  selVfk.value = eduProgsStore.getSelectedVfk
 })
 
-console.log(eduProgsStore.getCompetencies)
-console.log(massZk.value)
+
+
 
 const changeCheckbox = (e, componentId, competencyId)=>{
   if(e){
@@ -71,7 +75,6 @@ const changeCheckbox = (e, componentId, competencyId)=>{
     valuesZK[competencyId]--
     eduProgsStore.deleteCompetencyRelation(+route.params.id, componentId, competencyId)
   }
-  console.log(massZk.value)
 }
 
 const updateObjectColors = obj => {
@@ -126,7 +129,7 @@ watch(valuesZK, newValue => {
             </th>
           </tr>
           <tr
-            v-for="item in massZk"
+            v-for="item in selZk"
             :key="item.id"
           >
             <td
@@ -213,7 +216,7 @@ watch(valuesZK, newValue => {
             </th>
           </tr>
           <tr
-            v-for="item in massFk"
+            v-for="item in selFk"
             :key="item.id"
           >
             <td
@@ -256,6 +259,240 @@ watch(valuesZK, newValue => {
               </VRow>
             </td>
           </tr>
+        </tbody>
+      </VTable>
+    </VCol>
+  </VRow>
+  <VRow>
+    <VCol>
+      <VTable class="mt-10">
+        <thead class="thead-light">
+        <tr>
+          <th class="text-center">
+            <h3>Спеціальні передбачені закладом вищої освіти компетентності</h3>
+          </th>
+        </tr>
+        </thead>
+      </VTable>
+      <VTable v-if='components.mandatory.length > 0'>
+        <tbody>
+        <tr>
+          <th />
+          <th
+            v-for="component in components.mandatory"
+            :key="component.id"
+          >
+            <div style="text-align: center">
+              <VTooltip
+                activator="parent"
+                location="top"
+              >
+                {{ component.name }}
+              </VTooltip>
+              <span>{{ 'ОК' + component.code }}</span>
+            </div>
+          </th>
+        </tr>
+        <tr
+          v-for="item in selVfk"
+          :key="item.id"
+        >
+          <td
+            colspan="1"
+            style="width: 30%"
+          >
+            <div style="text-align: center">
+                <span><h3>
+                        {{ item.type + '' + item.code }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
+                  {{ item.definition }}
+                </span>
+              <VRow
+                justify="start"
+                align="center"
+                no-gutters
+              >
+                <br>
+                <VCol>
+                  <VProgressLinear
+                    v-model="valuesZK[item.id]"
+                    :max="maxValue"
+                    :buffer-value="value"
+                    :color="progressColor[item.id]"
+                    :height="10"
+                    rounded
+                  />
+                </VCol>
+              </VRow>
+            </div>
+          </td>
+          <td
+            v-for=" component in components.mandatory "
+            :key=" component.id"
+          >
+            <VRow justify="center">
+              <VCheckbox
+                v-model="selected[item.id][component.id]"
+                @update:modelValue="changeCheckbox($event, component.id, item.id)"
+              />
+            </VRow>
+          </td>
+        </tr>
+        </tbody>
+      </VTable>
+    </VCol>
+  </VRow>
+  <VRow>
+    <VCol>
+      <VTable class="mt-10">
+        <thead class="thead-light">
+        <tr>
+          <th class="text-center">
+            <h3>Програмні результати навчання</h3>
+          </th>
+        </tr>
+        </thead>
+      </VTable>
+      <VTable v-if="components.mandatory.length>0">
+        <tbody>
+        <tr>
+          <th />
+          <th
+            v-for="component in components.mandatory"
+            :key="component.id"
+          >
+            <div style="text-align: center">
+              <VTooltip
+                activator="parent"
+                location="top"
+              >
+                {{ component.name }}
+              </VTooltip>
+              <span>{{ 'ОК' + component.code }}</span>
+            </div>
+          </th>
+        </tr>
+        <tr
+          v-for="item in selPr"
+          :key="item.id"
+        >
+          <td
+            colspan="1"
+            style="width: 30%"
+          >
+            <div style="text-align: center">
+                <span><h3>
+                        {{ item.type + '' + item.code }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
+                  {{ item.definition }}
+                </span>
+              <VRow
+                justify="start"
+                align="center"
+                no-gutters
+              >
+                <br>
+                <VCol>
+                  <VProgressLinear
+                    v-model="valuesZK[item.id]"
+                    :max="maxValue"
+                    :buffer-value="value"
+                    :color="progressColor[item.id]"
+                    :height="10"
+                    rounded
+                  />
+                </VCol>
+              </VRow>
+            </div>
+          </td>
+          <td
+            v-for=" component in components.mandatory "
+            :key=" component.id"
+          >
+            <VRow justify="center">
+              <VCheckbox
+                v-model="selected[item.id][component.id]"
+                @update:modelValue="changeCheckbox($event, component.id, item.id)"
+              />
+            </VRow>
+          </td>
+        </tr>
+        </tbody>
+      </VTable>
+    </VCol>
+  </VRow>
+  <VRow>
+    <VCol>
+      <VTable class="mt-10">
+        <thead class="thead-light">
+        <tr>
+          <th class="text-center">
+            <h3>Спеціальні передбачені закладом вищої освіти програмні результати навчання</h3>
+          </th>
+        </tr>
+        </thead>
+      </VTable>
+      <VTable v-if="components.mandatory.length>0">
+        <tbody>
+        <tr>
+          <th />
+          <th
+            v-for="component in components.mandatory"
+            :key="component.id"
+          >
+            <div style="text-align: center">
+              <VTooltip
+                activator="parent"
+                location="top"
+              >
+                {{ component.name }}
+              </VTooltip>
+              <span>{{ 'ОК' + component.code }}</span>
+            </div>
+          </th>
+        </tr>
+        <tr
+          v-for="item in selVpr"
+          :key="item.id"
+        >
+          <td
+            colspan="1"
+            style="width: 30%"
+          >
+            <div style="text-align: center">
+                <span><h3>
+                        {{ item.type + '' + item.code }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
+                  {{ item.definition }}
+                </span>
+              <VRow
+                justify="start"
+                align="center"
+                no-gutters
+              >
+                <br>
+                <VCol>
+                  <VProgressLinear
+                    v-model="valuesZK[item.id]"
+                    :max="maxValue"
+                    :buffer-value="value"
+                    :color="progressColor[item.id]"
+                    :height="10"
+                    rounded
+                  />
+                </VCol>
+              </VRow>
+            </div>
+          </td>
+          <td
+            v-for=" component in components.mandatory "
+            :key=" component.id"
+          >
+            <VRow justify="center">
+              <VCheckbox
+                v-model="selected[item.id][component.id]"
+                @update:modelValue="changeCheckbox($event, component.id, item.id)"
+              />
+            </VRow>
+          </td>
+        </tr>
         </tbody>
       </VTable>
     </VCol>
