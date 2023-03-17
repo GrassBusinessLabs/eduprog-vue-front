@@ -22,11 +22,8 @@ const exportToExcel = () =>{
   eduProgsStore.exportToExcel(route.params.id)
 }
 const changeURL = (tab) =>{
-  console.log("ПАТЗ",route.path)
-  console.log("ПАРАМС",route.params.id)
   router.replace({path: route.path, query: {tab: tab.tab}})
   activeTab.value=tab.tab
-  console.log("АКТИВ",activeTab)
 }
 const tabs = [
   {

@@ -20,6 +20,8 @@ export const useEduProgsStore = defineStore({
     selectedFk:[],
     selectedPr:[],
     selectedVpr:[],
+    allCompetencies:[],
+    selectedCompetencies:[]
   }),
 
   getters: {
@@ -38,6 +40,8 @@ export const useEduProgsStore = defineStore({
     getSelectedFk: state => state.selectedFk,
     getSelectedPr: state => state.selectedPr,
     getSelectedVpr: state => state.selectedVpr,
+    getAllCompetencies: state => state.allCompetencies,
+    getSelectedCompetencies: state => state.selectedCompetencies,
   },
 
   actions: {
@@ -122,6 +126,7 @@ export const useEduProgsStore = defineStore({
       const response = await getData('/eduprogs/competencies/byEduprogId/' + eduId)
       this.competencies = response
     },
+    
     async createCompetencyRelation(eduprogId, componentId, competencyId) {
       const newRelation = {
         eduprog_id: eduprogId,
@@ -139,12 +144,11 @@ export const useEduProgsStore = defineStore({
     },
     async fetchSelectedCompetencies(eduId, type) {
       const response = await getData(`/eduprogs/competencies/byEduprogId/${eduId}/byType?type=${type}`)
-      return response
+      this.selectedCompetencies = response
     },
     async fetchCompetencies(type) {
-      console.log("равботет", type)
       const response = await getData(`/eduprogs/baseCompetencies/byType?type=${type}`)
-      return response
+      this.allCompetencies = response
     },
     async fetchZkCompetencies(eduId) {
       const response = await getData('/eduprogs/baseCompetencies/byType?type=ZK')

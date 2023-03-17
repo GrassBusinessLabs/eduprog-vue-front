@@ -1,10 +1,10 @@
 <script setup>
 import { useEduProgsStore } from '@/stores/eduProgs.js'
-import { reactive } from 'vue'
+import { onBeforeMount, onMounted, reactive } from 'vue'
 import EditZkCompetencies from '@/views/pages/edit-document/edit-competency-tabs/EditZkCompetencies.vue'
+import { useRoute } from 'vue-router'
 const props = defineProps(['eduProg'])
 const route = useRoute()
-import { useRoute } from 'vue-router'
 const eduProgsStore = useEduProgsStore()
 const activeTab = ref(route.params.tab)
 const tabs = [
@@ -46,57 +46,8 @@ const tabs = [
         <EditZkCompetencies/>
       </VWindowItem>
     </VWindow>
-  <!-- <VTable>
-    <thead class="thead-light">
-      <tr>
-        <th class="text-center">
-          <h3>Загальні компетентності</h3>
-        </th>
-      </tr>
-    </thead>
-  </VTable>
-  <VTable>
-    <thead class="thead-light">
-      <tr>
-        <th style="text-align: center">Код</th>
-        <th style="text-align: center">Опис</th>
-        <th style="text-align: center; width: 20%">
-          <div class="mt-2" style="display: flex; flex-direction: column; align-items: center; justify-content: center">
-            <span>Обрати все</span>
-            <VCheckbox
-              v-model="allSelect"
-              @update:modelValue="selectAll($event, 'ZK')"
-            />
-          </div>
-        </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr
-        v-for="item in allZkComp"
-        :key="item.id"
-      >
-        <td
-          class="py-3"
-          style="text-align: center"
-        >
-          {{ item.code }}
-        </td>
-        <td class="py-3">
-          {{ item.definition }}
-        </td>
-        <td>
-          <VRow justify="center">
-            <VCheckbox
-              v-model="valueComp[item.competency_id]"
-              @update:modelValue="changeCheckbox($event, item.competency_id)"
-            />
-          </VRow>
-        </td>
-      </tr>
-    </tbody>
-  </VTable>
-  <VTable class="mt-10">
+  
+  <!-- <VTable class="mt-10">
     <thead class="thead-light">
       <tr>
         <th class="text-center">
