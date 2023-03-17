@@ -15,11 +15,11 @@ export const useEduProgsStore = defineStore({
     competencyRelations: [],
     competenciesZk:[],
     competenciesFk:[],
-    competenciesVfk:[],
+    selectedVfk:[],
     selectedZk:[],
-    getSelectedFk:[],
-    getSelectedPr:[],
-    getSelectedVpr:[],
+    selectedFk:[],
+    selectedPr:[],
+    selectedVpr:[],
   }),
 
   getters: {
@@ -33,7 +33,7 @@ export const useEduProgsStore = defineStore({
     getCompetencyRelations: state => state.competencyRelations,
     getCompetenciesZk: state => state.competenciesZk,
     getCompetenciesFk: state => state.competenciesFk,
-    getCompetenciesVfk: state => state.competenciesVfk,
+    getSelectedVfk: state => state.selectedVfk,
     getSelectedZk: state => state.selectedZk,
     getSelectedFk: state => state.selectedFk,
     getSelectedPr: state => state.selectedPr,
@@ -155,9 +155,9 @@ export const useEduProgsStore = defineStore({
       this.competenciesFk = response
     },
 
-    async fetchVfkCompetencies(eduId) {
+    async fetchSelectedVfk(eduId) {
       const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId+'/byType?type=VFK')
-      this.competenciesVfk = response
+      this.selectedVfk = response
     },
     async fetchSelectedZk(eduId) {
       const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId+'/byType?type=ZK')
