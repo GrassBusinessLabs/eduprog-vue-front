@@ -87,7 +87,7 @@ watch(valuesZK, newValue => {
 </script>
 
 <template>
-  <VRow v-if='selZk'>
+  <VRow v-if='selZk>0'>
     <VCol>
       <VTable class="mt-10">
         <thead class="thead-light">

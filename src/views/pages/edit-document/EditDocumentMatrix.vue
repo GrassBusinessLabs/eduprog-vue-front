@@ -13,6 +13,10 @@ const eduProgsStore = useEduProgsStore()
 const route = useRoute()
 const activeTab = ref(route.params.tab)
 
+const changeURL = (tab) =>{
+  console.log("АКТИВ",activeTab.value)
+}
+
 const tabs = [
   {
     title: 'Загальні компетентності',
@@ -51,6 +55,7 @@ const tabs = [
       v-for="item in tabs"
       :key="item.icon"
       :value="item.tab"
+      @click="changeURL(item)"
     >
       <VIcon
         size="20"
