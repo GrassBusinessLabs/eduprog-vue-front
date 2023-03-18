@@ -13,34 +13,29 @@ const eduProgsStore = useEduProgsStore()
 const route = useRoute()
 const activeTab = ref(route.params.tab)
 
-const changeURL = (tab) =>{
-  console.log("АКТИВ",activeTab.value)
+const changeURL = tab => {
+  console.log('АКТИВ', activeTab.value)
 }
 
 const tabs = [
   {
     title: 'Загальні компетентності',
-    icon: 'mdi-table',
     tab: 'ZKt',
   },
   {
     title: 'Фахові компетентності',
-    icon: 'mdi-table',
     tab: 'FKt',
   },
   {
     title: 'Спеціальні фахові',
-    icon: 'mdi-table',
     tab: 'VFKt',
   },
   {
     title: 'Програмні результати навчання',
-    icon: 'mdi-table',
     tab: 'PRt',
   },
   {
     title: 'Спеціальні програмні результати ',
-    icon: 'mdi-table',
     tab: 'VPRt',
   },
 ]
@@ -53,15 +48,10 @@ const tabs = [
   >
     <VTab
       v-for="item in tabs"
-      :key="item.icon"
+      :key="item.tab"
       :value="item.tab"
       @click="changeURL(item)"
     >
-      <VIcon
-        size="20"
-        start
-        :icon="item.icon"
-      />
       {{ item.title }}
     </VTab>
   </VTabs>
@@ -72,28 +62,24 @@ const tabs = [
     class="mt-5 disable-tab-transition"
     :touch="false"
   >
-    <!-- Головна -->
     <VWindowItem value="ZKt">
       <ZkTable />
     </VWindowItem>
-
-    <!-- Перелік компонент -->
     <VWindowItem value="FKt">
       <FkTable />
     </VWindowItem>
-    <!-- Структурно логічна схема -->
-    <VWindowItem value="VFKt">
+        <VWindowItem value="VFKt">
       <VfkTable />
     </VWindowItem>
-    <!-- Структурно логічна послідовнсість -->
     <VWindowItem value="PRt">
       <PrTable />
     </VWindowItem>
-
-    <!--   Компоненти ЗК   -->
     <VWindowItem value="VPRt">
       <VprTable />
     </VWindowItem>
+    <!-- Структурно логічна послідовнсість -->
+
+    <!--   Компоненти ЗК   -->
   </VWindow>
 </template>
 
