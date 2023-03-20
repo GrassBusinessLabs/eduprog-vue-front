@@ -1,10 +1,9 @@
 <script setup>
-import { useRoute } from 'vue-router'
+import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import ZkTable from '@/views/pages/edit-document/edit-matrix-tabs/ZK-table.vue'
 import FkTable from '@/views/pages/edit-document/edit-matrix-tabs/FK-table.vue'
-import VfkTable from '@/views/pages/edit-document/edit-matrix-tabs/VFK-table.vue'
 import PrTable from '@/views/pages/edit-document/edit-matrix-tabs/PR-table.vue'
-import VprTable from '@/views/pages/edit-document/edit-matrix-tabs/VPR-table.vue'
+
 
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 
@@ -16,7 +15,9 @@ const activeTab = ref(route.params.tab)
 const changeURL = tab => {
   console.log('АКТИВ', activeTab.value)
 }
-
+onBeforeRouteUpdate((to, from) => {
+  activeTab.value = to.params.tab
+})
 const tabs = [
   {
     title: 'Загальні компетентності',
@@ -27,16 +28,8 @@ const tabs = [
     tab: 'FKt',
   },
   {
-    title: 'Спеціальні фахові',
-    tab: 'VFKt',
-  },
-  {
     title: 'Програмні результати навчання',
     tab: 'PRt',
-  },
-  {
-    title: 'Спеціальні програмні результати ',
-    tab: 'VPRt',
   },
 ]
 </script>
@@ -63,23 +56,20 @@ const tabs = [
     :touch="false"
   >
     <VWindowItem value="ZKt">
+      <template v-if="activeTab === 'ZKt'">
       <ZkTable />
+      </template>
     </VWindowItem>
     <VWindowItem value="FKt">
+      <template v-if="activeTab === 'FKt'">
       <FkTable />
-    </VWindowItem>
-        <VWindowItem value="VFKt">
-      <VfkTable />
+      </template>
     </VWindowItem>
     <VWindowItem value="PRt">
+      <template v-if="activeTab === 'PRt'">
       <PrTable />
+      </template>
     </VWindowItem>
-    <VWindowItem value="VPRt">
-      <VprTable />
-    </VWindowItem>
-    <!-- Структурно логічна послідовнсість -->
-
-    <!--   Компоненти ЗК   -->
   </VWindow>
 </template>
 

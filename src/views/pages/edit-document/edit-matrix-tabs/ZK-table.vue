@@ -19,7 +19,7 @@ const selZk = ref()
 
 
 onBeforeMount(async () => {
-  await eduProgsStore.fetchSelectedZk(route.params.id)
+  await eduProgsStore.fetchSelectedCompetencies(route.params.id, 'ZK')
   await eduProgsStore.fetchCompetencyRelations(route.params.id)
   await eduProgsStore.fetchAllCompetencies(route.params.id)
 
@@ -50,11 +50,7 @@ onBeforeMount(async () => {
       }
     })
   })
-  selZk.value = eduProgsStore.getSelectedZk
-})
-
-onUnmounted (()=>{
-  console.log("ОТВЯЗАЛИСЧЬ")
+  selZk.value = eduProgsStore.getSelectedCompetencies
 })
 
 
@@ -89,7 +85,7 @@ watch(valuesZK, newValue => {
 </script>
 
 <template>
-  <VRow v-if='selZk>0'>
+  <VRow>
     <VCol>
       <VTable class="mt-10">
         <thead class="thead-light">
@@ -176,13 +172,4 @@ watch(valuesZK, newValue => {
       </VAlert>
     </VCol>
   </VRow>
-  <VAlert
-    v-else
-    border="left"
-    text
-    type="info"
-    prominent
-  >
-    Поки що не додано жодної компетентності до схеми.
-  </VAlert>
 </template>

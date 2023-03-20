@@ -13,12 +13,7 @@ export const useEduProgsStore = defineStore({
     disciplines: [],
     competencies: [],
     competencyRelations: [],
-    competenciesZk:[],
-    competenciesFk:[],
     selectedVfk:[],
-    selectedZk:[],
-    selectedFk:[],
-    selectedPr:[],
     selectedVpr:[],
     allCompetencies:[],
     selectedCompetencies:[]
@@ -33,12 +28,7 @@ export const useEduProgsStore = defineStore({
     getDisciplines: state => state.disciplines,
     getCompetencies: state => state.competencies,
     getCompetencyRelations: state => state.competencyRelations,
-    getCompetenciesZk: state => state.competenciesZk,
-    getCompetenciesFk: state => state.competenciesFk,
     getSelectedVfk: state => state.selectedVfk,
-    getSelectedZk: state => state.selectedZk,
-    getSelectedFk: state => state.selectedFk,
-    getSelectedPr: state => state.selectedPr,
     getSelectedVpr: state => state.selectedVpr,
     getAllCompetencies: state => state.allCompetencies,
     getSelectedCompetencies: state => state.selectedCompetencies,
@@ -146,34 +136,14 @@ export const useEduProgsStore = defineStore({
       const response = await getData(`/eduprogs/competencies/byEduprogId/${eduId}/byType?type=${type}`)
       this.selectedCompetencies = response
     },
-    async fetchCompetencies(type) {
-      const response = await getData(`/eduprogs/baseCompetencies/byType?type=${type}`)
+    async fetchCompetencies(type, eduSp) {
+      const response = await getData(`/eduprogs/baseCompetencies/byType?type=${type}&specialty=${eduSp}`)
       this.allCompetencies = response
-    },
-    async fetchZkCompetencies(eduId) {
-      const response = await getData('/eduprogs/baseCompetencies/byType?type=ZK')
-      this.competenciesZk = response
-    },
-    async fetchFkCompetencies(eduId) {
-      const response = await getData('/eduprogs/baseCompetencies/byType?type=FK')
-      this.competenciesFk = response
     },
 
     async fetchSelectedVfk(eduId) {
       const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId+'/byType?type=VFK')
       this.selectedVfk = response
-    },
-    async fetchSelectedZk(eduId) {
-      const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId+'/byType?type=ZK')
-      this.selectedZk = response
-    },
-    async fetchSelectedFk(eduId) {
-      const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId+'/byType?type=FK')
-      this.selectedFk = response
-    },
-    async fetchSelectedPr(eduId) {
-      const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId+'/byType?type=PR')
-      this.selectedPr = response
     },
     async fetchSelectedVpr(eduId) {
       const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId+'/byType?type=VPR')

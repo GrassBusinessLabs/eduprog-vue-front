@@ -15,12 +15,14 @@ const valuesZK = reactive({})
 const maxValue = ref(6)
 const progressColor = ref({})
 const selPr = ref([])
+const selVpr = ref([])
 
 
 onBeforeMount(async () => {
   await eduProgsStore.fetchCompetencyRelations(route.params.id)
   await eduProgsStore.fetchAllCompetencies(route.params.id)
-  await eduProgsStore.fetchSelectedPr(route.params.id)
+  await eduProgsStore.fetchSelectedCompetencies(route.params.id, 'PR')
+  await eduProgsStore.fetchSelectedVpr(route.params.id)
 
   const relations = eduProgsStore.getCompetencyRelations.reduce((acc, cur) => {
     const competency_id = cur.competency_id
@@ -49,7 +51,8 @@ onBeforeMount(async () => {
       }
     })
   })
-  selPr.value = eduProgsStore.getSelectedPr
+  selPr.value = eduProgsStore.getSelectedCompetencies
+  selVpr.value = eduProgsStore.getSelectedVpr
 })
 
 
@@ -86,7 +89,7 @@ watch(valuesZK, newValue => {
 </script>
 
 <template>
-  <VRow v-if='selPr>0'>
+  <VRow>
     <VCol>
       <VTable class="mt-10">
         <thead class="thead-light">
@@ -173,13 +176,91 @@ watch(valuesZK, newValue => {
       </VAlert>
     </VCol>
   </VRow>
-  <VAlert
-    v-else
-    border="left"
-    text
-    type="info"
-    prominent
-  >
-    Поки що не додано жодної компетентності до схеми.
-  </VAlert>
+  <VRow>
+    <VCol>
+      <VTable class="mt-10">
+        <thead class="thead-light">
+          <tr>
+            <th class="text-center">
+              <h3>Спеціальні програмні результати навчанняпередбачені закладом вищої освіти програмні результати навчання</h3>
+            </th>
+          </tr>
+        </thead>
+      </VTable>
+      <VTable v-if="components.mandatory.length>0">
+        <tbody>
+          <tr>
+            <th />
+            <th
+              v-for="component in components.mandatory"
+              :key="component.id"
+            >
+              <div style="text-align: center">
+                <VTooltip
+                  activator="parent"
+                  location="top"
+                >
+                  {{ component.name }}
+                </VTooltip>
+                <span>{{ 'ОК' + component.code }}</span>
+              </div>
+            </th>
+          </tr>
+          <tr
+            v-for="item in selVpr"
+            :key="item.id"
+          >
+            <td
+              colspan="1"
+              style="width: 30%"
+            >
+              <div style="text-align: center">
+                <span><h3>
+                        {{ item.type + '' + item.code }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
+                  {{ item.definition }}
+                </span>
+                <VRow
+                  justify="start"
+                  align="center"
+                  no-gutters
+                >
+                  <br>
+                  <VCol>
+                    <VProgressLinear
+                      v-model="valuesZK[item.id]"
+                      :max="maxValue"
+                      :buffer-value="value"
+                      :color="progressColor[item.id]"
+                      :height="10"
+                      rounded
+                    />
+                  </VCol>
+                </VRow>
+              </div>
+            </td>
+            <td
+              v-for=" component in components.mandatory "
+              :key=" component.id"
+            >
+              <VRow justify="center">
+                <VCheckbox
+                  v-model="selected[item.id][component.id]"
+                  @update:modelValue="changeCheckbox($event, component.id, item.id)"
+                />
+              </VRow>
+            </td>
+          </tr>
+        </tbody>
+      </VTable>
+      <VAlert
+        v-else
+        border="left"
+        text
+        type="info"
+        prominent
+      >
+        Поки що не додано жодного освітнього компонента до схеми.
+      </VAlert>
+    </VCol>
+  </VRow>
 </template>
