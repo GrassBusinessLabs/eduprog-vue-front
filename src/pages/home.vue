@@ -86,6 +86,21 @@ const newEduProg = ref({
   speciality :'',
   knowledge_field :'',
 })
+
+const education_level = [
+  {
+    title: 'Початковий рівень (короткий цикл)',
+  },
+  {
+    title: 'Перший (бакалаврський) рівень',
+  },
+  {
+    title: 'Другий (магістерський) рівень',
+  },
+  {
+    title: 'Третій (освітньо-науковий/освітньо-творчий) рівень',
+  },
+]
 </script>
 
 <template>
@@ -123,17 +138,10 @@ const newEduProg = ref({
             <VCol
               cols="12"
             >
-              <VTextField
+              <VSelect
                 v-model="newEduProg.education_level"
+                :items="education_level"
                 label="Освітній рівень"
-              />
-            </VCol>
-            <VCol
-              cols="12"
-            >
-              <VTextField
-                v-model="newEduProg.stage"
-                label="Освітній ступінь"
                 required
               />
             </VCol>
@@ -169,7 +177,7 @@ const newEduProg = ref({
         </VBtn>
         <VBtn
           text
-          :disabled="!(newEduProg.knowledge_field && newEduProg.speciality && newEduProg.name &&newEduProg.education_level && newEduProg.stage)"
+          :disabled="!(newEduProg.knowledge_field && newEduProg.speciality && newEduProg.name &&newEduProg.education_level)"
           @click="createEduProg"
         >
           <!-- Need fix, user need to reload page for check new EduProg -->
@@ -200,9 +208,9 @@ const newEduProg = ref({
     </thead>
     <tbody>
       <tr 
-        class="eduprog-item"
         v-for="item in eduProgs"
         :key="item.id"
+        class="eduprog-item"
         @click="editEduProg($event, item.id)"
       >
         <td>{{ item.name }}</td>
@@ -274,7 +282,7 @@ const newEduProg = ref({
           <VBtn
             text
             @click="editNameEduProg(); 
-            dialogRename = false"
+                    dialogRename = false"
           >
             Зберегти
           </VBtn>

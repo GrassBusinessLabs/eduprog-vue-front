@@ -229,7 +229,7 @@
       <tr>
         <th colspan="5">
           <div style="float: left">
-            Загальний обсяг обов’язкових компонентів:
+            Загальний обсяг вибіркових компонентів:
           </div>
           <div style="float: left">
             <input
@@ -361,6 +361,24 @@
       </VCardText>
     </VCard>
   </VDialog>
+  <VDialog
+    v-model="alert"
+    persistent
+    max-width="600"
+  >
+    <VCardText>
+      <h1 style='text-align: center'>Ви ввели забагато кредитів</h1>
+    </VCardText>
+    <VSpacer />
+
+    <VBtn
+      text
+      @click="alert = false"
+      style='width: 50%;margin: 0 auto; display: block;'
+    >
+      Закрити
+    </VBtn>
+  </VDialog>
 </template>
 
 <script setup>
@@ -377,6 +395,7 @@ const components = eduProgsStore.getEduProg.components
 const editIndex =  ref(null)
 const originalData = ref(null)
 const dialogCreate = ref(false)
+const alert = ref(false)
 const dialogCreateSelective = ref(false)
 const newComponent = reactive({
   code: "",
@@ -404,10 +423,14 @@ async function createComponent() {
     }else{
       createdComponent.code="1"
     }
-    console.log(createdComponent)
-    createdComponent.id = await eduProgsStore.createComponent(createdComponent)
-    components.mandatory.push(createdComponent)
-    dialogCreate.value = false
+    try {
+      console.log(createdComponent)
+      createdComponent.id = await eduProgsStore.createComponent(createdComponent)
+      components.mandatory.push(createdComponent)
+      dialogCreate.value = false
+    } catch (error) {
+      alert.value = true
+    }
   } 
   else if(dialogCreateSelective.value){
     console.log(createdComponent)
@@ -417,9 +440,13 @@ async function createComponent() {
     }else{
       createdComponent.code="1"
     }
-    createdComponent.id = await eduProgsStore.createComponent(createdComponent)
-    components.selective.push(createdComponent)
-    dialogCreateSelective.value = false
+    try {
+      createdComponent.id = await eduProgsStore.createComponent(createdComponent)
+      components.selective.push(createdComponent)
+      dialogCreateSelective.value = false
+    } catch (error) {
+      alert.value = true
+    }
   }
   newComponent.name=""
   newComponent.credits=0

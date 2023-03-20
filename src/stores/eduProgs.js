@@ -13,6 +13,10 @@ export const useEduProgsStore = defineStore({
     disciplines: [],
     competencies: [],
     competencyRelations: [],
+    selectedVfk:[],
+    selectedVpr:[],
+    allCompetencies:[],
+    selectedCompetencies:[]
   }),
 
   getters: {
@@ -24,8 +28,10 @@ export const useEduProgsStore = defineStore({
     getDisciplines: state => state.disciplines,
     getCompetencies: state => state.competencies,
     getCompetencyRelations: state => state.competencyRelations,
-    getCompetencyAllRelations: state => state.competencyAllRelations,
-    getCompetencyFkAllRelations: state => state.competencyFkAllRelations,
+    getSelectedVfk: state => state.selectedVfk,
+    getSelectedVpr: state => state.selectedVpr,
+    getAllCompetencies: state => state.allCompetencies,
+    getSelectedCompetencies: state => state.selectedCompetencies,
   },
 
   actions: {
@@ -106,10 +112,11 @@ export const useEduProgsStore = defineStore({
       const response = await getData('/eduprogs/compRelations/posRel/' + eduId + '/' + compId)
       return response
     },
-    async fetchCompetencies(eduId) {
+    async fetchAllCompetencies(eduId) {
       const response = await getData('/eduprogs/competencies/byEduprogId/' + eduId)
       this.competencies = response
     },
+    
     async createCompetencyRelation(eduprogId, componentId, competencyId) {
       const newRelation = {
         eduprog_id: eduprogId,
@@ -125,14 +132,24 @@ export const useEduProgsStore = defineStore({
       const response = await getData('/eduprogs/competenciesMatrix/'+eduId+'?type=ZK')
       this.competencyRelations = response
     },
-    async fetchCompetencyAllRelations(eduId) {
-      const response = await getData('/eduprogs/baseCompetencies/ZK_list')
-      this.competencyAllRelations = response
+    async fetchSelectedCompetencies(eduId, type) {
+      const response = await getData(`/eduprogs/competencies/byEduprogId/${eduId}/byType?type=${type}`)
+      this.selectedCompetencies = response
     },
-    async fetchCompetencyFkAllRelations(eduId) {
-      const response = await getData('/eduprogs/baseCompetencies/FK_list')
-      this.competencyFkAllRelations = response
+    async fetchCompetencies(type, eduSp) {
+      const response = await getData(`/eduprogs/baseCompetencies/byType?type=${type}&specialty=${eduSp}`)
+      this.allCompetencies = response
     },
+
+    async fetchSelectedVfk(eduId) {
+      const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId+'/byType?type=VFK')
+      this.selectedVfk = response
+    },
+    async fetchSelectedVpr(eduId) {
+      const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId+'/byType?type=VPR')
+      this.selectedVpr = response
+    },
+
     async addCompetencyToEduprog(eduprogId, competencyId) {
       const newRelation = {
         competency_id:competencyId,
@@ -144,8 +161,24 @@ export const useEduProgsStore = defineStore({
 
       return response
     },
+    async addAllCompetencies(eduprogId, type) {
+      await postData(`/eduprogs/competencies/addAll/${eduprogId}/type?type=${type}`)
+    },
+    async deleteAllCompetencies(eduprogId, type) {
+      await deleteData(`/eduprogs/competencies/delAll/${eduprogId}/type?type=${type}`)
+    },
     async deleteCompetencyInEduprog(competencyId) {
       await deleteData('/eduprogs/competencies/' + competencyId)
+    },
+    async addCustomCompetency(payload) {
+      const respone = await postData('/eduprogs/competencies/addCustom', payload)
+      return respone
+    },
+    async editCustomCompetency(id, payload) {
+      const newDefinition={
+        definition: payload
+      }
+      await editData('/eduprogs/competencies/'+id, newDefinition)
     },
     async exportToExcel(eduId) {
       await getFile('/eduprogs/toExcel/'+eduId).then(response => {
@@ -168,5 +201,6 @@ export const useEduProgsStore = defineStore({
       const response = await deleteData('/eduprogs/compRelations/'+baseId+'/'+childId);
       return response
     },
+
   },
 })

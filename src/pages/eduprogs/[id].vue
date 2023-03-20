@@ -1,5 +1,5 @@
 <script setup>
-import { useRoute } from 'vue-router'
+import { useRoute, onBeforeRouteUpdate, useRouter } from 'vue-router'
 import EditDocumentCharacteristic from '@/views/pages/edit-document/EditDocumentCharacteristic.vue'
 import EditDocumentComponents from '@/views/pages/edit-document/EditDocumentComponents.vue'
 import EditDocumentSchema from '@/views/pages/edit-document/EditDocumentSchema.vue'
@@ -9,9 +9,11 @@ import EditDocumentZK from '@/views/pages/edit-document/EditDocumentZK.vue'
 
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 import axios from 'axios'
+import { reactive } from 'vue'
 const eduProgsStore = useEduProgsStore()
 const route = useRoute()
-const activeTab = ref(route.params.tab)
+const router = useRouter()
+const activeTab = reactive({value: route.params.query?.tab})
 onMounted(async () => {
   await eduProgsStore.findEduProgById(route.params.id)
   await eduProgsStore.fetchScheme(route.params.id)
@@ -19,7 +21,10 @@ onMounted(async () => {
 const exportToExcel = () =>{
   eduProgsStore.exportToExcel(route.params.id)
 }
-// tabs
+const changeURL = (tab) =>{
+  router.replace({path: route.path, query: {tab: tab.tab}})
+  activeTab.value=tab.tab
+}
 const tabs = [
   {
     title: 'Загальна Характеристика',
@@ -52,6 +57,7 @@ const tabs = [
     tab: 'matrix',
   },
 ]
+
 </script>
 
 <template>
@@ -68,13 +74,14 @@ const tabs = [
   </VRow>
   <div v-if="!eduProgsStore.isLoading && eduProgsStore.getEduProg && eduProgsStore.getEduProg.id != 0">
     <VTabs
-      v-model="activeTab"
+      :value="activeTab.value"
       show-arrows
     >
       <VTab
         v-for="item in tabs"
         :key="item.icon"
         :value="item.tab"
+        @click="changeURL(item)"
       >
         <VIcon
           size="20"
@@ -87,7 +94,7 @@ const tabs = [
     <VDivider />
 
     <VWindow
-      v-model="activeTab"
+      v-model="activeTab.value"
       class="mt-5 disable-tab-transition"
       :touch="false"
     >
@@ -96,7 +103,7 @@ const tabs = [
         <EditDocumentCharacteristic :edu-prog="eduProgsStore.getEduProg" />
       </VWindowItem>
 
-      <!-- Перелік компонент -->
+      <!-- Перелік компонентів -->
       <VWindowItem value="components">
         <EditDocumentComponents />
       </VWindowItem>
@@ -119,11 +126,11 @@ const tabs = [
 
       <!-- Матриця -->
       <VWindowItem value="matrix">
-        <EditDocumentMatrix />
+          <EditDocumentMatrix />
       </VWindowItem>
     </VWindow>
   </div>
-  <v-alert
+  <VAlert
     v-if="eduProgsStore.getEduProg.id == 0"
     border="bottom"
     colored-border
@@ -131,7 +138,7 @@ const tabs = [
     elevation="2"
   >
     ОПП з таким id не знайдено.
-  </v-alert>
+  </VAlert>
 </template>
 
 <route lang="yaml">
