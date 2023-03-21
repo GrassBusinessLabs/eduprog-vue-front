@@ -10,14 +10,13 @@ import { useEduProgsStore } from '@/stores/eduProgs.js'
 const props = defineProps(['eduProg'])
 const eduProgsStore = useEduProgsStore()
 const route = useRoute()
-const activeTab = ref(route.params.tab)
-
-const changeURL = tab => {
-  console.log('АКТИВ', activeTab.value)
-}
+const lastTab = ref('ZKt')
+const activeTab = ref(localStorage.getItem('activeTab') || route.params.tab)
+console.log(route.params.tab)
 onBeforeRouteUpdate((to, from) => {
-  activeTab.value = to.params.tab
+  activeTab.value = lastTab.value
 })
+
 const tabs = [
   {
     title: 'Загальні компетентності',
@@ -32,6 +31,32 @@ const tabs = [
     tab: 'PRt',
   },
 ]
+watch(activeTab, newValue => {
+
+  switch (newValue){
+  case undefined :
+    console.log('undefined')
+    localStorage.setItem('activeTab',lastTab)
+    console.log(lastTab.value)
+    break
+  case 'ZKt' :
+    console.log('Ok ZKt')
+    lastTab.value = newValue
+    localStorage.setItem('activeTab', newValue)
+    console.log(lastTab.value)
+    break
+  case 'FKt' :
+    console.log('Ok FKt')
+    lastTab.value = newValue
+    localStorage.setItem('activeTab', newValue)
+    break
+  case 'PRt':
+    console.log('Ok Prt')
+    lastTab.value = newValue
+    localStorage.setItem('activeTab', newValue)
+    break
+  }
+})
 </script>
 
 <template>
@@ -43,7 +68,6 @@ const tabs = [
       v-for="item in tabs"
       :key="item.tab"
       :value="item.tab"
-      @click="changeURL(item)"
     >
       {{ item.title }}
     </VTab>
@@ -57,24 +81,19 @@ const tabs = [
   >
     <VWindowItem value="ZKt">
       <template v-if="activeTab === 'ZKt'">
-      <ZkTable />
+        <ZkTable />
       </template>
     </VWindowItem>
     <VWindowItem value="FKt">
       <template v-if="activeTab === 'FKt'">
-      <FkTable />
+        <FkTable />
       </template>
     </VWindowItem>
     <VWindowItem value="PRt">
       <template v-if="activeTab === 'PRt'">
-      <PrTable />
+        <PrTable />
       </template>
     </VWindowItem>
   </VWindow>
 </template>
 
-<route lang="yaml">
-meta:
-navActiveLink: pages-account-settings-tab
-requiresAuth: true
-</route>
