@@ -12,10 +12,6 @@ const eduProgsStore = useEduProgsStore()
 const route = useRoute()
 const lastTab = ref('ZKt')
 const activeTab = ref(localStorage.getItem('activeTab') || route.params.tab)
-console.log(route.params.tab)
-onBeforeRouteUpdate((to, from) => {
-  activeTab.value = lastTab.value
-})
 
 const tabs = [
   {
