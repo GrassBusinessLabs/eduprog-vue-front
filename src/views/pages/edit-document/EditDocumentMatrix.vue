@@ -36,7 +36,7 @@ watch(activeTab, newValue => {
   switch (newValue){
   case undefined :
     console.log('undefined')
-    localStorage.setItem('activeTab',lastTab)
+    localStorage.setItem('activeTab',lastTab.value)
     console.log(lastTab.value)
     break
   case 'ZKt' :
@@ -75,6 +75,7 @@ watch(activeTab, newValue => {
   <VDivider />
 
   <VWindow
+    :key="activeTab"
     v-model="activeTab"
     class="mt-5 disable-tab-transition"
     :touch="false"
@@ -96,4 +97,3 @@ watch(activeTab, newValue => {
     </VWindowItem>
   </VWindow>
 </template>
-
