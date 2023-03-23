@@ -36,6 +36,8 @@ const editNameEduProg =( async() => {
   dialogRename.value=false
 })
 const createEduProg =( async() => {
+  console.log('Spes',specialities)
+  console.log('Spes',newEduProg)
   await eduProgsStore.createEduProg(newEduProg.value)
   dialogCreate.value=false
   await eduProgsStore.fetchEduProgs()
@@ -132,43 +134,28 @@ const newEduProg = ref({
             <VCol
               cols="12"
             >
-              <VSelect
+              <VCombobox
                 v-model="newEduProg.education_level"
                 :items="education_level"
                 item-title="level"
                 item-value="level"
                 label="Освітній рівень"
-                required
+                outlined
+                dense
               />
             </VCol>
             <VCol
               cols="12"
             >
-              <VTextField
+              <VCombobox
                 v-model="newEduProg.speciality_code"
-                label="Спеціальність"
-                required
-              />
-            </VCol>
-            <VCol
-              cols="12"
-            >
-              <VTextField
-                v-model="newEduProg.knowledge_field"
-                label="Галузь знань"
-                required
-              />
-            </VCol>
-            <VCol
-              cols="12"
-            >
-              <VSelect
-                v-model="newEduProg.speciality"
                 :items="specialities"
-                item-title="name"
                 item-value="code"
-                label="Спеціальність"
+                item-title="name"
+                label="Освітній рівень"
                 required
+                outlined
+                dense
               />
             </VCol>
           </VRow>
@@ -185,7 +172,7 @@ const newEduProg = ref({
         </VBtn>
         <VBtn
           text
-          :disabled="!(newEduProg.knowledge_field && newEduProg.speciality_code && newEduProg.name &&newEduProg.education_level)"
+          :disabled="!(newEduProg.speciality_code && newEduProg.name &&newEduProg.education_level)"
           @click="createEduProg"
         >
           <!-- Need fix, user need to reload page for check new EduProg -->
