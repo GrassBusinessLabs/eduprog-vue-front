@@ -111,7 +111,7 @@ onMounted(async () => {
   </v-snackbar>
 </template>
 <route lang="yaml">
-name: test2
+name: matrix
 meta:
   navActiveLink: pages-account-settings-tab
   requiresAuth: true
