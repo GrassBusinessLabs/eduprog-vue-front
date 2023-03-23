@@ -7,14 +7,14 @@ import { useRoute } from 'vue-router'
 const eduProgsStore = useEduProgsStore()
 const saveChanges = async () => {
   try {
-    await eduProgsStore.editEduprog(eduProgData)
+    await eduProgsStore.editEduprog(eduProgData.value)
     snackbarText.value = 'Зміни успішно збережені'
   } catch {
     snackbarText.value = 'Ой, щось пішло не так'
   }
   changesSaved.value = true
 }
-const eduProgData = reactive(eduProgsStore.getEduProg)
+const eduProgData = ref([])
 const education_level = ref([])
 const specialities = ref([])
 const snackbarText = ref('')
@@ -25,7 +25,9 @@ onMounted(async () => {
   await eduProgsStore.findEduProgById(route.params.pages)
   specialities.value = eduProgsStore.getSpecialities
   education_level.value = eduProgsStore.getLevels
+  eduProgData.value=eduProgsStore.getEduProg
   console.log(education_level.value)
+  console.log(eduProgData)
   console.log("РОУТ",route)
 })
 </script>

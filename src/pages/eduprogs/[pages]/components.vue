@@ -43,7 +43,7 @@
               v-model="item.name"
               class="my-3"
               style="width: 50%"
-              @keyup.enter="edit"
+              @keyup.enter="saveComponent(item)"
             />
           </span>
         </td>
@@ -56,7 +56,7 @@
               class="my-3"
               style="width: 50%"
               type="number"
-              @keyup.enter="edit"
+              @keyup.enter="saveComponent(item)"
             />
           </span>
         </td>
@@ -70,7 +70,7 @@
               v-model="item.control_type"
               class="my-3"
               style="width: 50%"
-              @keyup.enter="edit"
+              @keyup.enter="saveComponent(item)"
             />
           </span>
         </td>
@@ -168,7 +168,7 @@
               v-model="item.name"
               class="my-3"
               style="width: 50%"
-              @keyup.enter="edit"
+              @keyup.enter="saveComponent(item)"
             />
           </span>
         </td>
@@ -181,7 +181,7 @@
               class="my-3"
               style="width: 50%"
               type="number"
-              @keyup.enter="edit"
+              @keyup.enter="saveComponent(item)"
             />
           </span>
         </td>
@@ -195,7 +195,7 @@
               v-model="item.control_type"
               class="my-3"
               style="width: 50%"
-              @keyup.enter="edit"
+              @keyup.enter="saveComponent(item)"
             />
           </span>
         </td>
@@ -449,6 +449,7 @@ async function createComponent() {
     } catch (error) {
       hasError.value = true
       errorMessage.value =  'Забагато кредитів'
+      return
     }
   } 
   else if(dialogCreateSelective.value){
@@ -466,6 +467,7 @@ async function createComponent() {
     } catch (error) {
       hasError.value = true
       errorMessage.value =  'Забагато кредитів'
+      return
     }
   }
   newComponent.name=""
@@ -493,7 +495,7 @@ async function remove(component, type) {
   await eduProgsStore.deleteComponent(component)
   components[type]=components[type].filter(obj => obj.id !== component.id)
   console.log(components[type])
-
+S
   // components = components.filter(obj => obj.id !== component.id)
 
   updateCredits()

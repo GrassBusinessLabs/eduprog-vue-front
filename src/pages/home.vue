@@ -5,7 +5,7 @@ import TableDensity from '@/views/user-interface/tables/TableDensity.vue'
 import TableHeight from '@/views/user-interface/tables/TableHeight.vue'
 import TableFixedHeader from '@/views/user-interface/tables/TableFixedHeader.vue'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
-import { computed } from 'vue-demi'
+import { computed, reactive } from 'vue-demi'
 import moment from 'moment'
 import router from '../router'
 const eduProgsStore = useEduProgsStore()
@@ -19,12 +19,14 @@ onMounted( async () => {
   education_level.value= eduProgsStore.getLevels
   specialities.value = eduProgsStore.getSpecialities
 })
-
+const checkValue=    ref('')
 let currentEduProg = null
 let newNameEduProg = ref(null)
 const eduProgs = computed(() => eduProgsStore.getEduProgs)
 
-
+const check = (e) =>{
+  console.log("Модел велью",e, checkValue)
+}
 const deleteEduProg =( async id => {
   await eduProgsStore.deleteEduProg(id)
   await eduProgsStore.fetchEduProgs()
@@ -151,6 +153,7 @@ const newEduProg = ref({
                 v-model="newEduProg.speciality_code"
                 :items="specialities"
                 item-value="code"
+                @update:modelValue="check"
                 item-title="name"
                 label="Освітній рівень"
                 required
