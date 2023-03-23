@@ -57,14 +57,14 @@ const vuetifyTheme = useTheme()
       <VerticalNavLink
         :item="{
           title: 'Характеристика',
-          to: 'test',
+          to: 'characteristic',
           icon: { icon: 'mdi-home-outline' }
         }"
       />
       <VerticalNavLink
         :item="{
           title: 'Перелік компонентів',
-          to: 'test2',
+          to: 'components',
           icon: { icon: 'mdi-home-outline' }
         }"
       />

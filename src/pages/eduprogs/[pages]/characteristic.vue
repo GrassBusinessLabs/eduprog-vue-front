@@ -110,9 +110,8 @@ onMounted(async () => {
   </v-snackbar>
 </template>
 <route lang="yaml">
-name: test
+name: characteristic
 meta:
   navActiveLink: pages-account-settings-tab
   requiresAuth: true
-  test: true
 </route>
