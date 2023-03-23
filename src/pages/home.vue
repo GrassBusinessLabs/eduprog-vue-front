@@ -82,7 +82,7 @@ const deleteEduProgDialog= function dialogg(id) {
 }
 const editEduProg = function edit(event, id) {
   console.log(event)
-  router.replace('/eduprogs/'+id)
+  router.replace('/eduprogs/'+id+'/characteristic')
 }
 
 
@@ -171,7 +171,6 @@ const newEduProg = ref({
                 required
               />
             </VCol>
-
           </VRow>
         </VContainer>
       </VCardText>
