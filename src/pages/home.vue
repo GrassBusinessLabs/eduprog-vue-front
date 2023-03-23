@@ -36,6 +36,8 @@ const editNameEduProg =( async() => {
   dialogRename.value=false
 })
 const createEduProg =( async() => {
+  console.log('Spes',specialities)
+  console.log('Spes',newEduProg)
   await eduProgsStore.createEduProg(newEduProg.value)
   dialogCreate.value=false
   await eduProgsStore.fetchEduProgs()
@@ -148,8 +150,8 @@ const newEduProg = ref({
               <VCombobox
                 v-model="newEduProg.speciality_code"
                 :items="specialities"
-                item-title="name"
                 item-value="code"
+                item-title="name"
                 label="Освітній рівень"
                 required
                 outlined
