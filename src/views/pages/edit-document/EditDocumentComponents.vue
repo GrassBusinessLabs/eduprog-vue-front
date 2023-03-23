@@ -77,7 +77,7 @@
               icon="mdi-pencil"
               size="x-small"
               style="margin-right:2% "
-              @click="editIndex = item.id"
+              @click="edit(item)"
             />
             <VBtn
               icon="mdi-trash-can"
@@ -199,7 +199,7 @@
               icon="mdi-pencil"
               size="x-small"
               style="margin-right:2% "
-              @click="editIndex = item.id"
+              @click="edit(item)"
             />
             <VBtn
               icon="mdi-trash-can"
@@ -370,6 +370,7 @@
 import { computed, reactive } from "vue"
 import { useRoute } from 'vue-router'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
+import { editData } from "@/api/http/apiService"
 
 const route = useRoute()
 const eduProgsStore = useEduProgsStore()
@@ -381,7 +382,7 @@ const hasError = ref(false)
 const errorMessage =  ref('')
 
 const editIndex =  ref(null)
-const originalData = ref(null)
+let originValue ={}
 const dialogCreate = ref(false)
 const dialogCreateSelective = ref(false)
 const newComponent = reactive({
@@ -394,6 +395,7 @@ const newComponent = reactive({
   category: "н/д",
   eduprog_id: +route.params.id,
 })
+
 function changeDialog() {
   dialogCreate.value = !dialogCreate.value
 }
@@ -443,16 +445,18 @@ async function createComponent() {
   await updateCredits()
 }
 
-function edit(item, index) {
-  originalData.value = Object.assign({}, item)
-  console.log(originalData.value)
-  editIndex.value = index
+function edit(item) {
+  originValue= Object.assign({}, item);
+  editIndex.value = item.id
 }
 
 function cancel(item) {
   editIndex.value = null
-  Object.assign(item, originalData.value)
-  originalData.value = null
+  for(let key in item){
+    item[key]=originValue[key]
+  }
+  console.log("Айтем анд оригин",item, originValue)
+  originValue={}
 }
 
 async function remove(component, type) {
@@ -469,7 +473,6 @@ async function remove(component, type) {
 async function saveComponent(component) {
   await eduProgsStore.editComponent(component.id, component)
   updateCredits()
-  originalData.value = null
   editIndex.value = null
 }
 </script>

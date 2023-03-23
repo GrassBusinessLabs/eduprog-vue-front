@@ -9,11 +9,15 @@ import { computed } from 'vue-demi'
 import moment from 'moment'
 import router from '../router'
 const eduProgsStore = useEduProgsStore()
-
+const specialities = ref([])
 //return { eduProgs: useEduProgsStore.getEduProgs }
-
+const education_level = ref([])
 onMounted( async () => {
   await eduProgsStore.fetchEduProgs()
+  await eduProgsStore.fetchLevelsList()
+  await eduProgsStore.fetchSpecialities()
+  education_level.value= eduProgsStore.getLevels
+  specialities.value = eduProgsStore.getSpecialities
 })
 
 let currentEduProg = null
@@ -36,6 +40,9 @@ const createEduProg =( async() => {
   dialogCreate.value=false
   await eduProgsStore.fetchEduProgs()
 })
+const cancelCreate = () =>{
+  dialogCreate.value=false
+}
 
 // const createEduProg =( async() => {
 //   console.log(newEduProg)
@@ -80,27 +87,14 @@ const editEduProg = function edit(event, id) {
 
 
 const newEduProg = ref({
-  name :'',
+  name:'',
   education_level :'',
   stage :'',
   speciality_code :'',
   knowledge_field :'',
 })
 
-const education_level = [
-  {
-    title: 'Початковий рівень (короткий цикл)',
-  },
-  {
-    title: 'Перший (бакалаврський) рівень',
-  },
-  {
-    title: 'Другий (магістерський) рівень',
-  },
-  {
-    title: 'Третій (освітньо-науковий/освітньо-творчий) рівень',
-  },
-]
+
 </script>
 
 <template>
@@ -141,6 +135,8 @@ const education_level = [
               <VSelect
                 v-model="newEduProg.education_level"
                 :items="education_level"
+                item-title="level"
+                item-value="level"
                 label="Освітній рівень"
                 required
               />
@@ -163,6 +159,19 @@ const education_level = [
                 required
               />
             </VCol>
+            <VCol
+              cols="12"
+            >
+              <VSelect
+                v-model="newEduProg.speciality"
+                :items="specialities"
+                item-title="name"
+                item-value="code"
+                label="Спеціальність"
+                required
+              />
+            </VCol>
+
           </VRow>
         </VContainer>
       </VCardText>
@@ -171,7 +180,7 @@ const education_level = [
         <VBtn
           color="blue darken-1"
           text
-          @click="dialogCreate = false"
+          @click="cancelCreate"
         >
           Закрити
         </VBtn>

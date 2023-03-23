@@ -16,7 +16,9 @@ export const useEduProgsStore = defineStore({
     selectedVfk:[],
     selectedVpr:[],
     allCompetencies:[],
-    selectedCompetencies:[]
+    selectedCompetencies:[],
+    levelsList:[],
+    specialities:[],
   }),
 
   getters: {
@@ -32,6 +34,8 @@ export const useEduProgsStore = defineStore({
     getSelectedVpr: state => state.selectedVpr,
     getAllCompetencies: state => state.allCompetencies,
     getSelectedCompetencies: state => state.selectedCompetencies,
+    getLevels: state => state.levelsList,
+    getSpecialities: state => state.specialities,
   },
 
   actions: {
@@ -71,7 +75,12 @@ export const useEduProgsStore = defineStore({
       this.creditsInfo = await getData('/eduprogs/credits/' + id)
     },
     async editEduprog(payload) {
-      await editData('eduprogs/' + this.eduProgData.id, payload)
+      try{
+        await editData('eduprogs/' + this.eduProgData.id, payload)
+      }
+      catch(error){
+        throw(error)
+      }
     },
     async createComponent(payload) {
       const response = await postData('eduprogs/comps/create', payload)
@@ -154,7 +163,7 @@ export const useEduProgsStore = defineStore({
       const newRelation = {
         competency_id:competencyId,
         eduprog_id: eduprogId,
-        redefinition:"",
+        definition:"",
       }
       const response = await postData('/eduprogs/competencies/add', newRelation)
       console.log('response',response)
@@ -201,6 +210,13 @@ export const useEduProgsStore = defineStore({
       const response = await deleteData('/eduprogs/compRelations/'+baseId+'/'+childId);
       return response
     },
-
+    async fetchLevelsList(eduId){
+      const response = await getData('/eduprogs/levelsList');
+      this.levelsList=response
+    },
+    async fetchSpecialities(eduId){
+      const response = await getData('/eduprogs/specialties/all');
+      this.specialities=response
+    },
   },
 })

@@ -91,7 +91,7 @@ watch(valuesZK, newValue => {
 <template>
   <VRow>
     <VCol>
-      <VTable class="mt-10">
+      <VTable>
         <thead class="thead-light">
           <tr>
             <th class="text-center">
