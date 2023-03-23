@@ -92,7 +92,7 @@ const vuetifyTheme = useTheme()
       <VerticalNavLink
         :item="{
           title: 'Матриця',
-          to: 'home',
+          to: 'matrix',
           icon: { icon: 'mdi-home-outline' }
         }"
       />

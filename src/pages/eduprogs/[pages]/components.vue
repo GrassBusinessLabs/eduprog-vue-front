@@ -273,6 +273,7 @@
                 label="Кількість кредитів"
                 :error="hasError"
                 :error-messages="errorMessage"
+                @focus="resetError"
                 @input="validateCredits"
               />
             </VCol>
@@ -396,6 +397,11 @@ const newComponent = reactive({
   eduprog_id: +route.params.id,
 })
 
+function  resetError() {
+  hasError.value = false
+  errorMessage.value = ''
+}
+
 function changeDialog() {
   dialogCreate.value = !dialogCreate.value
 }
@@ -490,5 +496,4 @@ name: components
 meta:
   navActiveLink: pages-account-settings-tab
   requiresAuth: true
-  test: true
 </route>
