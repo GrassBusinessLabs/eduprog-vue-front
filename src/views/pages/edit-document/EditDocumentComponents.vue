@@ -271,6 +271,9 @@
                 v-model="newComponent.credits"
                 type="number"
                 label="Кількість кредитів"
+                :error="hasError"
+                :error-messages="errorMessage"
+                @input="validateCredits"
               />
             </VCol>
             <VCol
@@ -361,24 +364,6 @@
       </VCardText>
     </VCard>
   </VDialog>
-  <VDialog
-    v-model="alert"
-    persistent
-    max-width="600"
-  >
-    <VCardText>
-      <h1 style='text-align: center'>Ви ввели забагато кредитів</h1>
-    </VCardText>
-    <VSpacer />
-
-    <VBtn
-      text
-      @click="alert = false"
-      style='width: 50%;margin: 0 auto; display: block;'
-    >
-      Закрити
-    </VBtn>
-  </VDialog>
 </template>
 
 <script setup>
@@ -392,10 +377,12 @@ const eduProgsStore = useEduProgsStore()
 const creditsInfo = ref(eduProgsStore.getCreditsInfo)
 const components = eduProgsStore.getEduProg.components
 
+const hasError = ref(false)
+const errorMessage =  ref('')
+
 const editIndex =  ref(null)
 const originalData = ref(null)
 const dialogCreate = ref(false)
-const alert = ref(false)
 const dialogCreateSelective = ref(false)
 const newComponent = reactive({
   code: "",
@@ -429,7 +416,8 @@ async function createComponent() {
       components.mandatory.push(createdComponent)
       dialogCreate.value = false
     } catch (error) {
-      alert.value = true
+      hasError.value = true
+      errorMessage.value =  'Забагато кредитів'
     }
   } 
   else if(dialogCreateSelective.value){
@@ -445,7 +433,8 @@ async function createComponent() {
       components.selective.push(createdComponent)
       dialogCreateSelective.value = false
     } catch (error) {
-      alert.value = true
+      hasError.value = true
+      errorMessage.value =  'Забагато кредитів'
     }
   }
   newComponent.name=""

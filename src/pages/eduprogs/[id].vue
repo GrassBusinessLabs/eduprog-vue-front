@@ -57,7 +57,6 @@ const tabs = [
     tab: 'matrix',
   },
 ]
-
 </script>
 
 <template>

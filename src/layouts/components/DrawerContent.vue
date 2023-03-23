@@ -1,5 +1,6 @@
 <script setup>
 import upgradeBannerDark from '@/assets/images/pro/upgrade-banner-dark.png'
+
 /*
 import upgradeBannerLight from '@/assets/images/pro/upgrade-banner-light.png'
 */
@@ -12,6 +13,7 @@ import {
 import { useTheme } from 'vuetify'
 import { RouterLink, useRoute } from 'vue-router'
 const vuetifyTheme = useTheme()
+
 /*const upgradeBanner = computed(() => {
   return vuetifyTheme.global.name.value === 'light' ? upgradeBannerLight : upgradeBannerDark
 })*/
@@ -44,15 +46,6 @@ const vuetifyTheme = useTheme()
         icon: { icon: 'mdi-home-outline' }
       }"
     />
-    <ul  v-show="$route.path === '/eduprogs/'+ route.params.id">
-      <VerticalNavLink
-        :item="{
-    title: 'Головна',
-    to: 'home',
-    icon: { icon: 'mdi-home-outline' }
-  }"
-      />
-    </ul>
     <VerticalNavLink
       :item="{
         title: 'Профіль',
@@ -60,23 +53,69 @@ const vuetifyTheme = useTheme()
         icon: { icon: 'mdi-account-cog-outline' }
       }"
     />
-
+    <ul v-show="$route.path === '/eduprogs/'+ route.params.id">
+      <VerticalNavSectionTitle :item="{ heading: 'Редагування ОПП' }" />
+      <VerticalNavLink
+        :item="{
+          title: 'Характеристика',
+          to: 'home',
+          icon: { icon: 'mdi-home-outline' }
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Перелік компонентів',
+          to: 'home',
+          icon: { icon: 'mdi-home-outline' }
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Розподіл по семестрам',
+          to: 'home',
+          icon: { icon: 'mdi-home-outline' }
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Послідовність ОПП',
+          to: 'home',
+          icon: { icon: 'mdi-home-outline' }
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Компентетності',
+          to: 'home',
+          icon: { icon: 'mdi-home-outline' }
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Матриця',
+          to: 'home',
+          icon: { icon: 'mdi-home-outline' }
+        }"
+      />
+    </ul>
   </ul>
 
   <!-- 👉 illustration -->
-<!--  <a
-    href="https://themeselection.com/item/materio-vuetify-vuejs-admin-template"
-    target="_blank"
-    rel="noopener noreferrer"
+<!--
+  <a
+  href="https://themeselection.com/item/materio-vuetify-vuejs-admin-template"
+  target="_blank"
+  rel="noopener noreferrer"
   >
-    <img
-      :src="upgradeBanner"
-      alt="upgrade-banner"
-      transition="scale-transition"
-      class="upgrade-banner mx-auto"
-      style="max-width: 230px"
-    >
-  </a>-->
+  <img
+  :src="upgradeBanner"
+  alt="upgrade-banner"
+  transition="scale-transition"
+  class="upgrade-banner mx-auto"
+  style="max-width: 230px"
+  >
+  </a>
+-->
 </template>
 
 <style lang="scss">
