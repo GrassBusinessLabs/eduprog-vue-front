@@ -36,7 +36,6 @@ const vuetifyTheme = useTheme()
       </Transition>
     </RouterLink>
   </div>
-
   <!-- 👉 Nav items -->
   <ul>
     <VerticalNavLink
@@ -53,19 +52,19 @@ const vuetifyTheme = useTheme()
         icon: { icon: 'mdi-account-cog-outline' }
       }"
     />
-    <ul v-show="$route.path === '/eduprogs/'+ route.params.id">
+    <ul v-if="route.params.pages">
       <VerticalNavSectionTitle :item="{ heading: 'Редагування ОПП' }" />
       <VerticalNavLink
         :item="{
           title: 'Характеристика',
-          to: 'home',
+          to: 'test',
           icon: { icon: 'mdi-home-outline' }
         }"
       />
       <VerticalNavLink
         :item="{
           title: 'Перелік компонентів',
-          to: 'home',
+          to: 'test2',
           icon: { icon: 'mdi-home-outline' }
         }"
       />
