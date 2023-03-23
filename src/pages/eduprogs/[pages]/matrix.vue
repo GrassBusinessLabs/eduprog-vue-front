@@ -1,114 +1,97 @@
 <script setup>
+import { useRoute, onBeforeRouteUpdate } from 'vue-router'
+import ZkTable from '@/views/pages/edit-document/edit-matrix-tabs/ZK-table.vue'
+import FkTable from '@/views/pages/edit-document/edit-matrix-tabs/FK-table.vue'
+import PrTable from '@/views/pages/edit-document/edit-matrix-tabs/PR-table.vue'
+
+
 import { useEduProgsStore } from '@/stores/eduProgs.js'
+
 const props = defineProps(['eduProg'])
-const route = useRoute()
-import { onMounted, reactive } from 'vue'
-import { useRoute } from 'vue-router'
 const eduProgsStore = useEduProgsStore()
-const saveChanges = async () => {
-  try {
-    await eduProgsStore.editEduprog(eduProgData)
-    snackbarText.value = 'Зміни успішно збережені'
-  } catch {
-    snackbarText.value = 'Ой, щось пішло не так'
+const route = useRoute()
+const lastTab = ref('ZKt')
+const activeTab = ref(localStorage.getItem('activeTab') || route.params.tab)
+
+const tabs = [
+  {
+    title: 'Загальні компетентності',
+    tab: 'ZKt',
+  },
+  {
+    title: 'Фахові компетентності',
+    tab: 'FKt',
+  },
+  {
+    title: 'Програмні результати навчання',
+    tab: 'PRt',
+  },
+]
+watch(activeTab, newValue => {
+
+  switch (newValue){
+  case undefined :
+    console.log('undefined')
+    localStorage.setItem('activeTab',lastTab.value)
+    console.log(lastTab.value)
+    break
+  case 'ZKt' :
+    console.log('Ok ZKt')
+    lastTab.value = newValue
+    localStorage.setItem('activeTab', newValue)
+    console.log(lastTab.value)
+    break
+  case 'FKt' :
+    console.log('Ok FKt')
+    lastTab.value = newValue
+    localStorage.setItem('activeTab', newValue)
+    break
+  case 'PRt':
+    console.log('Ok Prt')
+    lastTab.value = newValue
+    localStorage.setItem('activeTab', newValue)
+    break
   }
-  changesSaved.value = true
-}
-const eduProgData = reactive(eduProgsStore.getEduProg)
-const education_level = ref([])
-const specialities = ref([])
-const snackbarText = ref('')
-const changesSaved = ref(false)
-onMounted(async () => {
-  await eduProgsStore.fetchLevelsList()
-  await eduProgsStore.fetchSpecialities()
-  await eduProgsStore.findEduProgById(route.params.pages)
-  specialities.value = eduProgsStore.getSpecialities
-  education_level.value = eduProgsStore.getLevels
-  console.log(education_level.value)
-  console.log("РОУТ",route)
 })
 </script>
 
 <template>
-<h2>МАТРИЦЯ</h2>
-  <VCard>
-    <VCardText>
-      <VContainer>
-        <VRow>
-          <VCol cols="12">
-            <VTextField
-              v-model="eduProgData.name"
-              label="Назва документу "
-              required
-            />
-          </VCol>
-          <VCol cols="12">
-            <VSelect
-              readonly
-              v-model="eduProgData.education_level"
-              :items="education_level"
-              item-title="level"
-              item-value="level"
-              label="Освітній рівень"
-              required
-            />
-          </VCol>
-          <VCol cols="12">
-            <VTextField
-              readonly
-              v-model="eduProgData.stage"
-              label="Освітній ступінь"
-              required
-            />
-          </VCol>
-          <VCol cols="12">
-            <VSelect
-              readonly
-              v-model="eduProgData.speciality"
-              :items="specialities"
-              item-title="name"
-              item-value="code"
-              label="Спеціальність"
-              required
-            />
-          </VCol>
-          <VCol cols="12">
-            <VTextField
-              readonly
-              v-model="eduProgData.knowledge_field"
-              label="Галузь знань"
-              required
-            />
-          </VCol>
-        </VRow>
-        <VRow justify="end">
-          <VBtn
-            class="mt-10"
-            dark
-            @click="saveChanges"
-          >
-            Зберегти зміни
-          </VBtn>
-        </VRow>
-      </VContainer>
-    </VCardText>
-  </VCard>
-  <v-snackbar
-    v-model="changesSaved"
-    :timeout="2000"
+  <VTabs
+    v-model="activeTab"
+    show-arrows
   >
-    {{ snackbarText }}
-    <template v-slot:actions>
-      <v-btn
-        color="pink"
-        variant="text"
-        @click="changesSaved = false"
-      >
-        Закрити
-      </v-btn>
-    </template>
-  </v-snackbar>
+    <VTab
+      v-for="item in tabs"
+      :key="item.tab"
+      :value="item.tab"
+    >
+      {{ item.title }}
+    </VTab>
+  </VTabs>
+  <VDivider />
+
+  <VWindow
+    :key="activeTab"
+    v-model="activeTab"
+    class="mt-5 disable-tab-transition"
+    :touch="false"
+  >
+    <VWindowItem value="ZKt">
+      <template v-if="activeTab === 'ZKt'">
+        <ZkTable />
+      </template>
+    </VWindowItem>
+    <VWindowItem value="FKt">
+      <template v-if="activeTab === 'FKt'">
+        <FkTable />
+      </template>
+    </VWindowItem>
+    <VWindowItem value="PRt">
+      <template v-if="activeTab === 'PRt'">
+        <PrTable />
+      </template>
+    </VWindowItem>
+  </VWindow>
 </template>
 <route lang="yaml">
 name: matrix

@@ -12,7 +12,7 @@ const zkCompetenciesValue = reactive({})
 const allSelect= ref(false)
 onBeforeMount(async ()=>{
    await eduProgsStore.fetchCompetencies("ZK",eduProgsStore.eduProgData.speciality_code)
-   await eduProgsStore.fetchSelectedCompetencies(route.params.id,"ZK")
+   await eduProgsStore.fetchSelectedCompetencies(route.params.pages,"ZK")
    zkCompetencies.value = eduProgsStore.getAllCompetencies
    selectedZkCompetencies.value = eduProgsStore.getSelectedCompetencies
    zkCompetencies.value.forEach((comp)=>{
@@ -27,7 +27,7 @@ onBeforeMount(async ()=>{
 
 const changeCheckbox = async (e, competencyId) => {
   if (e) {
-    const newCompetency = await eduProgsStore.addCompetencyToEduprog(+route.params.id, competencyId)
+    const newCompetency = await eduProgsStore.addCompetencyToEduprog(+route.params.pages, competencyId)
     selectedZkCompetencies.value.push(newCompetency)
   } else if (!e) {
     allSelect.value = false
@@ -41,14 +41,14 @@ const changeCheckbox = async (e, competencyId) => {
 //Function for add all competencies or delete
 const selectAll = async (event, type) => {
   if (event) {
-    await eduProgsStore.addAllCompetencies(route.params.id, "ZK")
+    await eduProgsStore.addAllCompetencies(route.params.pages, "ZK")
     for (let key in zkCompetenciesValue) {
       zkCompetenciesValue[key] = true
     }
-    await eduProgsStore.fetchSelectedCompetencies(route.params.id,"ZK")
+    await eduProgsStore.fetchSelectedCompetencies(route.params.pages,"ZK")
     selectedZkCompetencies.value = eduProgsStore.getSelectedCompetencies
   } else if (!event) {
-    await eduProgsStore.deleteAllCompetencies(route.params.id, "ZK")
+    await eduProgsStore.deleteAllCompetencies(route.params.pages, "ZK")
     for (let key in zkCompetenciesValue) {
       zkCompetenciesValue[key] = false
     }

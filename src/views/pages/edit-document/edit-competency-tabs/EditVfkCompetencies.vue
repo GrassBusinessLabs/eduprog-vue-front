@@ -11,12 +11,12 @@ const editIndex = ref(null)
 const vfkCompetencies = ref([])
 const creatingDialog = ref(false)
 const newCompetency = reactive({
-  eduprog_id: +route.params.id,
+  eduprog_id: +route.params.pages,
   type: 'ВФК',
   definition: '',
 })
 onBeforeMount(async () => {
-  await eduProgsStore.fetchSelectedCompetencies(route.params.id, 'VFK')
+  await eduProgsStore.fetchSelectedCompetencies(route.params.pages, 'VFK')
   vfkCompetencies.value = eduProgsStore.getSelectedCompetencies
 })
 const createCompetency = async () => {
@@ -27,7 +27,7 @@ const createCompetency = async () => {
 }
 const deleteCompetency = async id => {
   await eduProgsStore.deleteCompetencyInEduprog(id)
-  await eduProgsStore.fetchSelectedCompetencies(route.params.id, 'VFK')
+  await eduProgsStore.fetchSelectedCompetencies(route.params.pages, 'VFK')
   vfkCompetencies.value = eduProgsStore.getSelectedCompetencies
 }
 const saveChanges = async competency => {

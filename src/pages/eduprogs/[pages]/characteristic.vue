@@ -63,7 +63,7 @@ onMounted(async () => {
           </VCol>
           <VCol cols="12">
             <VSelect
-              readonly
+              disabled
               v-model="eduProgData.speciality"
               :items="specialities"
               item-title="name"
@@ -74,7 +74,7 @@ onMounted(async () => {
           </VCol>
           <VCol cols="12">
             <VTextField
-              readonly
+              disabled
               v-model="eduProgData.knowledge_field"
               label="Галузь знань"
               required

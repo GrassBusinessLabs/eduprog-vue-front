@@ -394,7 +394,7 @@ const newComponent = reactive({
   type: "",
   sub_type: "н/д",
   category: "н/д",
-  eduprog_id: +route.params.id,
+  eduprog_id: +route.params.pages,
 })
 
 function  resetError() {
@@ -406,7 +406,7 @@ function changeDialog() {
   dialogCreate.value = !dialogCreate.value
 }
 async function updateCredits(){
-  await eduProgsStore.fetchCreditsInfo(route.params.id)
+  await eduProgsStore.fetchCreditsInfo(route.params.pages)
   creditsInfo.value = eduProgsStore.getCreditsInfo
 }
 async function createComponent() {

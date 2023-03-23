@@ -11,12 +11,12 @@ const editIndex = ref(null)
 const vprCompetencies = ref([])
 const creatingDialog = ref(false)
 const newCompetency = reactive({
-  eduprog_id: +route.params.id,
+  eduprog_id: +route.params.pages,
   type: 'ВПР',
   definition: '',
 })
 onBeforeMount(async () => {
-  await eduProgsStore.fetchSelectedCompetencies(route.params.id, 'VPR')
+  await eduProgsStore.fetchSelectedCompetencies(route.params.pages, 'VPR')
   vprCompetencies.value = eduProgsStore.getSelectedCompetencies
 })
 const createCompetency = async () => {
@@ -27,7 +27,7 @@ const createCompetency = async () => {
 }
 const deleteCompetency = async id => {
   await eduProgsStore.deleteCompetencyInEduprog(id)
-  await eduProgsStore.fetchSelectedCompetencies(route.params.id, 'VPR')
+  await eduProgsStore.fetchSelectedCompetencies(route.params.pages, 'VPR')
   vprCompetencies.value = eduProgsStore.getSelectedCompetencies
 }
 const saveChanges = async competency => {

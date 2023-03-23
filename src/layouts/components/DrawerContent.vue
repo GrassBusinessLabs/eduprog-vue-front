@@ -71,21 +71,21 @@ const vuetifyTheme = useTheme()
       <VerticalNavLink
         :item="{
           title: 'Розподіл по семестрам',
-          to: 'home',
+          to: 'schema',
           icon: { icon: 'mdi-home-outline' }
         }"
       />
       <VerticalNavLink
         :item="{
           title: 'Послідовність ОПП',
-          to: 'home',
+          to: 'sequence',
           icon: { icon: 'mdi-home-outline' }
         }"
       />
       <VerticalNavLink
         :item="{
           title: 'Компентетності',
-          to: 'home',
+          to: 'competencies',
           icon: { icon: 'mdi-home-outline' }
         }"
       />
