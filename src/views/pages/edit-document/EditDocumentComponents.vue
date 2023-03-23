@@ -273,6 +273,7 @@
                 label="Кількість кредитів"
                 :error="hasError"
                 :error-messages="errorMessage"
+                @focus="resetError"
                 @input="validateCredits"
               />
             </VCol>
@@ -395,6 +396,11 @@ const newComponent = reactive({
   category: "н/д",
   eduprog_id: +route.params.id,
 })
+
+function  resetError() {
+  hasError.value = false
+  errorMessage.value = ''
+}
 
 function changeDialog() {
   dialogCreate.value = !dialogCreate.value
