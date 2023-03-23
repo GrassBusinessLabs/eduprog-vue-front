@@ -4,12 +4,13 @@ import upgradeBannerDark from '@/assets/images/pro/upgrade-banner-dark.png'
 import upgradeBannerLight from '@/assets/images/pro/upgrade-banner-light.png'
 */
 import logo from '@/assets/logo.svg?raw'
+const route = useRoute()
 import {
   VerticalNavLink,
   VerticalNavSectionTitle,
 } from '@layouts'
 import { useTheme } from 'vuetify'
-
+import { RouterLink, useRoute } from 'vue-router'
 const vuetifyTheme = useTheme()
 /*const upgradeBanner = computed(() => {
   return vuetifyTheme.global.name.value === 'light' ? upgradeBannerLight : upgradeBannerDark
@@ -43,6 +44,15 @@ const vuetifyTheme = useTheme()
         icon: { icon: 'mdi-home-outline' }
       }"
     />
+    <ul  v-show="$route.path === '/eduprogs/'+ route.params.id">
+      <VerticalNavLink
+        :item="{
+    title: 'Головна',
+    to: 'home',
+    icon: { icon: 'mdi-home-outline' }
+  }"
+      />
+    </ul>
     <VerticalNavLink
       :item="{
         title: 'Профіль',
@@ -50,7 +60,6 @@ const vuetifyTheme = useTheme()
         icon: { icon: 'mdi-account-cog-outline' }
       }"
     />
-
 
   </ul>
 

@@ -12,10 +12,6 @@ const eduProgsStore = useEduProgsStore()
 const route = useRoute()
 const lastTab = ref('ZKt')
 const activeTab = ref(localStorage.getItem('activeTab') || route.params.tab)
-console.log(route.params.tab)
-onBeforeRouteUpdate((to, from) => {
-  activeTab.value = lastTab.value
-})
 
 const tabs = [
   {
@@ -36,7 +32,7 @@ watch(activeTab, newValue => {
   switch (newValue){
   case undefined :
     console.log('undefined')
-    localStorage.setItem('activeTab',lastTab)
+    localStorage.setItem('activeTab',lastTab.value)
     console.log(lastTab.value)
     break
   case 'ZKt' :
@@ -75,6 +71,7 @@ watch(activeTab, newValue => {
   <VDivider />
 
   <VWindow
+    :key="activeTab"
     v-model="activeTab"
     class="mt-5 disable-tab-transition"
     :touch="false"
@@ -96,4 +93,3 @@ watch(activeTab, newValue => {
     </VWindowItem>
   </VWindow>
 </template>
-

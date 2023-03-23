@@ -90,7 +90,7 @@ const newEduProg = ref({
   name:'',
   education_level :'',
   stage :'',
-  speciality :'',
+  speciality_code :'',
   knowledge_field :'',
 })
 
@@ -141,7 +141,16 @@ const newEduProg = ref({
                 required
               />
             </VCol>
-                        <VCol
+            <VCol
+              cols="12"
+            >
+              <VTextField
+                v-model="newEduProg.speciality_code"
+                label="Спеціальність"
+                required
+              />
+            </VCol>
+            <VCol
               cols="12"
             >
               <VTextField
@@ -177,7 +186,7 @@ const newEduProg = ref({
         </VBtn>
         <VBtn
           text
-          :disabled="!(newEduProg.knowledge_field && newEduProg.speciality && newEduProg.name &&newEduProg.education_level)"
+          :disabled="!(newEduProg.knowledge_field && newEduProg.speciality_code && newEduProg.name &&newEduProg.education_level)"
           @click="createEduProg"
         >
           <!-- Need fix, user need to reload page for check new EduProg -->
