@@ -35,39 +35,42 @@
         <td>{{ 'ОК ' + item.code }}</td>
         <td>
           <span v-if="editIndex !== item.id">
-            {{item.name}}
+            {{ item.name }}
           </span>
           <span v-if="editIndex === item.id">
 
             <VTextField
-            class="my-3"
               v-model="item.name"
+              class="my-3"
               style="width: 50%"
+              @keyup.enter="edit"
             />
           </span>
         </td>
         <td>
           <span v-if="editIndex !== item.id">
-            {{item.credits}}</span>
+            {{ item.credits }}</span>
           <span v-if="editIndex === item.id">
             <VTextField
-            class="my-3"
               v-model="item.credits"
+              class="my-3"
               style="width: 50%"
-              type='number'
+              type="number"
+              @keyup.enter="edit"
             />
           </span>
         </td>
         <td>
           <span v-if="editIndex !== item.id">
-            {{item.control_type}}
+            {{ item.control_type }}
           </span>
           <span v-if="editIndex === item.id">
 
             <VTextField
-              class="my-3"
               v-model="item.control_type"
+              class="my-3"
               style="width: 50%"
+              @keyup.enter="edit"
             />
           </span>
         </td>
@@ -115,7 +118,7 @@
               disabled
               :value="creditsInfo.mandatory_credits"
             >/<span>
-              {{creditsInfo.mandatory_credits+creditsInfo.mandatory_free_credits}}
+              {{ creditsInfo.mandatory_credits+creditsInfo.mandatory_free_credits }}
             </span>
           </div>
         </th>
@@ -157,39 +160,42 @@
         <td>{{ 'ВБ ' + item.code }}</td>
         <td>
           <span v-if="editIndex !== item.id">
-            {{item.name}}
+            {{ item.name }}
           </span>
           <span v-if="editIndex === item.id">
 
             <VTextField
-            class="my-3"
               v-model="item.name"
+              class="my-3"
               style="width: 50%"
+              @keyup.enter="edit"
             />
           </span>
         </td>
         <td>
           <span v-if="editIndex !== item.id">
-            {{item.credits}}</span>
+            {{ item.credits }}</span>
           <span v-if="editIndex === item.id">
             <VTextField
-            class="my-3"
               v-model="item.credits"
+              class="my-3"
               style="width: 50%"
-              type='number'
+              type="number"
+              @keyup.enter="edit"
             />
           </span>
         </td>
         <td>
           <span v-if="editIndex !== item.id">
-            {{item.control_type}}
+            {{ item.control_type }}
           </span>
           <span v-if="editIndex === item.id">
 
             <VTextField
-              class="my-3"
               v-model="item.control_type"
+              class="my-3"
               style="width: 50%"
+              @keyup.enter="edit"
             />
           </span>
         </td>
@@ -237,7 +243,7 @@
               disabled
               :value="creditsInfo.selective_credits"
             >/<span>
-              {{creditsInfo.selective_credits+creditsInfo.selective_free_credits}}
+              {{ creditsInfo.selective_credits+creditsInfo.selective_free_credits }}
             </span>
           </div>
         </th>
@@ -259,9 +265,9 @@
             >
               <VTextField
                 v-model="newComponent.name"
-                @input="check"
                 label="Назва компонента"
                 required
+                @input="check"
               />
             </VCol>
             <VCol
@@ -299,6 +305,7 @@
           </VBtn>
           <VBtn
             text
+            :disabled="!(newComponent.name && newComponent.credits && newComponent.control_type)"
             @click="createComponent"
           >
             Зберегти
@@ -351,13 +358,14 @@
           <VSpacer />
           <VBtn
             text
-            @click="dialogCreateSelective = false"
+            @click="changeDialogVB"
           >
             Відмінити
           </VBtn>
           <VBtn
             text
             @click="createComponent"
+            :disabled="!(newComponent.name && newComponent.credits && newComponent.control_type)"
           >
             Зберегти
           </VBtn>
@@ -394,7 +402,7 @@ const newComponent = reactive({
   type: "",
   sub_type: "н/д",
   category: "н/д",
-  eduprog_id: +route.params.id,
+  eduprog_id: +route.params.pages,
 })
 
 function  resetError() {
@@ -404,13 +412,28 @@ function  resetError() {
 
 function changeDialog() {
   dialogCreate.value = !dialogCreate.value
+  newComponent.name=""
+  newComponent.credits=0
+  newComponent.control_type=""
 }
+
+function changeDialogVB() {
+  dialogCreateSelective.value = false
+  newComponent.name=""
+  newComponent.credits=0
+  newComponent.control_type=""
+}
+
+
+
+
+
 async function updateCredits(){
-  await eduProgsStore.fetchCreditsInfo(route.params.id)
+  await eduProgsStore.fetchCreditsInfo(route.params.pages)
   creditsInfo.value = eduProgsStore.getCreditsInfo
 }
 async function createComponent() {
-  const createdComponent = Object.assign({}, newComponent);
+  const createdComponent = Object.assign({}, newComponent)
   if(dialogCreate.value){
     createdComponent.type= "ОК"
     if(components.mandatory.length){
@@ -452,7 +475,7 @@ async function createComponent() {
 }
 
 function edit(item) {
-  originValue= Object.assign({}, item);
+  originValue= Object.assign({}, item)
   editIndex.value = item.id
 }
 
@@ -471,7 +494,7 @@ async function remove(component, type) {
   components[type]=components[type].filter(obj => obj.id !== component.id)
   console.log(components[type])
 
- // components = components.filter(obj => obj.id !== component.id)
+  // components = components.filter(obj => obj.id !== component.id)
 
   updateCredits()
 }
@@ -491,6 +514,7 @@ input[type="number"] {
   cursor: pointer
 }
 </style>
+
 <route lang="yaml">
 name: components
 meta:
