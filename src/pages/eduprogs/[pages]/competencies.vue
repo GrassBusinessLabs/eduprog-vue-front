@@ -7,7 +7,11 @@ import EditPrCompetencies from '@/views/pages/edit-document/edit-competency-tabs
 import EditVfkCompetencies from '@/views/pages/edit-document/edit-competency-tabs/EditVfkCompetencies.vue'
 import EditVprCompetencies from '@/views/pages/edit-document/edit-competency-tabs/EditVprCompetencies.vue'
 import { useRoute } from 'vue-router'
-const props = defineProps(['eduProg'])
+
+onMounted(async () => {
+  await eduProgsStore.findEduProgById(route.params.pages)
+})
+
 const route = useRoute()
 const eduProgsStore = useEduProgsStore()
 const activeTab = ref(route.params.tab)

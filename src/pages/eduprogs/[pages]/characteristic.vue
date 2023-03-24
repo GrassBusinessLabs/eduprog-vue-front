@@ -14,7 +14,7 @@ const saveChanges = async () => {
   }
   changesSaved.value = true
 }
-const eduProgData = ref([])
+const eduProgData = ref({})
 const education_level = ref([])
 const specialities = ref([])
 const snackbarText = ref('')
@@ -26,9 +26,6 @@ onMounted(async () => {
   specialities.value = eduProgsStore.getSpecialities
   education_level.value = eduProgsStore.getLevels
   eduProgData.value=eduProgsStore.getEduProg
-  console.log(education_level.value)
-  console.log(eduProgData)
-  console.log("РОУТ",route)
 })
 </script>
 

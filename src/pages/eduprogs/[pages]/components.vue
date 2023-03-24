@@ -376,16 +376,20 @@
 </template>
 
 <script setup>
-import { computed, reactive } from "vue"
+import { computed, onMounted, reactive } from "vue"
 import { useRoute } from 'vue-router'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 import { editData } from "@/api/http/apiService"
-
+onMounted(async()=>{
+  await eduProgsStore.findEduProgById(route.params.pages)
+  creditsInfo.value=eduProgsStore.getCreditsInfo
+  components= reactive(eduProgsStore.getEduProg.components)
+})
 const route = useRoute()
 const eduProgsStore = useEduProgsStore()
 
 const creditsInfo = ref(eduProgsStore.getCreditsInfo)
-const components = eduProgsStore.getEduProg.components
+let components = reactive({})
 
 const hasError = ref(false)
 const errorMessage =  ref('')

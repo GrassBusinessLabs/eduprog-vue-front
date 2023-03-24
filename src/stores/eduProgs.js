@@ -66,6 +66,7 @@ export const useEduProgsStore = defineStore({
           const response = await getData('eduprogs/' + id)
           this.eduProgData = response
           this.creditsInfo = await getData('/eduprogs/credits/' + id)
+          console.log("response", response)
         } finally {
           this.loading = false
         }
