@@ -11,7 +11,7 @@
       </tr>
     </thead>
   </VTable>
-  <VTable>
+  <VTable v-if="components && components.mandatory">
     <thead class="thead-light">
       <tr>
         <th>Код <br> н/д</th>
@@ -22,7 +22,7 @@
           <VBtn
             icon="mdi-plus"
             size="x-small"
-            @click="changeDialog"
+            @click="changeDialog('ОК')"
           />
         </th>
       </tr>
@@ -136,7 +136,7 @@
       </tr>
     </thead>
   </VTable>
-  <VTable>
+  <VTable v-if="components && components.selective">
     <thead class="thead-light">
       <tr>
         <th>Код <br> н/д</th>
@@ -147,7 +147,7 @@
           <VBtn
             icon="mdi-plus"
             size="x-small"
-            @click="dialogCreateSelective = true"
+            @click="changeDialog('ВБ')"
           />
         </th>
       </tr>
@@ -299,7 +299,7 @@
           <VSpacer />
           <VBtn
             text
-            @click="changeDialog"
+            @click="changeDialog('ОК')"
           >
             Відмінити
           </VBtn>
@@ -358,7 +358,7 @@
           <VSpacer />
           <VBtn
             text
-            @click="changeDialogVB"
+            @click="changeDialog('ВБ')"
           >
             Відмінити
           </VBtn>
@@ -380,17 +380,15 @@ import { computed, onMounted, reactive } from "vue"
 import { useRoute } from 'vue-router'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 import { editData } from "@/api/http/apiService"
+import { storeToRefs } from "pinia"
 onMounted(async()=>{
   await eduProgsStore.findEduProgById(route.params.pages)
-  creditsInfo.value=eduProgsStore.getCreditsInfo
-  components= reactive(eduProgsStore.getEduProg.components)
+  console.log("COMPONENTS", components)
 })
 const route = useRoute()
 const eduProgsStore = useEduProgsStore()
 
-const creditsInfo = ref(eduProgsStore.getCreditsInfo)
-let components = reactive({})
-
+const {components, creditsInfo} =storeToRefs(eduProgsStore)
 const hasError = ref(false)
 const errorMessage =  ref('')
 
@@ -399,7 +397,6 @@ let originValue ={}
 const dialogCreate = ref(false)
 const dialogCreateSelective = ref(false)
 const newComponent = reactive({
-  code: "",
   name: "",
   credits: 0,
   control_type: "",
@@ -414,23 +411,17 @@ function  resetError() {
   errorMessage.value = ''
 }
 
-function changeDialog() {
-  dialogCreate.value = !dialogCreate.value
+function changeDialog(type) {
+  if(type=="ОК"){
+    dialogCreate.value = !dialogCreate.value
+  }
+  else if(type =="ВБ"){
+    dialogCreateSelective.value = !dialogCreate.value
+  }
   newComponent.name=""
   newComponent.credits=0
   newComponent.control_type=""
 }
-
-function changeDialogVB() {
-  dialogCreateSelective.value = false
-  newComponent.name=""
-  newComponent.credits=0
-  newComponent.control_type=""
-}
-
-
-
-
 
 async function updateCredits(){
   await eduProgsStore.fetchCreditsInfo(route.params.pages)
@@ -440,33 +431,37 @@ async function createComponent() {
   const createdComponent = Object.assign({}, newComponent)
   if(dialogCreate.value){
     createdComponent.type= "ОК"
-    if(components.mandatory.length){
-      createdComponent.code=String(+components.mandatory[components.mandatory.length-1].code+1)
-    }else{
-      createdComponent.code="1"
-    }
     try {
       console.log(createdComponent)
-      createdComponent.id = await eduProgsStore.createComponent(createdComponent)
-      components.mandatory.push(createdComponent)
+      const response = await eduProgsStore.createComponent(createdComponent)
+      createdComponent.id=response.id
+      createdComponent.code=response.code
+      console.log("Компонент",createdComponent)
+      components.value.mandatory.push(createdComponent)
       dialogCreate.value = false
     } catch (error) {
+      const errorFromServer =error.response.data.error
+      if(errorFromServer==="eduprog component with this name already exists"){
+        errorMessage.value =  'Компонент з такою назвою вже існує'
+      }
+      else{
+        errorMessage.value =  'Забагато кредитів'
+      }
       hasError.value = true
-      errorMessage.value =  'Забагато кредитів'
       return
     }
   } 
   else if(dialogCreateSelective.value){
     console.log(createdComponent)
     createdComponent.type= "ВБ"
-    if(components.selective.length){
-      createdComponent.code=String(+components.selective[components.selective.length-1].code+1)
+    if(components.value.selective.length){
+      createdComponent.code=String(+components.value.selective[components.value.selective.length-1].code+1)
     }else{
       createdComponent.code="1"
     }
     try {
       createdComponent.id = await eduProgsStore.createComponent(createdComponent)
-      components.selective.push(createdComponent)
+      components.value.selective.push(createdComponent)
       dialogCreateSelective.value = false
     } catch (error) {
       hasError.value = true
@@ -495,14 +490,12 @@ function cancel(item) {
 }
 
 async function remove(component, type) {
-  console.log(components)
+  console.log(components.value)
   await eduProgsStore.deleteComponent(component)
-  components[type]=components[type].filter(obj => obj.id !== component.id)
-  console.log(components[type])
-S
-  // components = components.filter(obj => obj.id !== component.id)
-
+  components.value[type]=components.value[type].filter(obj => obj.id !== component.id)
+  console.log(components.value[type])
   updateCredits()
+ await eduProgsStore.findEduProgById(route.params.pages)
 }
 
 async function saveComponent(component) {

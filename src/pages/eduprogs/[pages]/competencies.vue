@@ -10,6 +10,7 @@ import { useRoute } from 'vue-router'
 
 onMounted(async () => {
   await eduProgsStore.findEduProgById(route.params.pages)
+  console.log("Специальность",eduProgsStore.eduProgData.speciality_code)
 })
 
 const route = useRoute()
@@ -41,6 +42,7 @@ const tabs = [
 </script>
 
 <template>
+  <div v-if="!eduProgsStore.isLoading && eduProgsStore.getEduProg && eduProgsStore.getEduProg.id != 0">
   <VTabs
     v-model="activeTab"
     show-arrows
@@ -77,6 +79,7 @@ const tabs = [
       <EditVfkCompetencies />
     </VWindowItem>
   </VWindow>
+  </div>
 </template>
 
 <style></style>

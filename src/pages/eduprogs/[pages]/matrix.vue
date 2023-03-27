@@ -6,7 +6,9 @@ import PrTable from '@/views/pages/edit-document/edit-matrix-tabs/PR-table.vue'
 
 
 import { useEduProgsStore } from '@/stores/eduProgs.js'
-
+onMounted(async () => {
+  await eduProgsStore.findEduProgById(route.params.pages)
+})
 const props = defineProps(['eduProg'])
 const eduProgsStore = useEduProgsStore()
 const route = useRoute()
@@ -56,6 +58,7 @@ watch(activeTab, newValue => {
 </script>
 
 <template>
+<div v-if="!eduProgsStore.isLoading && eduProgsStore.getEduProg && eduProgsStore.getEduProg.id != 0">
   <VTabs
     v-model="activeTab"
     show-arrows
@@ -92,6 +95,7 @@ watch(activeTab, newValue => {
       </template>
     </VWindowItem>
   </VWindow>
+</div>
 </template>
 <route lang="yaml">
 name: matrix

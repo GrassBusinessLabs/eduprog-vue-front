@@ -19,6 +19,7 @@ export const useEduProgsStore = defineStore({
     selectedCompetencies:[],
     levelsList:[],
     specialities:[],
+    components:[],
   }),
 
   getters: {
@@ -36,6 +37,7 @@ export const useEduProgsStore = defineStore({
     getSelectedCompetencies: state => state.selectedCompetencies,
     getLevels: state => state.levelsList,
     getSpecialities: state => state.specialities,
+    getComponents: state => state.components,
   },
 
   actions: {
@@ -65,6 +67,7 @@ export const useEduProgsStore = defineStore({
           this.loading = true
           const response = await getData('eduprogs/' + id)
           this.eduProgData = response
+          this.components= response.components
           this.creditsInfo = await getData('/eduprogs/credits/' + id)
           console.log("response", response)
         } finally {
@@ -74,6 +77,9 @@ export const useEduProgsStore = defineStore({
     },
     async fetchCreditsInfo(id) {
       this.creditsInfo = await getData('/eduprogs/credits/' + id)
+    },
+    async fetchComponents(id) {
+      this.components = await getData('/eduprogs/comps/byEduprogId/' + id)
     },
     async editEduprog(payload) {
       try{
@@ -85,7 +91,8 @@ export const useEduProgsStore = defineStore({
     },
     async createComponent(payload) {
       const response = await postData('eduprogs/comps/create', payload)
-      return response.id
+      console.log("FQLB",response)
+      return response
     },
     async editComponent(id, payload) {
       await editData('eduprogs/comps/' + id, payload)

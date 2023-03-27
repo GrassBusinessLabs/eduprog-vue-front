@@ -30,7 +30,7 @@ onMounted(async () => {
 </script>
 
 <template>
-  <VCard>
+  <VCard >
     <VCardText>
       <VContainer>
         <VRow>

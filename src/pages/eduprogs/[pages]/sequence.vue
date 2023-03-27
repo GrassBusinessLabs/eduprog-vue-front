@@ -23,6 +23,7 @@ const selectedComponents = reactive({})
 const selectedComponentsInDB =ref({})
 const possibleComponents = reactive({})
 onBeforeMount(async () => {
+  await eduProgsStore.findEduProgById(route.params.pages)
   loading.value = true
   await components.mandatory.forEach(el => {
     selectedComponents[el.id]=[]

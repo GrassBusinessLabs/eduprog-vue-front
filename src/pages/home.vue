@@ -322,7 +322,11 @@ const newEduProg = ref({
     </VCard>
   </VDialog>
 </template>
-
+<style scoped>
+.eduprog-item{
+  cursor: pointer;
+}
+</style>
 <route lang="yaml">
 meta:
   requiresAuth: true

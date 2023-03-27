@@ -58,42 +58,42 @@ const vuetifyTheme = useTheme()
         :item="{
           title: 'Характеристика',
           to: 'characteristic',
-          icon: { icon: 'mdi-home-outline' }
+          icon: { icon: 'mdi-format-list-bulleted' }
         }"
       />
       <VerticalNavLink
         :item="{
           title: 'Перелік компонентів',
           to: 'components',
-          icon: { icon: 'mdi-home-outline' }
+          icon: { icon: 'mdi-sort-variant' }
         }"
       />
       <VerticalNavLink
         :item="{
           title: 'Розподіл по семестрам',
           to: 'schema',
-          icon: { icon: 'mdi-home-outline' }
+          icon: { icon: 'mdi-table' }
         }"
       />
       <VerticalNavLink
         :item="{
           title: 'Послідовність ОПП',
           to: 'sequence',
-          icon: { icon: 'mdi-home-outline' }
+          icon: { icon: 'mdi-vector-polyline' }
         }"
       />
       <VerticalNavLink
         :item="{
           title: 'Компентетності',
           to: 'competencies',
-          icon: { icon: 'mdi-home-outline' }
+          icon: { icon: 'mdi-archive-check-outline' }
         }"
       />
       <VerticalNavLink
         :item="{
           title: 'Матриця',
           to: 'matrix',
-          icon: { icon: 'mdi-home-outline' }
+          icon: { icon: 'mdi-matrix' }
         }"
       />
     </ul>

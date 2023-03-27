@@ -19,9 +19,9 @@ const selZk = ref()
 
 
 onBeforeMount(async () => {
-  await eduProgsStore.fetchSelectedCompetencies(route.params.id, 'ZK')
-  await eduProgsStore.fetchCompetencyRelations(route.params.id)
-  await eduProgsStore.fetchAllCompetencies(route.params.id)
+  await eduProgsStore.fetchSelectedCompetencies(route.params.pages, 'ZK')
+  await eduProgsStore.fetchCompetencyRelations(route.params.pages)
+  await eduProgsStore.fetchAllCompetencies(route.params.pages)
 
   const relations = eduProgsStore.getCompetencyRelations.reduce((acc, cur) => {
     const competency_id = cur.competency_id
@@ -57,10 +57,10 @@ onBeforeMount(async () => {
 const changeCheckbox = (e, componentId, competencyId)=>{
   if(e){
     valuesZK[competencyId]++
-    eduProgsStore.createCompetencyRelation(+route.params.id, componentId, competencyId)
+    eduProgsStore.createCompetencyRelation(+route.params.pages, componentId, competencyId)
   }else if(!e){
     valuesZK[competencyId]--
-    eduProgsStore.deleteCompetencyRelation(+route.params.id, componentId, competencyId)
+    eduProgsStore.deleteCompetencyRelation(+route.params.pages, componentId, competencyId)
   }
 }
 
