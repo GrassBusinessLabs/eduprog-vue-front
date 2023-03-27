@@ -44,6 +44,9 @@
               class="my-3"
               style="width: 50%"
               @keyup.enter="saveComponent(item)"
+              :error="ErrorName"
+              :error-messages="ErrorNameM"
+              @focus="EresetName"
             />
           </span>
         </td>
@@ -57,6 +60,9 @@
               style="width: 50%"
               type="number"
               @keyup.enter="saveComponent(item)"
+              :error="ErrorCredit"
+              :error-messages="ErrorCreditM"
+              @focus="EresetCredits"
             />
           </span>
         </td>
@@ -71,6 +77,9 @@
               class="my-3"
               style="width: 50%"
               @keyup.enter="saveComponent(item)"
+              :error="ErrorExam"
+              :error-messages="ErrorExamM"
+              @focus="EresetExam"
             />
           </span>
         </td>
@@ -169,6 +178,9 @@
               class="my-3"
               style="width: 50%"
               @keyup.enter="saveComponent(item)"
+              :error="ErrorName"
+              :error-messages="ErrorNameM"
+              @focus="EresetName"
             />
           </span>
         </td>
@@ -182,6 +194,9 @@
               style="width: 50%"
               type="number"
               @keyup.enter="saveComponent(item)"
+              :error="ErrorCredit"
+              :error-messages="ErrorCreditM"
+              @focus="EresetCredits"
             />
           </span>
         </td>
@@ -196,6 +211,9 @@
               class="my-3"
               style="width: 50%"
               @keyup.enter="saveComponent(item)"
+              :error="ErrorExam"
+              :error-messages="ErrorExamM"
+              @focus="EresetExam"
             />
           </span>
         </td>
@@ -364,8 +382,8 @@
           </VBtn>
           <VBtn
             text
-            @click="createComponent"
             :disabled="!(newComponent.name && newComponent.credits && newComponent.control_type)"
+            @click="createComponent"
           >
             Зберегти
           </VBtn>
@@ -405,6 +423,31 @@ const newComponent = reactive({
   category: "н/д",
   eduprog_id: +route.params.pages,
 })
+
+const ErrorName = ref(false)
+const errorNameM =  ref('')
+
+const ErrorCredit = ref(false)
+const errorCreditM =  ref('')
+
+const ErrorExam = ref(false)
+const errorExamM =  ref('')
+
+
+function  EresetName() {
+  ErrorName.value = false
+  errorNameM.value = ''
+}
+
+function  EresetCredits() {
+  ErrorCredit.value = false
+  errorCreditM.value = ''
+}
+
+function  EresetExam() {
+  ErrorExam.value = false
+  errorExamM.value = ''
+}
 
 function  resetError() {
   hasError.value = false
@@ -450,7 +493,7 @@ async function createComponent() {
       hasError.value = true
       return
     }
-  } 
+  }
   else if(dialogCreateSelective.value){
     console.log(createdComponent)
     createdComponent.type= "ВБ"
@@ -466,6 +509,7 @@ async function createComponent() {
     } catch (error) {
       hasError.value = true
       errorMessage.value =  'Забагато кредитів'
+
       return
     }
   }
@@ -499,9 +543,29 @@ async function remove(component, type) {
 }
 
 async function saveComponent(component) {
-  await eduProgsStore.editComponent(component.id, component)
-  updateCredits()
-  editIndex.value = null
+  try {
+
+    await eduProgsStore.editComponent(component.id, component)
+    updateCredits()
+    editIndex.value = null
+
+  } catch (error) {
+    console.log('ERROR1',error.response.data)
+    if (error.response.data.error === 'too much credits') {
+      console.log('ERhjkhj',error.response.data)
+      ErrorName.value = true
+      errorNameM.value =  "Некоректне ім'я"
+    }
+    else if(error.response.data.error === "Key: 'UpdateEduprogcompRequest.Name' Error:Field validation for 'Name' failed on the 'gte' tag") {
+      console.log('PPPPPPPPPPPP',error.response.data)
+      ErrorCredit.value = true
+      errorCreditM.value =  "Забагато кредитів"
+    }
+    else if (error.response.data.error === "Key: 'UpdateEduprogcompRequest.ControlType' Error:Field validation for 'ControlType' failed on the 'gte' tag")
+      console.log('llllllllllllllll',error.response.data)
+    ErrorExam.value = true
+    errorExamM.value =  "Некоректне значення"
+  }
 }
 </script>
 
