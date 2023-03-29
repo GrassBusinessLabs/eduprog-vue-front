@@ -34,6 +34,19 @@ const saveChanges = async competency => {
   await eduProgsStore.editCustomCompetency(competency.id, competency.definition)
   editIndex.value = null
 }
+let originValue={}
+function edit(item) {
+  originValue= Object.assign({}, item)
+  editIndex.value = item.id
+}
+
+function cancel(item) {
+  editIndex.value = null
+  for(let key in item){
+    item[key]=originValue[key]
+  }
+  originValue={}
+}
 </script>
 <template>
   <VTable>
@@ -99,7 +112,7 @@ const saveChanges = async competency => {
               <VBtn
                 icon="mdi-close-thick"
                 size="x-small"
-                @click="editIndex = null"
+                @click="cancel(item)"
               />
             </VCol>
           </VRow>
@@ -113,7 +126,7 @@ const saveChanges = async competency => {
                 icon="mdi-pencil"
                 size="x-small"
                 style="margin-right: 2%"
-                @click="editIndex = item.id"
+                @click="edit(item)"
               />
             </VCol>
             <VCol>

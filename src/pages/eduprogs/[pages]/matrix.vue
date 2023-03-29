@@ -3,8 +3,6 @@ import { useRoute, onBeforeRouteUpdate } from 'vue-router'
 import ZkTable from '@/views/pages/edit-document/edit-matrix-tabs/ZK-table.vue'
 import FkTable from '@/views/pages/edit-document/edit-matrix-tabs/FK-table.vue'
 import PrTable from '@/views/pages/edit-document/edit-matrix-tabs/PR-table.vue'
-
-
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 onMounted(async () => {
   await eduProgsStore.findEduProgById(route.params.pages)
@@ -13,7 +11,7 @@ const props = defineProps(['eduProg'])
 const eduProgsStore = useEduProgsStore()
 const route = useRoute()
 const lastTab = ref('ZKt')
-const activeTab = ref(localStorage.getItem('activeTab') || route.params.tab)
+const activeTab = ref('ZKt')
 
 const tabs = [
   {
@@ -29,36 +27,9 @@ const tabs = [
     tab: 'PRt',
   },
 ]
-watch(activeTab, newValue => {
-
-  switch (newValue){
-  case undefined :
-    console.log('undefined')
-    localStorage.setItem('activeTab',lastTab.value)
-    console.log(lastTab.value)
-    break
-  case 'ZKt' :
-    console.log('Ok ZKt')
-    lastTab.value = newValue
-    localStorage.setItem('activeTab', newValue)
-    console.log(lastTab.value)
-    break
-  case 'FKt' :
-    console.log('Ok FKt')
-    lastTab.value = newValue
-    localStorage.setItem('activeTab', newValue)
-    break
-  case 'PRt':
-    console.log('Ok Prt')
-    lastTab.value = newValue
-    localStorage.setItem('activeTab', newValue)
-    break
-  }
-})
 </script>
 
 <template>
-<div v-if="!eduProgsStore.isLoading && eduProgsStore.getEduProg && eduProgsStore.getEduProg.id != 0">
   <VTabs
     v-model="activeTab"
     show-arrows
@@ -74,28 +45,20 @@ watch(activeTab, newValue => {
   <VDivider />
 
   <VWindow
-    :key="activeTab"
     v-model="activeTab"
     class="mt-5 disable-tab-transition"
     :touch="false"
   >
     <VWindowItem value="ZKt">
-      <template v-if="activeTab === 'ZKt'">
         <ZkTable />
-      </template>
     </VWindowItem>
     <VWindowItem value="FKt">
-      <template v-if="activeTab === 'FKt'">
         <FkTable />
-      </template>
     </VWindowItem>
     <VWindowItem value="PRt">
-      <template v-if="activeTab === 'PRt'">
         <PrTable />
-      </template>
     </VWindowItem>
   </VWindow>
-</div>
 </template>
 <route lang="yaml">
 name: matrix

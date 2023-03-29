@@ -1,18 +1,17 @@
 <script setup>
 import draggable from 'vuedraggable'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
-
 import { reactive } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
 const disciplines = ref([])
 onBeforeMount(async () => {
-  await eduProgsStore.fetchDisciplines(route.params.id)
+  await eduProgsStore.fetchDisciplines(route.params.pages)
   disciplines.value = eduProgsStore.getDisciplines
   initData()
 })
 const eduProgsStore = useEduProgsStore()
-const components = eduProgsStore.getEduProg.components
+const {components} =storeToRefs(eduProgsStore)
 const scheme = eduProgsStore.getScheme
 
 const editIndex = ref(null)
@@ -30,7 +29,7 @@ const dragging = ref(false)
 
 async function deleteDiscipline(id) {
   await eduProgsStore.deleteDiscipline(id)
-  await eduProgsStore.fetchDisciplines(route.params.id)
+  await eduProgsStore.fetchDisciplines(route.params.pages)
   disciplines.value = eduProgsStore.getDisciplines
 }
 
@@ -62,14 +61,14 @@ async function addNewComponent(event, discipline, semester) {
   console.log(componentData)
   console.log(newComponent)
   await eduProgsStore.setComponentToScheme(newComponent)
-  await eduProgsStore.fetchScheme(route.params.id)
+  await eduProgsStore.fetchScheme(route.params.pages)
   console.log('Схема',  scheme)
   initData()
 }
 async function deleteComponent(event, element) {
   console.log(event, element)
   await eduProgsStore.deleteComponentFromSheme(element.id)
-  await eduProgsStore.fetchScheme(route.params.id)
+  await eduProgsStore.fetchScheme(route.params.pages)
 }
 
 function edit(item) {
@@ -100,7 +99,7 @@ function getComponentByDiscipline(discipline, semestr) {
   return array
 }
 
-const getSubjects =  computed(() => components.mandatory.concat(components.selective))
+//const getSubjects =  computed(() => components.value.mandatory.concat(components.value.selective))
 
 function handleSubject(event, semester, discipline) {
   changes.subjects = event
@@ -114,12 +113,12 @@ const createDiscipline = function dialogg() {
 const dialogCreate = ref(false)
 const newDiscipline = reactive( {
   name:"",
-  eduprog_id: +route.params.id,
+  eduprog_id: +route.params.pages,
 })
 
 async function createNewDiscipline() {
   await eduProgsStore.createDiscipline(newDiscipline)
-  await eduProgsStore.fetchDisciplines(route.params.id)
+  await eduProgsStore.fetchDisciplines(route.params.pages)
   newDiscipline.name=''
   disciplines.value = eduProgsStore.getDisciplines
   dialogCreate.value=false

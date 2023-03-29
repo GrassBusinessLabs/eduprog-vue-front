@@ -401,7 +401,6 @@ import { editData } from "@/api/http/apiService"
 import { storeToRefs } from "pinia"
 onMounted(async()=>{
   await eduProgsStore.findEduProgById(route.params.pages)
-  console.log("COMPONENTS", components)
 })
 const route = useRoute()
 const eduProgsStore = useEduProgsStore()
@@ -434,12 +433,12 @@ const ErrorExam = ref(false)
 const errorExamM =  ref('')
 
 
-function  EresetName() {
+function EresetName() {
   ErrorName.value = false
   errorNameM.value = ''
 }
 
-function  EresetCredits() {
+function EresetCredits() {
   ErrorCredit.value = false
   errorCreditM.value = ''
 }
@@ -529,7 +528,6 @@ function cancel(item) {
   for(let key in item){
     item[key]=originValue[key]
   }
-  console.log("Айтем анд оригин",item, originValue)
   originValue={}
 }
 

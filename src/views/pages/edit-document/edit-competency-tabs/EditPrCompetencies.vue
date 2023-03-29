@@ -69,7 +69,7 @@ const hasAllSelected = () =>{
     <thead class="thead-light">
       <tr>
         <th class="text-center">
-          <h3>Загальні компетентності</h3>
+          <h3>Програмні результати</h3>
         </th>
       </tr>
     </thead>

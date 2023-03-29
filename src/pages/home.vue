@@ -102,14 +102,13 @@ const newEduProg = ref({
 </script>
 
 <template>
-  <VCardText>
     <VBtn
       dark
       @click="createEduProgDialog"
+      class="mb-3"
     >
       Створити ОПП
     </VBtn>
-  </VCardText>
 
 
   <VDialog
@@ -153,9 +152,8 @@ const newEduProg = ref({
                 v-model="newEduProg.speciality_code"
                 :items="specialities"
                 item-value="code"
-                @update:modelValue="check"
                 item-title="name"
-                label="Освітній рівень"
+                label="Спеціальність"
                 required
                 outlined
                 dense

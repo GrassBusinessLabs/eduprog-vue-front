@@ -6,6 +6,13 @@ import { VerticalNavLayout } from '@layouts'
 import Footer from '@/layouts/components/Footer.vue'
 import NavbarThemeSwitcher from '@/layouts/components/NavbarThemeSwitcher.vue'
 import UserProfile from '@/layouts/components/UserProfile.vue'
+import { useEduProgsStore } from '@/stores/eduProgs.js'
+const route = useRoute()
+import { useRoute } from 'vue-router'
+const eduProgsStore = useEduProgsStore()
+const exportToExcel = () => {
+  eduProgsStore.exportToExcel(route.params.pages)
+}
 </script>
 
 <template>
@@ -21,7 +28,14 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
       />
 
       <VSpacer />
-
+      <VBtn
+        v-if="route.params.pages"
+        dark
+        @click="exportToExcel"
+        variant="flat"
+      >
+        Експортувати
+      </VBtn>
       <NavbarThemeSwitcher />
       <UserProfile />
     </template>
@@ -46,7 +60,7 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
 <style lang="scss">
 .app-bar-search {
   .v-input__control {
-    width: 236px
+    width: 236px;
   }
 
   .v-field__outline__start {
@@ -58,4 +72,5 @@ import UserProfile from '@/layouts/components/UserProfile.vue'
     border-radius: 0 28px 28px 0 !important;
   }
 }
+
 </style>

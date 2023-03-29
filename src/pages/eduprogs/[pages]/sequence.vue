@@ -1,31 +1,23 @@
 <script setup>
 import { useEduProgsStore } from '@/stores/eduProgs.js'
-import { reactive } from 'vue'
+import { onMounted, reactive } from 'vue'
 import { useRoute } from 'vue-router'
-
 const route = useRoute()
 const eduProgsStore = useEduProgsStore()
-const components = eduProgsStore.getEduProg.components
+const {components} =storeToRefs(eduProgsStore)
 const loading = ref(false)
-const mandatoryComponents = reactive(
-  components.mandatory.map(component => ({
-    ...component,
-    items: [], // добавляем пустой массив items для каждого компонента
-  })),
-)
-const allComponents = ref(components.mandatory)
 const sortedComponents = component => {
-  return components.mandatory.filter(el => {
+  return components.value.mandatory.filter(el => {
     return el.id !== component.id
   })
 }
 const selectedComponents = reactive({})
 const selectedComponentsInDB =ref({})
 const possibleComponents = reactive({})
-onBeforeMount(async () => {
+onMounted(async () => {
   await eduProgsStore.findEduProgById(route.params.pages)
   loading.value = true
-  await components.mandatory.forEach(el => {
+  await components.value.mandatory.forEach(el => {
     selectedComponents[el.id]=[]
     eduProgsStore.fetchPossibleRelations(el.eduprog_id, el.id).then(res => {
       possibleComponents[el.id] = res

@@ -8,7 +8,7 @@ const route = useRoute()
 
 
 const eduProgsStore = useEduProgsStore()
-const components = eduProgsStore.getEduProg.components
+const {components} =storeToRefs(eduProgsStore)
 const generalCompetencies =ref([])
 const selected = reactive({})
 const valuesZK = reactive({})
@@ -19,10 +19,10 @@ const selVpr = ref([])
 
 
 onBeforeMount(async () => {
-  await eduProgsStore.fetchCompetencyRelations(route.params.id)
-  await eduProgsStore.fetchAllCompetencies(route.params.id)
-  await eduProgsStore.fetchSelectedCompetencies(route.params.id, 'PR')
-  await eduProgsStore.fetchSelectedVpr(route.params.id)
+  await eduProgsStore.fetchCompetencyRelations(route.params.pages)
+  await eduProgsStore.fetchAllCompetencies(route.params.pages)
+  await eduProgsStore.fetchSelectedCompetencies(route.params.pages, 'PR')
+  await eduProgsStore.fetchSelectedVpr(route.params.pages)
 
   const relations = eduProgsStore.getCompetencyRelations.reduce((acc, cur) => {
     const competency_id = cur.competency_id
@@ -39,7 +39,7 @@ onBeforeMount(async () => {
   generalCompetencies.value.forEach(el => {
     selected[el.id] = reactive({})
     valuesZK[el.id] = 0
-    components.mandatory.forEach(comp => {
+    components.value.mandatory.forEach(comp => {
       try{
         if(relations[el.id][comp.id]){
           valuesZK[el.id]++
@@ -61,10 +61,10 @@ onBeforeMount(async () => {
 const changeCheckbox = (e, componentId, competencyId)=>{
   if(e){
     valuesZK[competencyId]++
-    eduProgsStore.createCompetencyRelation(+route.params.id, componentId, competencyId)
+    eduProgsStore.createCompetencyRelation(+route.params.pages, componentId, competencyId)
   }else if(!e){
     valuesZK[competencyId]--
-    eduProgsStore.deleteCompetencyRelation(+route.params.id, componentId, competencyId)
+    eduProgsStore.deleteCompetencyRelation(+route.params.pages, componentId, competencyId)
   }
 }
 
@@ -89,7 +89,7 @@ watch(valuesZK, newValue => {
 </script>
 
 <template>
-  <VRow>
+  <VRow v-if="components.mandatory?.length && components.mandatory.length > 0 && selPr?.length && selPr.length > 0">
     <VCol>
       <VTable>
         <thead class="thead-light">
@@ -100,7 +100,7 @@ watch(valuesZK, newValue => {
           </tr>
         </thead>
       </VTable>
-      <VTable v-if="components.mandatory.length>0">
+      <VTable>
         <tbody>
           <tr>
             <th />
@@ -165,18 +165,27 @@ watch(valuesZK, newValue => {
           </tr>
         </tbody>
       </VTable>
-      <VAlert
-        v-else
-        border="left"
-        text
-        type="info"
-        prominent
-      >
-        Поки що не додано жодного освітнього компонента до схеми.
-      </VAlert>
     </VCol>
   </VRow>
-  <VRow>
+      <VAlert
+      v-else-if="components.mandatory?.length  && components.mandatory?.length > 0 && !selZk?.length "
+      border="left"
+      text
+      type="info"
+      prominent
+    >
+      Поки що не додано жодногно програмного результату навчання до ОПП.
+    </VAlert>
+    <VAlert
+      v-else-if="!components.mandatory?.length  && selZk?.length && selZk?.length>0"
+      border="left"
+      text
+      type="info"
+      prominent
+    >
+      Поки що не додано жодного основного компоненту до ОПП.
+    </VAlert>
+  <VRow v-if="components.mandatory?.length && components.mandatory.length > 0 && selVpr?.length && selVpr.length > 0">
     <VCol>
       <VTable class="mt-10">
         <thead class="thead-light">
@@ -263,4 +272,24 @@ watch(valuesZK, newValue => {
       </VAlert>
     </VCol>
   </VRow>
+        <VAlert
+      v-else-if="components.mandatory?.length  && components.mandatory?.length > 0 && !selVpr?.length "
+      border="left"
+      text
+      type="info"
+      prominent
+      class="mt-3"
+    >
+      Поки що не додано жодної компетентності передбаченої вищим закладом освіти до ОПП.
+    </VAlert>
+    <VAlert
+      v-else-if="!components.mandatory?.length  && selZk?.length && selVpr?.length>0"
+      border="left"
+      text
+      type="info"
+      prominent
+      class="mt-3"
+    >
+      Поки що не додано жодного основного компоненту до ОПП.
+    </VAlert>
 </template>
