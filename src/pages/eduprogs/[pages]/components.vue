@@ -44,9 +44,7 @@
               class="my-3"
               style="width: 50%"
               @keyup.enter="saveComponent(item)"
-              :error="ErrorName"
-              :error-messages="ErrorNameM"
-              @focus="EresetName"
+              :rules="rulesComp.nameComp"
             />
           </span>
         </td>
@@ -60,9 +58,8 @@
               style="width: 50%"
               type="number"
               @keyup.enter="saveComponent(item)"
-              :error="ErrorCredit"
-              :error-messages="ErrorCreditM"
-              @focus="EresetCredits"
+              @focus="resetError"
+              :rules="rulesComp.credits"
             />
           </span>
         </td>
@@ -77,9 +74,7 @@
               class="my-3"
               style="width: 50%"
               @keyup.enter="saveComponent(item)"
-              :error="ErrorExam"
-              :error-messages="ErrorExamM"
-              @focus="EresetExam"
+              :rules="rulesComp.typeExam"
             />
           </span>
         </td>
@@ -178,9 +173,7 @@
               class="my-3"
               style="width: 50%"
               @keyup.enter="saveComponent(item)"
-              :error="ErrorName"
-              :error-messages="ErrorNameM"
-              @focus="EresetName"
+              :rules="rulesComp.nameComp"
             />
           </span>
         </td>
@@ -193,10 +186,11 @@
               class="my-3"
               style="width: 50%"
               type="number"
+              :error="hasError"
+              :error-messages="errorMessage"
               @keyup.enter="saveComponent(item)"
-              :error="ErrorCredit"
-              :error-messages="ErrorCreditM"
-              @focus="EresetCredits"
+              @focus="resetError"
+              :rules="rulesComp.credits"
             />
           </span>
         </td>
@@ -211,9 +205,7 @@
               class="my-3"
               style="width: 50%"
               @keyup.enter="saveComponent(item)"
-              :error="ErrorExam"
-              :error-messages="ErrorExamM"
-              @focus="EresetExam"
+              :rules="rulesComp.typeExam"
             />
           </span>
         </td>
@@ -285,6 +277,7 @@
                 v-model="newComponent.name"
                 label="Назва компонента"
                 required
+                :rules="rulesComp.nameComp"
                 @input="check"
               />
             </VCol>
@@ -295,6 +288,7 @@
                 v-model="newComponent.credits"
                 type="number"
                 label="Кількість кредитів"
+                :rules="rulesComp.credits"
                 :error="hasError"
                 :error-messages="errorMessage"
                 @focus="resetError"
@@ -308,6 +302,7 @@
                 v-model="newComponent.control_type"
                 label="Форма підсумку контролю"
                 required
+                :rules="rulesComp.typeExam"
               />
             </VCol>
           </VRow>
@@ -349,6 +344,7 @@
                 v-model="newComponent.name"
                 label="Назва компонента"
                 required
+                :rules="rulesComp.nameComp"
               />
             </VCol>
             <VCol
@@ -358,6 +354,7 @@
                 v-model="newComponent.credits"
                 type="number"
                 label="Кількість кредитів"
+                :rules="rulesComp.credits"
               />
             </VCol>
             <VCol
@@ -367,6 +364,7 @@
                 v-model="newComponent.control_type"
                 label="Форма підсумку контролю"
                 required
+                :rules="rulesComp.typeExam"
               />
             </VCol>
           </VRow>
@@ -406,8 +404,7 @@ const route = useRoute()
 const eduProgsStore = useEduProgsStore()
 
 const {components, creditsInfo} =storeToRefs(eduProgsStore)
-const hasError = ref(false)
-const errorMessage =  ref('')
+
 
 const editIndex =  ref(null)
 let originValue ={}
@@ -423,30 +420,29 @@ const newComponent = reactive({
   eduprog_id: +route.params.pages,
 })
 
-const ErrorName = ref(false)
-const errorNameM =  ref('')
+const rulesComp = ref({
+  nameComp: [
+    value => {
+      if (value) return true
 
-const ErrorCredit = ref(false)
-const errorCreditM =  ref('')
+      return 'Введіть назвву'   },
+  ],
+  credits: [
+    value => {
+      if (value) return true
 
-const ErrorExam = ref(false)
-const errorExamM =  ref('')
+      return 'Введіть кредити'   },
+  ],
+  typeExam:[
+    value => {
+      if (value) return true
 
+      return 'Введіть форму підсумку контролю'},
+  ],
+})
 
-function EresetName() {
-  ErrorName.value = false
-  errorNameM.value = ''
-}
-
-function EresetCredits() {
-  ErrorCredit.value = false
-  errorCreditM.value = ''
-}
-
-function  EresetExam() {
-  ErrorExam.value = false
-  errorExamM.value = ''
-}
+const hasError = ref(false)
+const errorMessage =  ref('')
 
 function  resetError() {
   hasError.value = false
@@ -490,6 +486,7 @@ async function createComponent() {
         errorMessage.value =  'Забагато кредитів'
       }
       hasError.value = true
+      
       return
     }
   }
@@ -537,7 +534,7 @@ async function remove(component, type) {
   components.value[type]=components.value[type].filter(obj => obj.id !== component.id)
   console.log(components.value[type])
   updateCredits()
- await eduProgsStore.findEduProgById(route.params.pages)
+  await eduProgsStore.findEduProgById(route.params.pages)
 }
 
 async function saveComponent(component) {
@@ -548,21 +545,12 @@ async function saveComponent(component) {
     editIndex.value = null
 
   } catch (error) {
-    console.log('ERROR1',error.response.data)
-    if (error.response.data.error === 'too much credits') {
-      console.log('ERhjkhj',error.response.data)
-      ErrorName.value = true
-      errorNameM.value =  "Некоректне ім'я"
+    console.log('ERROR1', error.response.data)
+    if (error.response.data.error === "too much credits") {
+      console.log('PPPPPPPPPPPP', error.response.data)
+      hasError.value =  true
+      errorMessage.value = "Забагато кредитів"
     }
-    else if(error.response.data.error === "Key: 'UpdateEduprogcompRequest.Name' Error:Field validation for 'Name' failed on the 'gte' tag") {
-      console.log('PPPPPPPPPPPP',error.response.data)
-      ErrorCredit.value = true
-      errorCreditM.value =  "Забагато кредитів"
-    }
-    else if (error.response.data.error === "Key: 'UpdateEduprogcompRequest.ControlType' Error:Field validation for 'ControlType' failed on the 'gte' tag")
-      console.log('llllllllllllllll',error.response.data)
-    ErrorExam.value = true
-    errorExamM.value =  "Некоректне значення"
   }
 }
 </script>
