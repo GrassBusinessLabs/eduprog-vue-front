@@ -20,6 +20,7 @@ export const useEduProgsStore = defineStore({
     levelsList:[],
     specialities:[],
     components:[],
+    VBblock:[],
   }),
 
   getters: {
@@ -38,6 +39,7 @@ export const useEduProgsStore = defineStore({
     getLevels: state => state.levelsList,
     getSpecialities: state => state.specialities,
     getComponents: state => state.components,
+    getVBblock: state => state.VBblock,
   },
 
   actions: {
@@ -165,6 +167,10 @@ export const useEduProgsStore = defineStore({
     async fetchSelectedVpr(eduId) {
       const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId+'/byType?type=VPR')
       this.selectedVpr = response
+    },
+    async fetchVBblock(eduId) {
+      const response = await getData('/eduprogs/comps/getVB/' + eduId)
+      this.VBblock = response
     },
 
     async addCompetencyToEduprog(eduprogId, competencyId) {

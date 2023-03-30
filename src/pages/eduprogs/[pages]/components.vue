@@ -367,6 +367,21 @@
                 :rules="rulesComp.typeExam"
               />
             </VCol>
+            <VCol
+              cols="12"
+            >
+              <VCombobox
+                v-model="newComponent.block_name"
+                :items="VBblock"
+                item-title="block_name"
+                item-value="block_num"
+                label="Назва блоку компонента"
+                :rules="rulesComp.nameComp"
+                outlined
+                dense
+                @click="updateSelectedBlockNum"
+              />
+            </VCol>
           </VRow>
         </VContainer>
 
@@ -380,7 +395,7 @@
           </VBtn>
           <VBtn
             text
-            :disabled="!(newComponent.name && newComponent.credits && newComponent.control_type)"
+            :disabled="!(newComponent.name && newComponent.credits && newComponent.control_type && newComponent.block_name)"
             @click="createComponent"
           >
             Зберегти
@@ -399,12 +414,15 @@ import { editData } from "@/api/http/apiService"
 import { storeToRefs } from "pinia"
 onMounted(async()=>{
   await eduProgsStore.findEduProgById(route.params.pages)
+  await eduProgsStore.fetchVBblock(route.params.pages)
+  VBblock.value = eduProgsStore.getVBblock
+  console.log('getVBblock',VBblock.value )
 })
 const route = useRoute()
 const eduProgsStore = useEduProgsStore()
 
 const {components, creditsInfo} =storeToRefs(eduProgsStore)
-
+const VBblock = ref()
 
 const editIndex =  ref(null)
 let originValue ={}
@@ -417,6 +435,8 @@ const newComponent = reactive({
   type: "",
   sub_type: "н/д",
   category: "н/д",
+  block_name:"",
+  block_num:"",
   eduprog_id: +route.params.pages,
 })
 
@@ -444,6 +464,21 @@ const rulesComp = ref({
 const hasError = ref(false)
 const errorMessage =  ref('')
 
+function updateSelectedBlockNum() {
+  const selectedBlock = VBblock.value.find(block => block.block_name === newComponent.block_name)
+  if (selectedBlock) {
+    newComponent.block_num = String(selectedBlock.block_num)
+  }
+  else if (VBblock.value.length === 0){
+    newComponent.block_num = String(1)
+  }
+  else {
+    // Вычисляем следующий block_num как максимальный block_num + 1
+    const maxBlockNum = Math.max(...VBblock.value.map(block => block.block_num))
+    newComponent.block_num = String(maxBlockNum + 1)
+  }
+}
+
 function  resetError() {
   hasError.value = false
   errorMessage.value = ''
@@ -454,18 +489,24 @@ function changeDialog(type) {
     dialogCreate.value = !dialogCreate.value
   }
   else if(type =="ВБ"){
-    dialogCreateSelective.value = !dialogCreate.value
+    dialogCreateSelective.value = !dialogCreateSelective.value
   }
   newComponent.name=""
   newComponent.credits=0
   newComponent.control_type=""
+  newComponent.block_name=""
+  newComponent.block_num=""
 }
 
 async function updateCredits(){
   await eduProgsStore.fetchCreditsInfo(route.params.pages)
   creditsInfo.value = eduProgsStore.getCreditsInfo
+  await eduProgsStore.fetchVBblock(route.params.pages)
+  VBblock.value = eduProgsStore.getVBblock
 }
 async function createComponent() {
+  updateSelectedBlockNum()
+  console.log(newComponent.block_name,newComponent.block_num)
   const createdComponent = Object.assign({}, newComponent)
   if(dialogCreate.value){
     createdComponent.type= "ОК"
@@ -499,6 +540,7 @@ async function createComponent() {
       createdComponent.code="1"
     }
     try {
+      console.log(createdComponent)
       createdComponent.id = await eduProgsStore.createComponent(createdComponent)
       components.value.selective.push(createdComponent)
       dialogCreateSelective.value = false
@@ -512,6 +554,9 @@ async function createComponent() {
   newComponent.name=""
   newComponent.credits=0
   newComponent.control_type=""
+  newComponent.block_name=""
+  newComponent.block_num=""
+
   await updateCredits()
 }
 

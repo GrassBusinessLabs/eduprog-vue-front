@@ -10,6 +10,7 @@ import moment from 'moment'
 import router from '../router'
 const eduProgsStore = useEduProgsStore()
 const specialities = ref([])
+console.log(specialities)
 //return { eduProgs: useEduProgsStore.getEduProgs }
 const education_level = ref([])
 onMounted( async () => {
@@ -39,7 +40,7 @@ const editNameEduProg =( async() => {
 })
 const createEduProg =( async() => {
   console.log('Spes',specialities)
-  console.log('Spes',newEduProg)
+  console.log('Spessss',newEduProg)
   await eduProgsStore.createEduProg(newEduProg.value)
   dialogCreate.value=false
   await eduProgsStore.fetchEduProgs()
