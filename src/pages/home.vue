@@ -39,9 +39,10 @@ const editNameEduProg =( async() => {
   dialogRename.value=false
 })
 const createEduProg =( async() => {
+  updateSelectedSpeciality()
   console.log('Spes',specialities)
   console.log('Spessss',newEduProg)
-  await eduProgsStore.createEduProg(newEduProg.value)
+  await eduProgsStore.createEduProg(newEduProg)
   dialogCreate.value=false
   await eduProgsStore.fetchEduProgs()
 })
@@ -90,16 +91,20 @@ const editEduProg = function edit(event, id) {
   router.replace('/eduprogs/'+id+'/characteristic')
 }
 
+function updateSelectedSpeciality() {
+  console.log(newEduProg.speciality_code)
+  const selectedSpes = specialities.value.find(spes => spes.name === newEduProg.speciality_code)
+  newEduProg.speciality_code = String(selectedSpes.code)
+  console.log(newEduProg.speciality_code)
+}
 
-const newEduProg = ref({
+const newEduProg = reactive({
   name:'',
   education_level :'',
   stage :'',
   speciality_code :'',
   knowledge_field :'',
 })
-
-
 </script>
 
 <template>

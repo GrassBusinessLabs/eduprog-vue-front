@@ -43,8 +43,8 @@
               v-model="item.name"
               class="my-3"
               style="width: 50%"
-              @keyup.enter="saveComponent(item)"
               :rules="rulesComp.nameComp"
+              @keyup.enter="saveComponent(item)"
             />
           </span>
         </td>
@@ -57,9 +57,9 @@
               class="my-3"
               style="width: 50%"
               type="number"
+              :rules="rulesComp.credits"
               @keyup.enter="saveComponent(item)"
               @focus="resetError"
-              :rules="rulesComp.credits"
             />
           </span>
         </td>
@@ -73,8 +73,8 @@
               v-model="item.control_type"
               class="my-3"
               style="width: 50%"
-              @keyup.enter="saveComponent(item)"
               :rules="rulesComp.typeExam"
+              @keyup.enter="saveComponent(item)"
             />
           </span>
         </td>
@@ -140,7 +140,7 @@
       </tr>
     </thead>
   </VTable>
-  <VTable v-if="components && components.selective">
+  <VTable>
     <thead class="thead-light">
       <tr>
         <th>Код <br> н/д</th>
@@ -156,71 +156,83 @@
         </th>
       </tr>
     </thead>
-    <tbody>
+    <tbody
+      v-for="(block, index) in VBblock"
+      :key="'block-' + index"
+    >
+      <tr>
+        <th
+          colspan="4"
+          class="text-center"
+        >
+          <h3>{{ block.block_name }}</h3>
+        </th>
+        <th />
+      </tr>
       <tr
-        v-for="item in components.selective"
-        :key="item.id"
+        v-for="(comp, compIndex) in block.comps_in_block"
+        :key="'comp-' + compIndex"
       >
-        <td>{{ 'ВБ ' + item.code }}</td>
+        <td>{{ 'ВБ ' + comp.block_num + '.'+ comp.code }}</td>
         <td>
-          <span v-if="editIndex !== item.id">
-            {{ item.name }}
+          <span v-if="editIndex !== comp.id">
+            {{ comp.name }}
           </span>
-          <span v-if="editIndex === item.id">
+          <span v-if="editIndex === comp.id">
 
             <VTextField
-              v-model="item.name"
+              v-model="comp.name"
               class="my-3"
               style="width: 50%"
-              @keyup.enter="saveComponent(item)"
               :rules="rulesComp.nameComp"
+              @keyup.enter="saveComponent(comp)"
             />
           </span>
         </td>
         <td>
-          <span v-if="editIndex !== item.id">
-            {{ item.credits }}</span>
-          <span v-if="editIndex === item.id">
+          <span v-if="editIndex !== comp.id">
+            {{ comp.credits }}</span>
+          <span v-if="editIndex === comp.id">
             <VTextField
-              v-model="item.credits"
+              v-model="comp.credits"
               class="my-3"
               style="width: 50%"
               type="number"
               :error="hasError"
               :error-messages="errorMessage"
-              @keyup.enter="saveComponent(item)"
-              @focus="resetError"
               :rules="rulesComp.credits"
+              @keyup.enter="saveComponent(comp)"
+              @focus="resetError"
             />
           </span>
         </td>
         <td>
-          <span v-if="editIndex !== item.id">
-            {{ item.control_type }}
+          <span v-if="editIndex !== comp.id">
+            {{ comp.control_type }}
           </span>
-          <span v-if="editIndex === item.id">
+          <span v-if="editIndex === comp.id">
 
             <VTextField
-              v-model="item.control_type"
+              v-model="comp.control_type"
               class="my-3"
               style="width: 50%"
-              @keyup.enter="saveComponent(item)"
               :rules="rulesComp.typeExam"
+              @keyup.enter="saveComponent(comp)"
             />
           </span>
         </td>
         <td>
-          <span v-if="editIndex !== item.id">
+          <span v-if="editIndex !== comp.id">
             <VBtn
               icon="mdi-pencil"
               size="x-small"
               style="margin-right:2% "
-              @click="edit(item)"
+              @click="edit(comp)"
             />
             <VBtn
               icon="mdi-trash-can"
               size="x-small"
-              @click="remove(item, 'selective')"
+              @click="remove(comp, 'selective')"
             />
           </span>
           <span v-else>
@@ -228,19 +240,20 @@
               icon="mdi-check-bold"
               size="x-small"
               style="margin-right:2% "
-              @click="saveComponent(item)"
+              @click="saveComponent(comp)"
             />
             <VBtn
               icon="mdi-close-thick"
               size="x-small"
-              @click="cancel(item)"
+              @click="cancel(comp)"
             />
 
           </span>
         </td>
       </tr>
     </tbody>
-
+  </VTable>
+  <VTable>
     <thead>
       <tr>
         <th colspan="5">
@@ -379,7 +392,6 @@
                 :rules="rulesComp.nameComp"
                 outlined
                 dense
-                @click="updateSelectedBlockNum"
               />
             </VCol>
           </VRow>
@@ -473,7 +485,6 @@ function updateSelectedBlockNum() {
     newComponent.block_num = String(1)
   }
   else {
-    // Вычисляем следующий block_num как максимальный block_num + 1
     const maxBlockNum = Math.max(...VBblock.value.map(block => block.block_num))
     newComponent.block_num = String(maxBlockNum + 1)
   }
