@@ -7,16 +7,30 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const eduProgsStore = useEduProgsStore()
 const editIndex = ref(null)
-
+let originValue={}
 const vfkCompetencies = ref([])
 const creatingDialog = ref(false)
+
+function edit(item) {
+  originValue= Object.assign({}, item)
+  editIndex.value = item.id
+}
+
+function cancel(item) {
+  editIndex.value = null
+  for(let key in item){
+    item[key]=originValue[key]
+  }
+  originValue={}
+}
+
 const newCompetency = reactive({
-  eduprog_id: +route.params.id,
+  eduprog_id: +route.params.pages,
   type: 'ВФК',
   definition: '',
 })
 onBeforeMount(async () => {
-  await eduProgsStore.fetchSelectedCompetencies(route.params.id, 'VFK')
+  await eduProgsStore.fetchSelectedCompetencies(route.params.pages, 'VFK')
   vfkCompetencies.value = eduProgsStore.getSelectedCompetencies
 })
 const createCompetency = async () => {
@@ -27,11 +41,12 @@ const createCompetency = async () => {
 }
 const deleteCompetency = async id => {
   await eduProgsStore.deleteCompetencyInEduprog(id)
-  await eduProgsStore.fetchSelectedCompetencies(route.params.id, 'VFK')
+  await eduProgsStore.fetchSelectedCompetencies(route.params.pages, 'VFK')
   vfkCompetencies.value = eduProgsStore.getSelectedCompetencies
 }
 const saveChanges = async competency => {
   await eduProgsStore.editCustomCompetency(competency.id, competency.definition)
+  originValue={}
   editIndex.value = null
 }
 </script>
@@ -99,7 +114,7 @@ const saveChanges = async competency => {
               <VBtn
                 icon="mdi-close-thick"
                 size="x-small"
-                @click="editIndex = null"
+                @click="cancel(item)"
               />
             </VCol>
           </VRow>
@@ -113,7 +128,7 @@ const saveChanges = async competency => {
                 icon="mdi-pencil"
                 size="x-small"
                 style="margin-right: 2%"
-                @click="editIndex = item.id"
+                @click="edit(item)"
               />
             </VCol>
             <VCol>

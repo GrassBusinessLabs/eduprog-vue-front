@@ -57,7 +57,6 @@ const tabs = [
     tab: 'matrix',
   },
 ]
-
 </script>
 
 <template>
@@ -126,7 +125,9 @@ const tabs = [
 
       <!-- Матриця -->
       <VWindowItem value="matrix">
+        <template v-if="activeTab.value === 'matrix'">
           <EditDocumentMatrix />
+        </template>
       </VWindowItem>
     </VWindow>
   </div>

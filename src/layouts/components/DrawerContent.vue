@@ -1,16 +1,19 @@
 <script setup>
 import upgradeBannerDark from '@/assets/images/pro/upgrade-banner-dark.png'
+
 /*
 import upgradeBannerLight from '@/assets/images/pro/upgrade-banner-light.png'
 */
 import logo from '@/assets/logo.svg?raw'
+const route = useRoute()
 import {
   VerticalNavLink,
   VerticalNavSectionTitle,
 } from '@layouts'
 import { useTheme } from 'vuetify'
-
+import { RouterLink, useRoute } from 'vue-router'
 const vuetifyTheme = useTheme()
+
 /*const upgradeBanner = computed(() => {
   return vuetifyTheme.global.name.value === 'light' ? upgradeBannerLight : upgradeBannerDark
 })*/
@@ -33,7 +36,6 @@ const vuetifyTheme = useTheme()
       </Transition>
     </RouterLink>
   </div>
-
   <!-- 👉 Nav items -->
   <ul>
     <VerticalNavLink
@@ -50,24 +52,69 @@ const vuetifyTheme = useTheme()
         icon: { icon: 'mdi-account-cog-outline' }
       }"
     />
-
-
+    <ul v-if="route.params.pages">
+      <VerticalNavSectionTitle :item="{ heading: 'Редагування ОПП' }" />
+      <VerticalNavLink
+        :item="{
+          title: 'Характеристика',
+          to: 'characteristic',
+          icon: { icon: 'mdi-format-list-bulleted' }
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Перелік компонентів',
+          to: 'components',
+          icon: { icon: 'mdi-sort-variant' }
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Розподіл по семестрам',
+          to: 'schema',
+          icon: { icon: 'mdi-table' }
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Послідовність ОПП',
+          to: 'sequence',
+          icon: { icon: 'mdi-vector-polyline' }
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Компентетності',
+          to: 'competencies',
+          icon: { icon: 'mdi-archive-check-outline' }
+        }"
+      />
+      <VerticalNavLink
+        :item="{
+          title: 'Матриця',
+          to: 'matrix',
+          icon: { icon: 'mdi-matrix' }
+        }"
+      />
+    </ul>
   </ul>
 
   <!-- 👉 illustration -->
-<!--  <a
-    href="https://themeselection.com/item/materio-vuetify-vuejs-admin-template"
-    target="_blank"
-    rel="noopener noreferrer"
+<!--
+  <a
+  href="https://themeselection.com/item/materio-vuetify-vuejs-admin-template"
+  target="_blank"
+  rel="noopener noreferrer"
   >
-    <img
-      :src="upgradeBanner"
-      alt="upgrade-banner"
-      transition="scale-transition"
-      class="upgrade-banner mx-auto"
-      style="max-width: 230px"
-    >
-  </a>-->
+  <img
+  :src="upgradeBanner"
+  alt="upgrade-banner"
+  transition="scale-transition"
+  class="upgrade-banner mx-auto"
+  style="max-width: 230px"
+  >
+  </a>
+-->
 </template>
 
 <style lang="scss">

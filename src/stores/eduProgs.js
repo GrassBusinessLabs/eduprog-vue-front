@@ -16,7 +16,11 @@ export const useEduProgsStore = defineStore({
     selectedVfk:[],
     selectedVpr:[],
     allCompetencies:[],
-    selectedCompetencies:[]
+    selectedCompetencies:[],
+    levelsList:[],
+    specialities:[],
+    components:[],
+    VBblock:[],
   }),
 
   getters: {
@@ -32,6 +36,10 @@ export const useEduProgsStore = defineStore({
     getSelectedVpr: state => state.selectedVpr,
     getAllCompetencies: state => state.allCompetencies,
     getSelectedCompetencies: state => state.selectedCompetencies,
+    getLevels: state => state.levelsList,
+    getSpecialities: state => state.specialities,
+    getComponents: state => state.components,
+    getVBblock: state => state.VBblock,
   },
 
   actions: {
@@ -61,7 +69,9 @@ export const useEduProgsStore = defineStore({
           this.loading = true
           const response = await getData('eduprogs/' + id)
           this.eduProgData = response
+          this.components= response.components
           this.creditsInfo = await getData('/eduprogs/credits/' + id)
+          console.log("response", response)
         } finally {
           this.loading = false
         }
@@ -70,12 +80,21 @@ export const useEduProgsStore = defineStore({
     async fetchCreditsInfo(id) {
       this.creditsInfo = await getData('/eduprogs/credits/' + id)
     },
+    async fetchComponents(id) {
+      this.components = await getData('/eduprogs/comps/byEduprogId/' + id)
+    },
     async editEduprog(payload) {
-      await editData('eduprogs/' + this.eduProgData.id, payload)
+      try{
+        await editData('eduprogs/' + this.eduProgData.id, payload)
+      }
+      catch(error){
+        throw(error)
+      }
     },
     async createComponent(payload) {
       const response = await postData('eduprogs/comps/create', payload)
-      return response.id
+      console.log("FQLB",response)
+      return response
     },
     async editComponent(id, payload) {
       await editData('eduprogs/comps/' + id, payload)
@@ -149,12 +168,16 @@ export const useEduProgsStore = defineStore({
       const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId+'/byType?type=VPR')
       this.selectedVpr = response
     },
+    async fetchVBblock(eduId) {
+      const response = await getData('/eduprogs/comps/getVB/' + eduId)
+      this.VBblock = response
+    },
 
     async addCompetencyToEduprog(eduprogId, competencyId) {
       const newRelation = {
         competency_id:competencyId,
         eduprog_id: eduprogId,
-        redefinition:"",
+        definition:"",
       }
       const response = await postData('/eduprogs/competencies/add', newRelation)
       console.log('response',response)
@@ -201,6 +224,13 @@ export const useEduProgsStore = defineStore({
       const response = await deleteData('/eduprogs/compRelations/'+baseId+'/'+childId);
       return response
     },
-
+    async fetchLevelsList(eduId){
+      const response = await getData('/eduprogs/levelsList');
+      this.levelsList=response
+    },
+    async fetchSpecialities(eduId){
+      const response = await getData('/eduprogs/specialties/all');
+      this.specialities=response
+    },
   },
 })

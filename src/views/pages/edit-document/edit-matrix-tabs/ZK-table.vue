@@ -6,23 +6,20 @@ import { useRoute } from 'vue-router'
 
 const route = useRoute()
 
-
 const eduProgsStore = useEduProgsStore()
-const components = eduProgsStore.getEduProg.components
-const generalCompetencies =ref([])
+const { components } = storeToRefs(eduProgsStore)
+const generalCompetencies = ref([])
 const selected = reactive({})
 const valuesZK = reactive({})
 const maxValue = ref(6)
 const progressColor = ref({})
 const selZk = ref()
 
-
-
 onBeforeMount(async () => {
-  await eduProgsStore.fetchSelectedCompetencies(route.params.id, 'ZK')
-  await eduProgsStore.fetchCompetencyRelations(route.params.id)
-  await eduProgsStore.fetchAllCompetencies(route.params.id)
-
+  await eduProgsStore.fetchSelectedCompetencies(route.params.pages, 'ZK')
+  await eduProgsStore.fetchCompetencyRelations(route.params.pages)
+  await eduProgsStore.fetchAllCompetencies(route.params.pages)
+  await eduProgsStore.fetchAllCompetencies(route.params.pages)
   const relations = eduProgsStore.getCompetencyRelations.reduce((acc, cur) => {
     const competency_id = cur.competency_id
     const component_id = cur.component_id
@@ -33,19 +30,17 @@ onBeforeMount(async () => {
 
     return acc
   }, {})
-
   generalCompetencies.value = eduProgsStore.getCompetencies
   generalCompetencies.value.forEach(el => {
-    selected[el.id] = reactive({})
+    selected[el.id] = {}
     valuesZK[el.id] = 0
-    components.mandatory.forEach(comp => {
-      try{
-        if(relations[el.id][comp.id]){
+    components.value.mandatory.forEach(comp => {
+      try {
+        if (relations[el.id][comp.id]) {
           valuesZK[el.id]++
           selected[el.id][comp.id] = true
         }
-      }
-      catch{
+      } catch {
         selected[el.id][comp.id] = false
       }
     })
@@ -53,14 +48,13 @@ onBeforeMount(async () => {
   selZk.value = eduProgsStore.getSelectedCompetencies
 })
 
-
-const changeCheckbox = (e, componentId, competencyId)=>{
-  if(e){
+const changeCheckbox = (e, componentId, competencyId) => {
+  if (e) {
     valuesZK[competencyId]++
-    eduProgsStore.createCompetencyRelation(+route.params.id, componentId, competencyId)
-  }else if(!e){
+    eduProgsStore.createCompetencyRelation(+route.params.pages, componentId, competencyId)
+  } else if (!e) {
     valuesZK[competencyId]--
-    eduProgsStore.deleteCompetencyRelation(+route.params.id, componentId, competencyId)
+    eduProgsStore.deleteCompetencyRelation(+route.params.pages, componentId, competencyId)
   }
 }
 
@@ -86,8 +80,8 @@ watch(valuesZK, newValue => {
 
 <template>
   <VRow>
-    <VCol>
-      <VTable class="mt-10">
+    <VCol v-if="components.mandatory?.length && components.mandatory.length > 0 && selZk?.length && selZk.length > 0">
+      <VTable>
         <thead class="thead-light">
           <tr>
             <th class="text-center">
@@ -96,7 +90,7 @@ watch(valuesZK, newValue => {
           </tr>
         </thead>
       </VTable>
-      <VTable v-if="components.mandatory.length>0">
+      <VTable>
         <tbody>
           <tr>
             <th />
@@ -124,8 +118,8 @@ watch(valuesZK, newValue => {
               style="width: 30%"
             >
               <div style="text-align: center">
-                <span><h3>
-                        {{ item.type + '' + item.code }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
+                <span
+                  ><h3>{{ item.type + '' + item.code }} {{ '(' + valuesZK[item.id] + ')' }}</h3>
                   {{ item.definition }}
                 </span>
                 <VRow
@@ -133,7 +127,7 @@ watch(valuesZK, newValue => {
                   align="center"
                   no-gutters
                 >
-                  <br>
+                  <br />
                   <VCol>
                     <VProgressLinear
                       v-model="valuesZK[item.id]"
@@ -148,8 +142,8 @@ watch(valuesZK, newValue => {
               </div>
             </td>
             <td
-              v-for=" component in components.mandatory "
-              :key=" component.id"
+              v-for="component in components.mandatory"
+              :key="component.id"
             >
               <VRow justify="center">
                 <VCheckbox
@@ -161,15 +155,24 @@ watch(valuesZK, newValue => {
           </tr>
         </tbody>
       </VTable>
-      <VAlert
-        v-else
-        border="left"
-        text
-        type="info"
-        prominent
-      >
-        Поки що не додано жодного освітнього компонента до схеми.
-      </VAlert>
     </VCol>
+    <VAlert
+      v-else-if="components.mandatory?.length  && components.mandatory?.length > 0 && !selZk?.length "
+      border="left"
+      text
+      type="info"
+      prominent
+    >
+      Поки що не додано жодної загальної компетентності до ОПП.
+    </VAlert>
+    <VAlert
+      v-else-if="!components.mandatory?.length  && selZk?.length && selZk?.length>0"
+      border="left"
+      text
+      type="info"
+      prominent
+    >
+      Поки що не додано жодного основного компоненту до ОПП.
+    </VAlert>
   </VRow>
 </template>

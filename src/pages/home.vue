@@ -5,22 +5,29 @@ import TableDensity from '@/views/user-interface/tables/TableDensity.vue'
 import TableHeight from '@/views/user-interface/tables/TableHeight.vue'
 import TableFixedHeader from '@/views/user-interface/tables/TableFixedHeader.vue'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
-import { computed } from 'vue-demi'
+import { computed, reactive } from 'vue-demi'
 import moment from 'moment'
 import router from '../router'
 const eduProgsStore = useEduProgsStore()
-
+const specialities = ref([])
+console.log(specialities)
 //return { eduProgs: useEduProgsStore.getEduProgs }
-
+const education_level = ref([])
 onMounted( async () => {
   await eduProgsStore.fetchEduProgs()
+  await eduProgsStore.fetchLevelsList()
+  await eduProgsStore.fetchSpecialities()
+  education_level.value= eduProgsStore.getLevels
+  specialities.value = eduProgsStore.getSpecialities
 })
-
+const checkValue=    ref('')
 let currentEduProg = null
 let newNameEduProg = ref(null)
 const eduProgs = computed(() => eduProgsStore.getEduProgs)
 
-
+const check = (e) =>{
+  console.log("Модел велью",e, checkValue)
+}
 const deleteEduProg =( async id => {
   await eduProgsStore.deleteEduProg(id)
   await eduProgsStore.fetchEduProgs()
@@ -32,10 +39,16 @@ const editNameEduProg =( async() => {
   dialogRename.value=false
 })
 const createEduProg =( async() => {
-  await eduProgsStore.createEduProg(newEduProg.value)
+  updateSelectedSpeciality()
+  console.log('Spes',specialities)
+  console.log('Spessss',newEduProg)
+  await eduProgsStore.createEduProg(newEduProg)
   dialogCreate.value=false
   await eduProgsStore.fetchEduProgs()
 })
+const cancelCreate = () =>{
+  dialogCreate.value=false
+}
 
 // const createEduProg =( async() => {
 //   console.log(newEduProg)
@@ -75,43 +88,33 @@ const deleteEduProgDialog= function dialogg(id) {
 }
 const editEduProg = function edit(event, id) {
   console.log(event)
-  router.replace('/eduprogs/'+id)
+  router.replace('/eduprogs/'+id+'/characteristic')
 }
 
+function updateSelectedSpeciality() {
+  console.log(newEduProg.speciality_code)
+  const selectedSpes = specialities.value.find(spes => spes.name === newEduProg.speciality_code)
+  newEduProg.speciality_code = String(selectedSpes.code)
+  console.log(newEduProg.speciality_code)
+}
 
-const newEduProg = ref({
-  name :'',
+const newEduProg = reactive({
+  name:'',
   education_level :'',
   stage :'',
-  speciality :'',
+  speciality_code :'',
   knowledge_field :'',
 })
-
-const education_level = [
-  {
-    title: 'Початковий рівень (короткий цикл)',
-  },
-  {
-    title: 'Перший (бакалаврський) рівень',
-  },
-  {
-    title: 'Другий (магістерський) рівень',
-  },
-  {
-    title: 'Третій (освітньо-науковий/освітньо-творчий) рівень',
-  },
-]
 </script>
 
 <template>
-  <VCardText>
     <VBtn
       dark
       @click="createEduProgDialog"
+      class="mb-3"
     >
       Створити ОПП
     </VBtn>
-  </VCardText>
 
 
   <VDialog
@@ -138,29 +141,28 @@ const education_level = [
             <VCol
               cols="12"
             >
-              <VSelect
+              <VCombobox
                 v-model="newEduProg.education_level"
                 :items="education_level"
+                item-title="level"
+                item-value="level"
                 label="Освітній рівень"
-                required
+                outlined
+                dense
               />
             </VCol>
             <VCol
               cols="12"
             >
-              <VTextField
-                v-model="newEduProg.speciality"
+              <VCombobox
+                v-model="newEduProg.speciality_code"
+                :items="specialities"
+                item-value="code"
+                item-title="name"
                 label="Спеціальність"
                 required
-              />
-            </VCol>
-            <VCol
-              cols="12"
-            >
-              <VTextField
-                v-model="newEduProg.knowledge_field"
-                label="Галузь знань"
-                required
+                outlined
+                dense
               />
             </VCol>
           </VRow>
@@ -171,13 +173,13 @@ const education_level = [
         <VBtn
           color="blue darken-1"
           text
-          @click="dialogCreate = false"
+          @click="cancelCreate"
         >
           Закрити
         </VBtn>
         <VBtn
           text
-          :disabled="!(newEduProg.knowledge_field && newEduProg.speciality && newEduProg.name &&newEduProg.education_level)"
+          :disabled="!(newEduProg.speciality_code && newEduProg.name &&newEduProg.education_level)"
           @click="createEduProg"
         >
           <!-- Need fix, user need to reload page for check new EduProg -->
@@ -324,7 +326,11 @@ const education_level = [
     </VCard>
   </VDialog>
 </template>
-
+<style scoped>
+.eduprog-item{
+  cursor: pointer;
+}
+</style>
 <route lang="yaml">
 meta:
   requiresAuth: true

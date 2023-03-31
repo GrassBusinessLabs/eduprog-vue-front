@@ -11,12 +11,12 @@ const editIndex = ref(null)
 const vprCompetencies = ref([])
 const creatingDialog = ref(false)
 const newCompetency = reactive({
-  eduprog_id: +route.params.id,
+  eduprog_id: +route.params.pages,
   type: 'ВПР',
   definition: '',
 })
 onBeforeMount(async () => {
-  await eduProgsStore.fetchSelectedCompetencies(route.params.id, 'VPR')
+  await eduProgsStore.fetchSelectedCompetencies(route.params.pages, 'VPR')
   vprCompetencies.value = eduProgsStore.getSelectedCompetencies
 })
 const createCompetency = async () => {
@@ -27,12 +27,25 @@ const createCompetency = async () => {
 }
 const deleteCompetency = async id => {
   await eduProgsStore.deleteCompetencyInEduprog(id)
-  await eduProgsStore.fetchSelectedCompetencies(route.params.id, 'VPR')
+  await eduProgsStore.fetchSelectedCompetencies(route.params.pages, 'VPR')
   vprCompetencies.value = eduProgsStore.getSelectedCompetencies
 }
 const saveChanges = async competency => {
   await eduProgsStore.editCustomCompetency(competency.id, competency.definition)
   editIndex.value = null
+}
+let originValue={}
+function edit(item) {
+  originValue= Object.assign({}, item)
+  editIndex.value = item.id
+}
+
+function cancel(item) {
+  editIndex.value = null
+  for(let key in item){
+    item[key]=originValue[key]
+  }
+  originValue={}
 }
 </script>
 <template>
@@ -99,7 +112,7 @@ const saveChanges = async competency => {
               <VBtn
                 icon="mdi-close-thick"
                 size="x-small"
-                @click="editIndex = null"
+                @click="cancel(item)"
               />
             </VCol>
           </VRow>
@@ -113,7 +126,7 @@ const saveChanges = async competency => {
                 icon="mdi-pencil"
                 size="x-small"
                 style="margin-right: 2%"
-                @click="editIndex = item.id"
+                @click="edit(item)"
               />
             </VCol>
             <VCol>

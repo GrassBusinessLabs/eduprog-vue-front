@@ -12,7 +12,7 @@ const fkCompetenciesValue = reactive({})
 const allSelect= ref(false)
 onBeforeMount(async ()=>{
   await eduProgsStore.fetchCompetencies("FK",eduProgsStore.eduProgData.speciality_code)
-   await eduProgsStore.fetchSelectedCompetencies(route.params.id,"FK")
+   await eduProgsStore.fetchSelectedCompetencies(route.params.pages,"FK")
    fkCompetencies.value = eduProgsStore.getAllCompetencies
    selectedFkCompetencies.value = eduProgsStore.getSelectedCompetencies
    fkCompetencies.value.forEach((comp)=>{
@@ -27,7 +27,7 @@ onBeforeMount(async ()=>{
 
 const changeCheckbox = async (e, competencyId) => {
   if (e) {
-    const newCompetency = await eduProgsStore.addCompetencyToEduprog(+route.params.id, competencyId)
+    const newCompetency = await eduProgsStore.addCompetencyToEduprog(+route.params.pages, competencyId)
     selectedFkCompetencies.value.push(newCompetency)
   } else if (!e) {
     allSelect.value = false
@@ -41,14 +41,14 @@ const changeCheckbox = async (e, competencyId) => {
 //Function for add all competencies or delete
 const selectAll = async (event, type) => {
   if (event) {
-    await eduProgsStore.addAllCompetencies(route.params.id, "FK")
+    await eduProgsStore.addAllCompetencies(route.params.pages, "FK")
     for (let key in fkCompetenciesValue) {
       fkCompetenciesValue[key] = true
     }
-    await eduProgsStore.fetchSelectedCompetencies(route.params.id,"FK")
+    await eduProgsStore.fetchSelectedCompetencies(route.params.pages,"FK")
     selectedFkCompetencies.value = eduProgsStore.getSelectedCompetencies
   } else if (!event) {
-    await eduProgsStore.deleteAllCompetencies(route.params.id, "FK")
+    await eduProgsStore.deleteAllCompetencies(route.params.pages, "FK")
     for (let key in fkCompetenciesValue) {
       fkCompetenciesValue[key] = false
     }
@@ -69,7 +69,7 @@ const hasAllSelected = () =>{
     <thead class="thead-light">
       <tr>
         <th class="text-center">
-          <h3>Загальні компетентності</h3>
+          <h3>Фахові компетентності</h3>
         </th>
       </tr>
     </thead>
