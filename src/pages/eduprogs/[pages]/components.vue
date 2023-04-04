@@ -18,7 +18,7 @@
         <th>Компонент освітньої <br> програми</th>
         <th>Кількість <br> кредитів</th>
         <th>Форма підсумку <br> контролю</th>
-        <th>
+        <th style="width:15%">
           <VBtn
             icon="mdi-plus"
             size="x-small"
@@ -147,7 +147,7 @@
         <th>Компонент освітньої <br> програми</th>
         <th>Кількість <br> кредитів</th>
         <th>Форма підсумку <br> контролю</th>
-        <th>
+        <th style="width:15%">
           <VBtn
             icon="mdi-plus"
             size="x-small"
