@@ -10,7 +10,6 @@ import moment from 'moment'
 import router from '../router'
 const eduProgsStore = useEduProgsStore()
 const specialities = ref([])
-console.log(specialities)
 //return { eduProgs: useEduProgsStore.getEduProgs }
 const education_level = ref([])
 onMounted( async () => {
@@ -25,9 +24,6 @@ let currentEduProg = null
 let newNameEduProg = ref(null)
 const eduProgs = computed(() => eduProgsStore.getEduProgs)
 
-const check = (e) =>{
-  console.log("Модел велью",e, checkValue)
-}
 const deleteEduProg =( async id => {
   await eduProgsStore.deleteEduProg(id)
   await eduProgsStore.fetchEduProgs()
@@ -40,8 +36,6 @@ const editNameEduProg =( async() => {
 })
 const createEduProg =( async() => {
   updateSelectedSpeciality()
-  console.log('Spes',specialities)
-  console.log('Spessss',newEduProg)
   await eduProgsStore.createEduProg(newEduProg)
   dialogCreate.value=false
   await eduProgsStore.fetchEduProgs()
@@ -182,7 +176,6 @@ const newEduProg = reactive({
           :disabled="!(newEduProg.speciality_code && newEduProg.name &&newEduProg.education_level)"
           @click="createEduProg"
         >
-          <!-- Need fix, user need to reload page for check new EduProg -->
           Створити
         </VBtn>
       </VCardActions>
