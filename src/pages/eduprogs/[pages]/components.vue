@@ -292,6 +292,9 @@
                 required
                 :rules="rulesComp.nameComp"
                 @input="check"
+                :error="NameError"
+                :error-messages="errorName"
+                @focus="resetErrorN"
               />
             </VCol>
             <VCol
@@ -358,6 +361,9 @@
                 label="Назва компонента"
                 required
                 :rules="rulesComp.nameComp"
+                :error="NameError"
+                :error-messages="errorName"
+                @focus="resetErrorN"
               />
             </VCol>
             <VCol
@@ -368,6 +374,9 @@
                 type="number"
                 label="Кількість кредитів"
                 :rules="rulesComp.credits"
+                :error="hasError"
+                :error-messages="errorMessage"
+                @focus="resetError"
               />
             </VCol>
             <VCol
@@ -475,6 +484,8 @@ const rulesComp = ref({
 
 const hasError = ref(false)
 const errorMessage =  ref('')
+const NameError  = ref(false)
+const errorName  =  ref('')
 
 function updateSelectedBlockNum() {
   const selectedBlock = VBblock.value.find(block => block.block_name === newComponent.block_name)
@@ -493,6 +504,11 @@ function updateSelectedBlockNum() {
 function  resetError() {
   hasError.value = false
   errorMessage.value = ''
+}
+
+function  resetErrorN() {
+  NameError.value = false
+  errorName.value = ''
 }
 
 function changeDialog(type) {
@@ -532,12 +548,13 @@ async function createComponent() {
     } catch (error) {
       const errorFromServer =error.response.data.error
       if(errorFromServer==="eduprog component with this name already exists"){
-        errorMessage.value =  'Компонент з такою назвою вже існує'
+        errorName.value =  'Компонент з такою назвою вже існує'
+        NameError.value = true
       }
       else{
         errorMessage.value =  'Забагато кредитів'
+        hasError.value = true
       }
-      hasError.value = true
       
       return
     }
@@ -555,9 +572,16 @@ async function createComponent() {
       createdComponent.id = await eduProgsStore.createComponent(createdComponent)
       components.value.selective.push(createdComponent)
       dialogCreateSelective.value = false
-    } catch (error) {
-      hasError.value = true
-      errorMessage.value =  'Забагато кредитів'
+    }  catch (error) {
+      const errorFromServer =error.response.data.error
+      if(errorFromServer==="eduprog component with this name already exists"){
+        errorName.value =  'Компонент з такою назвою вже існує'
+        NameError.value = true
+      }
+      else{
+        errorMessage.value =  'Забагато кредитів'
+        hasError.value = true
+      }
 
       return
     }
