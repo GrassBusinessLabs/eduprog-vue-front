@@ -14,19 +14,19 @@
     <thead class="thead-light">
       <tr>
         <th style="width: 5%">
-          Код <br />
+          Код <br>
           н/д
         </th>
-        <th >
-          Компонент освітньої <br />
+        <th>
+          Компонент освітньої <br>
           програми
         </th>
         <th style="width: 10%">
-          Кількість <br />
+          Кількість <br>
           кредитів
         </th>
         <th style="width: 10%">
-          Форма підсумку <br />
+          Форма підсумку <br>
           контролю
         </th>
         <th style="width: 15%">
@@ -43,7 +43,7 @@
         v-for="(item, index) in components.mandatory"
         :key="index"
       >
-        <td >{{ 'ОК ' + item.code }}</td>
+        <td>{{ 'ОК ' + item.code }}</td>
         <td>
           <span v-if="editIndex !== item.id">
             {{ item.name }}
@@ -74,7 +74,7 @@
             {{ item.control_type }}
           </span>
           <span v-if="editIndex === item.id">
-            <v-select
+            <VSelect
               v-model="item.control_type"
               :items="control_types"
               :rules="rulesComp.typeExam"
@@ -83,7 +83,10 @@
           </span>
         </td>
         <td>
-          <span class="my-4" v-if="editIndex !== item.id">
+          <span
+            v-if="editIndex !== item.id"
+            class="my-4"
+          >
             <VBtn
               icon="mdi-pencil"
               size="x-small"
@@ -116,13 +119,15 @@
     <thead>
       <tr>
         <th colspan="5">
-          <div style="float: left">Загальний обсяг обов’язкових компонентів:</div>
+          <div style="float: left">
+            Загальний обсяг обов’язкових компонентів:
+          </div>
           <div style="float: left">
             <input
               class="text-right"
               disabled
               :value="creditsInfo.mandatory_credits"
-            />/<span>
+            >/<span>
               {{ creditsInfo.mandatory_credits + creditsInfo.mandatory_free_credits }}
             </span>
           </div>
@@ -145,19 +150,19 @@
     <thead class="thead-light">
       <tr>
         <th style="width: 5%">
-          Код <br />
+          Код <br>
           н/д
         </th>
         <th>
-          Компонент освітньої <br />
+          Компонент освітньої <br>
           програми
         </th>
         <th style="width: 10%">
-          Кількість <br />
+          Кількість <br>
           кредитів
         </th>
         <th>
-          Форма підсумку <br />
+          Форма підсумку <br>
           контролю
         </th>
         <th style="width: 15%">
@@ -210,9 +215,9 @@
               :error="hasError"
               :error-messages="errorMessage"
               :rules="rulesComp.credits"
+              min="0"
               @keyup.enter="saveComponent(comp)"
               @focus="resetError"
-              min="0"
             />
           </span>
         </td>
@@ -221,7 +226,7 @@
             {{ comp.control_type }}
           </span>
           <span v-if="editIndex === comp.id">
-            <v-select
+            <VSelect
               v-model="comp.control_type"
               class="my-3"
               :items="control_types"
@@ -265,13 +270,15 @@
     <thead>
       <tr>
         <th colspan="5">
-          <div style="float: left">Загальний обсяг вибіркових компонентів:</div>
+          <div style="float: left">
+            Загальний обсяг вибіркових компонентів:
+          </div>
           <div style="float: left">
             <input
               class="text-right"
               disabled
               :value="creditsInfo.selective_credits"
-            />/<span>
+            >/<span>
               {{ creditsInfo.selective_credits + creditsInfo.selective_free_credits }}
             </span>
           </div>
@@ -295,9 +302,9 @@
                 label="Назва компонента"
                 required
                 :rules="rulesComp.nameComp"
-                @input="check"
                 :error="NameError"
                 :error-messages="errorName"
+                @input="check"
                 @focus="resetErrorN"
               />
             </VCol>
@@ -314,12 +321,12 @@
               />
             </VCol>
             <VCol cols="12">
-              <v-select
+              <VSelect
                 v-model="newComponent.control_type"
                 label="Форма підсумку контролю"
                 :items="control_types"
                 :rules="rulesComp.typeExam"
-              ></v-select>
+              />
             </VCol>
           </VRow>
         </VContainer>
@@ -376,12 +383,12 @@
               />
             </VCol>
             <VCol cols="12">
-              <v-select
+              <VSelect
                 v-model="newComponent.control_type"
                 label="Форма підсумку контролю"
                 :items="control_types"
                 :rules="rulesComp.typeExam"
-              ></v-select>
+              />
             </VCol>
             <VCol cols="12">
               <VCombobox
@@ -512,13 +519,15 @@ function changeDialog(type) {
   } else if (type == 'ВБ') {
     dialogCreateSelective.value = !dialogCreateSelective.value
   }
-  newComponent.name=""
-  newComponent.credits=0
-  newComponent.control_type=""
-  newComponent.block_name=""
-  newComponent.block_num=""
   resetError()
   resetErrorN()
+  setTimeout(() => {
+    newComponent.name=""
+    newComponent.credits=0
+    newComponent.control_type=""
+    newComponent.block_name=""
+    newComponent.block_num=""
+  }, 500)
 }
 
 async function updateCredits() {
@@ -579,12 +588,13 @@ async function createComponent() {
       return
     }
   }
-  newComponent.name = ''
-  newComponent.credits = 0
-  newComponent.control_type = ''
-  newComponent.block_name = ''
-  newComponent.block_num = ''
-
+  setTimeout(() => {
+    newComponent.name = ''
+    newComponent.credits = 0
+    newComponent.control_type = ''
+    newComponent.block_name = ''
+    newComponent.block_num = ''
+  }, 500)
   await updateCredits()
 }
 
