@@ -1,4 +1,3 @@
-
 <template>
   <!-- Основний компонент -->
   <VTable>
@@ -14,11 +13,23 @@
   <VTable v-if="components && components.mandatory">
     <thead class="thead-light">
       <tr>
-        <th>Код <br> н/д</th>
-        <th>Компонент освітньої <br> програми</th>
-        <th>Кількість <br> кредитів</th>
-        <th>Форма підсумку <br> контролю</th>
-        <th style="width:15%">
+        <th style="width: 5%">
+          Код <br />
+          н/д
+        </th>
+        <th >
+          Компонент освітньої <br />
+          програми
+        </th>
+        <th style="width: 10%">
+          Кількість <br />
+          кредитів
+        </th>
+        <th style="width: 10%">
+          Форма підсумку <br />
+          контролю
+        </th>
+        <th style="width: 15%">
           <VBtn
             icon="mdi-plus"
             size="x-small"
@@ -32,31 +43,26 @@
         v-for="(item, index) in components.mandatory"
         :key="index"
       >
-        <td>{{ 'ОК ' + item.code }}</td>
+        <td >{{ 'ОК ' + item.code }}</td>
         <td>
           <span v-if="editIndex !== item.id">
             {{ item.name }}
           </span>
           <span v-if="editIndex === item.id">
-
             <VTextField
               v-model="item.name"
-              class="my-3"
-              style="width: 50%"
               :rules="rulesComp.nameComp"
               @keyup.enter="saveComponent(item)"
             />
           </span>
         </td>
         <td>
-          <span v-if="editIndex !== item.id">
-            {{ item.credits }}</span>
+          <span v-if="editIndex !== item.id"> {{ item.credits }}</span>
           <span v-if="editIndex === item.id">
             <VTextField
               v-model="item.credits"
-              class="my-3"
-              style="width: 50%"
               type="number"
+              min="0"
               :rules="rulesComp.credits"
               @keyup.enter="saveComponent(item)"
               @focus="resetError"
@@ -68,22 +74,20 @@
             {{ item.control_type }}
           </span>
           <span v-if="editIndex === item.id">
-
-            <VTextField
+            <v-select
               v-model="item.control_type"
-              class="my-3"
-              style="width: 50%"
+              :items="control_types"
               :rules="rulesComp.typeExam"
-              @keyup.enter="saveComponent(item)"
+              @keyup.enter="saveComponent(comp)"
             />
           </span>
         </td>
         <td>
-          <span v-if="editIndex !== item.id">
+          <span class="my-4" v-if="editIndex !== item.id">
             <VBtn
               icon="mdi-pencil"
               size="x-small"
-              style="margin-right:2% "
+              style="margin-right: 2%"
               @click="edit(item)"
             />
             <VBtn
@@ -96,7 +100,7 @@
             <VBtn
               icon="mdi-check-bold"
               size="x-small"
-              style="margin-right:2% "
+              style="margin-right: 2%"
               @click="saveComponent(item)"
             />
             <VBtn
@@ -104,7 +108,6 @@
               size="x-small"
               @click="cancel(item)"
             />
-
           </span>
         </td>
       </tr>
@@ -113,16 +116,14 @@
     <thead>
       <tr>
         <th colspan="5">
-          <div style="float: left">
-            Загальний обсяг обов’язкових компонентів:
-          </div>
+          <div style="float: left">Загальний обсяг обов’язкових компонентів:</div>
           <div style="float: left">
             <input
               class="text-right"
               disabled
               :value="creditsInfo.mandatory_credits"
-            >/<span>
-              {{ creditsInfo.mandatory_credits+creditsInfo.mandatory_free_credits }}
+            />/<span>
+              {{ creditsInfo.mandatory_credits + creditsInfo.mandatory_free_credits }}
             </span>
           </div>
         </th>
@@ -143,11 +144,23 @@
   <VTable>
     <thead class="thead-light">
       <tr>
-        <th>Код <br> н/д</th>
-        <th>Компонент освітньої <br> програми</th>
-        <th>Кількість <br> кредитів</th>
-        <th>Форма підсумку <br> контролю</th>
-        <th style="width:15%">
+        <th style="width: 5%">
+          Код <br />
+          н/д
+        </th>
+        <th>
+          Компонент освітньої <br />
+          програми
+        </th>
+        <th style="width: 10%">
+          Кількість <br />
+          кредитів
+        </th>
+        <th>
+          Форма підсумку <br />
+          контролю
+        </th>
+        <th style="width: 15%">
           <VBtn
             icon="mdi-plus"
             size="x-small"
@@ -173,36 +186,33 @@
         v-for="(comp, compIndex) in block.comps_in_block"
         :key="'comp-' + compIndex"
       >
-        <td>{{ 'ВБ ' + comp.block_num + '.'+ comp.code }}</td>
+        <td>{{ 'ВБ ' + comp.block_num + '.' + comp.code }}</td>
         <td>
           <span v-if="editIndex !== comp.id">
             {{ comp.name }}
           </span>
           <span v-if="editIndex === comp.id">
-
             <VTextField
               v-model="comp.name"
               class="my-3"
-              style="width: 50%"
               :rules="rulesComp.nameComp"
               @keyup.enter="saveComponent(comp)"
             />
           </span>
         </td>
         <td>
-          <span v-if="editIndex !== comp.id">
-            {{ comp.credits }}</span>
+          <span v-if="editIndex !== comp.id"> {{ comp.credits }}</span>
           <span v-if="editIndex === comp.id">
             <VTextField
               v-model="comp.credits"
               class="my-3"
-              style="width: 50%"
               type="number"
               :error="hasError"
               :error-messages="errorMessage"
               :rules="rulesComp.credits"
               @keyup.enter="saveComponent(comp)"
               @focus="resetError"
+              min="0"
             />
           </span>
         </td>
@@ -211,11 +221,10 @@
             {{ comp.control_type }}
           </span>
           <span v-if="editIndex === comp.id">
-
-            <VTextField
+            <v-select
               v-model="comp.control_type"
               class="my-3"
-              style="width: 50%"
+              :items="control_types"
               :rules="rulesComp.typeExam"
               @keyup.enter="saveComponent(comp)"
             />
@@ -226,7 +235,7 @@
             <VBtn
               icon="mdi-pencil"
               size="x-small"
-              style="margin-right:2% "
+              style="margin-right: 2%"
               @click="edit(comp)"
             />
             <VBtn
@@ -239,7 +248,7 @@
             <VBtn
               icon="mdi-check-bold"
               size="x-small"
-              style="margin-right:2% "
+              style="margin-right: 2%"
               @click="saveComponent(comp)"
             />
             <VBtn
@@ -247,7 +256,6 @@
               size="x-small"
               @click="cancel(comp)"
             />
-
           </span>
         </td>
       </tr>
@@ -257,16 +265,14 @@
     <thead>
       <tr>
         <th colspan="5">
-          <div style="float: left">
-            Загальний обсяг вибіркових компонентів:
-          </div>
+          <div style="float: left">Загальний обсяг вибіркових компонентів:</div>
           <div style="float: left">
             <input
               class="text-right"
               disabled
               :value="creditsInfo.selective_credits"
-            >/<span>
-              {{ creditsInfo.selective_credits+creditsInfo.selective_free_credits }}
+            />/<span>
+              {{ creditsInfo.selective_credits + creditsInfo.selective_free_credits }}
             </span>
           </div>
         </th>
@@ -283,9 +289,7 @@
       <VCardText>
         <VContainer>
           <VRow>
-            <VCol
-              cols="12"
-            >
+            <VCol cols="12">
               <VTextField
                 v-model="newComponent.name"
                 label="Назва компонента"
@@ -297,9 +301,7 @@
                 @focus="resetErrorN"
               />
             </VCol>
-            <VCol
-              cols="12"
-            >
+            <VCol cols="12">
               <VTextField
                 v-model="newComponent.credits"
                 type="number"
@@ -311,15 +313,13 @@
                 @input="validateCredits"
               />
             </VCol>
-            <VCol
-              cols="12"
-            >
-              <VTextField
+            <VCol cols="12">
+              <v-select
                 v-model="newComponent.control_type"
                 label="Форма підсумку контролю"
-                required
+                :items="control_types"
                 :rules="rulesComp.typeExam"
-              />
+              ></v-select>
             </VCol>
           </VRow>
         </VContainer>
@@ -353,9 +353,7 @@
       <VCardText>
         <VContainer>
           <VRow>
-            <VCol
-              cols="12"
-            >
+            <VCol cols="12">
               <VTextField
                 v-model="newComponent.name"
                 label="Назва компонента"
@@ -366,9 +364,7 @@
                 @focus="resetErrorN"
               />
             </VCol>
-            <VCol
-              cols="12"
-            >
+            <VCol cols="12">
               <VTextField
                 v-model="newComponent.credits"
                 type="number"
@@ -379,19 +375,15 @@
                 @focus="resetError"
               />
             </VCol>
-            <VCol
-              cols="12"
-            >
-              <VTextField
+            <VCol cols="12">
+              <v-select
                 v-model="newComponent.control_type"
                 label="Форма підсумку контролю"
-                required
+                :items="control_types"
                 :rules="rulesComp.typeExam"
-              />
+              ></v-select>
             </VCol>
-            <VCol
-              cols="12"
-            >
+            <VCol cols="12">
               <VCombobox
                 v-model="newComponent.block_name"
                 :items="VBblock"
@@ -416,7 +408,9 @@
           </VBtn>
           <VBtn
             text
-            :disabled="!(newComponent.name && newComponent.credits && newComponent.control_type && newComponent.block_name)"
+            :disabled="
+              !(newComponent.name && newComponent.credits && newComponent.control_type && newComponent.block_name)
+            "
             @click="createComponent"
           >
             Зберегти
@@ -428,104 +422,104 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive } from "vue"
+import { computed, onMounted, reactive } from 'vue'
 import { useRoute } from 'vue-router'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
-import { editData } from "@/api/http/apiService"
-import { storeToRefs } from "pinia"
-onMounted(async()=>{
+import { editData } from '@/api/http/apiService'
+import { storeToRefs } from 'pinia'
+onMounted(async () => {
   await eduProgsStore.findEduProgById(route.params.pages)
   await eduProgsStore.fetchVBblock(route.params.pages)
   VBblock.value = eduProgsStore.getVBblock
-  console.log('getVBblock',VBblock.value )
+  console.log('getVBblock', VBblock.value)
 })
 const route = useRoute()
 const eduProgsStore = useEduProgsStore()
 
-const {components, creditsInfo} =storeToRefs(eduProgsStore)
+const { components, creditsInfo } = storeToRefs(eduProgsStore)
 const VBblock = ref()
 
-const editIndex =  ref(null)
-let originValue ={}
+const editIndex = ref(null)
+let originValue = {}
 const dialogCreate = ref(false)
 const dialogCreateSelective = ref(false)
 const newComponent = reactive({
-  name: "",
+  name: '',
   credits: 0,
-  control_type: "",
-  type: "",
-  sub_type: "н/д",
-  category: "н/д",
-  block_name:"",
-  block_num:"",
+  control_type: '',
+  type: '',
+  sub_type: 'н/д',
+  category: 'н/д',
+  block_name: '',
+  block_num: '',
   eduprog_id: +route.params.pages,
 })
-
+const control_types=['залік', 'іспит']
 const rulesComp = ref({
   nameComp: [
     value => {
       if (value) return true
 
-      return 'Введіть назвву'   },
+      return 'Введіть назвву'
+    },
   ],
   credits: [
     value => {
       if (value) return true
 
-      return 'Введіть кредити'   },
+      return 'Введіть кредити'
+    },
   ],
-  typeExam:[
+  typeExam: [
     value => {
       if (value) return true
 
-      return 'Введіть форму підсумку контролю'},
+      return 'Введіть форму підсумку контролю'
+    },
   ],
 })
 
 const hasError = ref(false)
-const errorMessage =  ref('')
-const NameError  = ref(false)
-const errorName  =  ref('')
+const errorMessage = ref('')
+const NameError = ref(false)
+const errorName = ref('')
 
 function updateSelectedBlockNum() {
   const selectedBlock = VBblock.value.find(block => block.block_name === newComponent.block_name)
   if (selectedBlock) {
     newComponent.block_num = String(selectedBlock.block_num)
-  }
-  else if (VBblock.value.length === 0){
+  } else if (VBblock.value.length === 0) {
     newComponent.block_num = String(1)
-  }
-  else {
+  } else {
     const maxBlockNum = Math.max(...VBblock.value.map(block => block.block_num))
     newComponent.block_num = String(maxBlockNum + 1)
   }
 }
 
-function  resetError() {
+function resetError() {
   hasError.value = false
   errorMessage.value = ''
 }
 
-function  resetErrorN() {
+function resetErrorN() {
   NameError.value = false
   errorName.value = ''
 }
 
 function changeDialog(type) {
-  if(type=="ОК"){
+  if (type == 'ОК') {
     dialogCreate.value = !dialogCreate.value
-  }
-  else if(type =="ВБ"){
+  } else if (type == 'ВБ') {
     dialogCreateSelective.value = !dialogCreateSelective.value
   }
-  newComponent.name=""
-  newComponent.credits=0
-  newComponent.control_type=""
-  newComponent.block_name=""
-  newComponent.block_num=""
+  newComponent.name = ''
+  newComponent.credits = 0
+  newComponent.control_type = ''
+  newComponent.block_name = ''
+  newComponent.block_num = ''
 }
 
-async function updateCredits(){
+async function updateCredits() {
   await eduProgsStore.fetchCreditsInfo(route.params.pages)
   creditsInfo.value = eduProgsStore.getCreditsInfo
   await eduProgsStore.fetchVBblock(route.params.pages)
@@ -533,85 +527,82 @@ async function updateCredits(){
 }
 async function createComponent() {
   updateSelectedBlockNum()
-  console.log(newComponent.block_name,newComponent.block_num)
+  console.log(newComponent.block_name, newComponent.block_num)
   const createdComponent = Object.assign({}, newComponent)
-  if(dialogCreate.value){
-    createdComponent.type= "ОК"
+  if (dialogCreate.value) {
+    createdComponent.type = 'ОК'
     try {
       console.log(createdComponent)
       const response = await eduProgsStore.createComponent(createdComponent)
-      createdComponent.id=response.id
-      createdComponent.code=response.code
-      console.log("Компонент",createdComponent)
+      createdComponent.id = response.id
+      createdComponent.code = response.code
+      console.log('Компонент', createdComponent)
       components.value.mandatory.push(createdComponent)
       dialogCreate.value = false
     } catch (error) {
-      const errorFromServer =error.response.data.error
-      if(errorFromServer==="eduprog component with this name already exists"){
-        errorName.value =  'Компонент з такою назвою вже існує'
+      const errorFromServer = error.response.data.error
+      if (errorFromServer === 'eduprog component with this name already exists') {
+        errorName.value = 'Компонент з такою назвою вже існує'
         NameError.value = true
-      }
-      else{
-        errorMessage.value =  'Забагато кредитів'
+      } else {
+        errorMessage.value = 'Забагато кредитів'
         hasError.value = true
       }
-      
+
       return
     }
-  }
-  else if(dialogCreateSelective.value){
+  } else if (dialogCreateSelective.value) {
     console.log(createdComponent)
-    createdComponent.type= "ВБ"
-    if(components.value.selective.length){
-      createdComponent.code=String(+components.value.selective[components.value.selective.length-1].code+1)
-    }else{
-      createdComponent.code="1"
+    createdComponent.type = 'ВБ'
+    if (components.value.selective.length) {
+      createdComponent.code = String(+components.value.selective[components.value.selective.length - 1].code + 1)
+    } else {
+      createdComponent.code = '1'
     }
     try {
       console.log(createdComponent)
       createdComponent.id = await eduProgsStore.createComponent(createdComponent)
       components.value.selective.push(createdComponent)
       dialogCreateSelective.value = false
-    }  catch (error) {
-      const errorFromServer =error.response.data.error
-      if(errorFromServer==="eduprog component with this name already exists"){
-        errorName.value =  'Компонент з такою назвою вже існує'
+    } catch (error) {
+      const errorFromServer = error.response.data.error
+      if (errorFromServer === 'eduprog component with this name already exists') {
+        errorName.value = 'Компонент з такою назвою вже існує'
         NameError.value = true
-      }
-      else{
-        errorMessage.value =  'Забагато кредитів'
+      } else {
+        errorMessage.value = 'Забагато кредитів'
         hasError.value = true
       }
 
       return
     }
   }
-  newComponent.name=""
-  newComponent.credits=0
-  newComponent.control_type=""
-  newComponent.block_name=""
-  newComponent.block_num=""
+  newComponent.name = ''
+  newComponent.credits = 0
+  newComponent.control_type = ''
+  newComponent.block_name = ''
+  newComponent.block_num = ''
 
   await updateCredits()
 }
 
 function edit(item) {
-  originValue= Object.assign({}, item)
+  originValue = Object.assign({}, item)
   editIndex.value = item.id
 }
 
 function cancel(item) {
   editIndex.value = null
-  for(let key in item){
-    item[key]=originValue[key]
+  for (let key in item) {
+    item[key] = originValue[key]
   }
-  originValue={}
+  originValue = {}
 }
 
 async function remove(component, type) {
   console.log(components.value)
   await eduProgsStore.deleteComponent(component)
-  components.value[type]=components.value[type].filter(obj => obj.id !== component.id)
+  components.value[type] = components.value[type].filter(obj => obj.id !== component.id)
   console.log(components.value[type])
   updateCredits()
   await eduProgsStore.findEduProgById(route.params.pages)
@@ -619,28 +610,26 @@ async function remove(component, type) {
 
 async function saveComponent(component) {
   try {
-
     await eduProgsStore.editComponent(component.id, component)
     updateCredits()
     editIndex.value = null
-
   } catch (error) {
     console.log('ERROR1', error.response.data)
-    if (error.response.data.error === "too much credits") {
+    if (error.response.data.error === 'too much credits') {
       console.log('PPPPPPPPPPPP', error.response.data)
-      hasError.value =  true
-      errorMessage.value = "Забагато кредитів"
+      hasError.value = true
+      errorMessage.value = 'Забагато кредитів'
     }
   }
 }
 </script>
 
 <style>
-input[type="number"] {
+input[type='number'] {
   text-align: right;
 }
-.eduprog-item{
-  cursor: pointer
+.eduprog-item {
+  cursor: pointer;
 }
 </style>
 

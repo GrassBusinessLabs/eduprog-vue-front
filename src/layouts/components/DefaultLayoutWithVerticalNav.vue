@@ -28,7 +28,7 @@ const exportToExcel = () => {
       />
 
       <VSpacer />
-      <VBtn
+      <VBtn class="mr-5"
         v-if="route.params.pages"
         dark
         @click="exportToExcel"
@@ -36,7 +36,7 @@ const exportToExcel = () => {
       >
         Експортувати
       </VBtn>
-      <NavbarThemeSwitcher />
+      <NavbarThemeSwitcher class="mr-5" />
       <UserProfile />
     </template>
 
