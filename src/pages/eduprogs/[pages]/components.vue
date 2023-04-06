@@ -13,11 +13,11 @@
   <VTable v-if="components && components.mandatory">
     <thead class="thead-light">
       <tr>
-        <th style="width: 5%">
+        <th style="width: 8%">
           Код <br />
           н/д
         </th>
-        <th >
+        <th>
           Компонент освітньої <br />
           програми
         </th>
@@ -29,7 +29,7 @@
           Форма підсумку <br />
           контролю
         </th>
-        <th style="width: 15%">
+        <th style="width: 10%">
           <VBtn
             icon="mdi-plus"
             size="x-small"
@@ -40,10 +40,11 @@
     </thead>
     <tbody>
       <tr
+        style="height: 65px"
         v-for="(item, index) in components.mandatory"
         :key="index"
       >
-        <td >{{ 'ОК ' + item.code }}</td>
+        <td>{{ 'ОК ' + item.code }}</td>
         <td>
           <span v-if="editIndex !== item.id">
             {{ item.name }}
@@ -83,7 +84,10 @@
           </span>
         </td>
         <td>
-          <span class="my-4" v-if="editIndex !== item.id">
+          <span
+            class="my-4"
+            v-if="editIndex !== item.id"
+          >
             <VBtn
               icon="mdi-pencil"
               size="x-small"
@@ -116,16 +120,9 @@
     <thead>
       <tr>
         <th colspan="5">
-          <div style="float: left">Загальний обсяг обов’язкових компонентів:</div>
-          <div style="float: left">
-            <input
-              class="text-right"
-              disabled
-              :value="creditsInfo.mandatory_credits"
-            />/<span>
-              {{ creditsInfo.mandatory_credits + creditsInfo.mandatory_free_credits }}
-            </span>
-          </div>
+          Загальний обсяг обов’язкових компонентів:
+          {{ creditsInfo.mandatory_credits }}/
+          {{ creditsInfo.mandatory_credits + creditsInfo.mandatory_free_credits }}
         </th>
       </tr>
     </thead>
@@ -144,7 +141,7 @@
   <VTable>
     <thead class="thead-light">
       <tr>
-        <th style="width: 5%">
+        <th style="width: 8%">
           Код <br />
           н/д
         </th>
@@ -156,11 +153,11 @@
           Кількість <br />
           кредитів
         </th>
-        <th>
+        <th style="width: 10%">
           Форма підсумку <br />
           контролю
         </th>
-        <th style="width: 15%">
+        <th style="width: 10%">
           <VBtn
             icon="mdi-plus"
             size="x-small"
@@ -183,6 +180,7 @@
         <th />
       </tr>
       <tr
+        style="height: 65px"
         v-for="(comp, compIndex) in block.comps_in_block"
         :key="'comp-' + compIndex"
       >
@@ -194,7 +192,6 @@
           <span v-if="editIndex === comp.id">
             <VTextField
               v-model="comp.name"
-              class="my-3"
               :rules="rulesComp.nameComp"
               @keyup.enter="saveComponent(comp)"
             />
@@ -205,7 +202,6 @@
           <span v-if="editIndex === comp.id">
             <VTextField
               v-model="comp.credits"
-              class="my-3"
               type="number"
               :error="hasError"
               :error-messages="errorMessage"
@@ -223,7 +219,6 @@
           <span v-if="editIndex === comp.id">
             <v-select
               v-model="comp.control_type"
-              class="my-3"
               :items="control_types"
               :rules="rulesComp.typeExam"
               @keyup.enter="saveComponent(comp)"
@@ -265,16 +260,9 @@
     <thead>
       <tr>
         <th colspan="5">
-          <div style="float: left">Загальний обсяг вибіркових компонентів:</div>
-          <div style="float: left">
-            <input
-              class="text-right"
-              disabled
-              :value="creditsInfo.selective_credits"
-            />/<span>
-              {{ creditsInfo.selective_credits + creditsInfo.selective_free_credits }}
-            </span>
-          </div>
+          Загальний обсяг вибіркових компонентів:
+          {{ creditsInfo.selective_credits }}/
+          {{ creditsInfo.selective_credits + creditsInfo.selective_free_credits }}
         </th>
       </tr>
     </thead>
@@ -454,7 +442,7 @@ const newComponent = reactive({
   block_num: '',
   eduprog_id: +route.params.pages,
 })
-const control_types=['залік', 'іспит']
+const control_types = ['залік', 'іспит']
 const rulesComp = ref({
   nameComp: [
     value => {
@@ -512,11 +500,11 @@ function changeDialog(type) {
   } else if (type == 'ВБ') {
     dialogCreateSelective.value = !dialogCreateSelective.value
   }
-  newComponent.name=""
-  newComponent.credits=0
-  newComponent.control_type=""
-  newComponent.block_name=""
-  newComponent.block_num=""
+  newComponent.name = ''
+  newComponent.credits = 0
+  newComponent.control_type = ''
+  newComponent.block_name = ''
+  newComponent.block_num = ''
   resetError()
   resetErrorN()
 }
