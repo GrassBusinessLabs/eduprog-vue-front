@@ -97,6 +97,7 @@
     // 👉 Nav Link
     .nav-link {
       overflow: hidden;
+      width: 270px;
 
       > :first-child {
         @extend %vertical-nav-item;
