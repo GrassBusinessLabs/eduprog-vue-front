@@ -523,6 +523,8 @@ function changeDialog(type) {
   newComponent.control_type=""
   newComponent.block_name=""
   newComponent.block_num=""
+  resetError()
+  resetErrorN()
 }
 
 async function updateCredits(){
