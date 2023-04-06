@@ -512,11 +512,13 @@ function changeDialog(type) {
   } else if (type == 'ВБ') {
     dialogCreateSelective.value = !dialogCreateSelective.value
   }
-  newComponent.name = ''
-  newComponent.credits = 0
-  newComponent.control_type = ''
-  newComponent.block_name = ''
-  newComponent.block_num = ''
+  newComponent.name=""
+  newComponent.credits=0
+  newComponent.control_type=""
+  newComponent.block_name=""
+  newComponent.block_num=""
+  resetError()
+  resetErrorN()
 }
 
 async function updateCredits() {
