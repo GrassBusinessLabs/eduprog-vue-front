@@ -22,11 +22,11 @@
           програми
         </th>
         <th style="width: 10%">
-          Кількість <br />
+          Кількість <br>
           кредитів
         </th>
         <th style="width: 10%">
-          Форма підсумку <br />
+          Форма підсумку <br>
           контролю
         </th>
         <th style="width: 10%">
@@ -75,7 +75,7 @@
             {{ item.control_type }}
           </span>
           <span v-if="editIndex === item.id">
-            <v-select
+            <VSelect
               v-model="item.control_type"
               :items="control_types"
               :rules="rulesComp.typeExam"
@@ -146,11 +146,11 @@
           н/д
         </th>
         <th>
-          Компонент освітньої <br />
+          Компонент освітньої <br>
           програми
         </th>
         <th style="width: 10%">
-          Кількість <br />
+          Кількість <br>
           кредитів
         </th>
         <th style="width: 10%">
@@ -206,9 +206,9 @@
               :error="hasError"
               :error-messages="errorMessage"
               :rules="rulesComp.credits"
+              min="0"
               @keyup.enter="saveComponent(comp)"
               @focus="resetError"
-              min="0"
             />
           </span>
         </td>
@@ -217,7 +217,7 @@
             {{ comp.control_type }}
           </span>
           <span v-if="editIndex === comp.id">
-            <v-select
+            <VSelect
               v-model="comp.control_type"
               :items="control_types"
               :rules="rulesComp.typeExam"
@@ -283,9 +283,9 @@
                 label="Назва компонента"
                 required
                 :rules="rulesComp.nameComp"
-                @input="check"
                 :error="NameError"
                 :error-messages="errorName"
+                @input="check"
                 @focus="resetErrorN"
               />
             </VCol>
@@ -302,12 +302,12 @@
               />
             </VCol>
             <VCol cols="12">
-              <v-select
+              <VSelect
                 v-model="newComponent.control_type"
                 label="Форма підсумку контролю"
                 :items="control_types"
                 :rules="rulesComp.typeExam"
-              ></v-select>
+              />
             </VCol>
           </VRow>
         </VContainer>
@@ -364,12 +364,12 @@
               />
             </VCol>
             <VCol cols="12">
-              <v-select
+              <VSelect
                 v-model="newComponent.control_type"
                 label="Форма підсумку контролю"
                 :items="control_types"
                 :rules="rulesComp.typeExam"
-              ></v-select>
+              />
             </VCol>
             <VCol cols="12">
               <VCombobox
@@ -500,13 +500,15 @@ function changeDialog(type) {
   } else if (type == 'ВБ') {
     dialogCreateSelective.value = !dialogCreateSelective.value
   }
-  newComponent.name = ''
-  newComponent.credits = 0
-  newComponent.control_type = ''
-  newComponent.block_name = ''
-  newComponent.block_num = ''
   resetError()
   resetErrorN()
+  setTimeout(() => {
+    newComponent.name=""
+    newComponent.credits=0
+    newComponent.control_type=""
+    newComponent.block_name=""
+    newComponent.block_num=""
+  }, 500)
 }
 
 async function updateCredits() {
@@ -567,12 +569,13 @@ async function createComponent() {
       return
     }
   }
-  newComponent.name = ''
-  newComponent.credits = 0
-  newComponent.control_type = ''
-  newComponent.block_name = ''
-  newComponent.block_num = ''
-
+  setTimeout(() => {
+    newComponent.name = ''
+    newComponent.credits = 0
+    newComponent.control_type = ''
+    newComponent.block_name = ''
+    newComponent.block_num = ''
+  }, 500)
   await updateCredits()
 }
 
