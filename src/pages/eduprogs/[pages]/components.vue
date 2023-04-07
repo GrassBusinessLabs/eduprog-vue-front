@@ -54,6 +54,8 @@
               variant="underlined"
               v-model="item.name"
               :rules="rulesComp.nameComp"
+              :error="NameError"
+              :error-messages="errorName"
               @keyup.enter="saveComponent(item)"
             />
           </span>
@@ -66,6 +68,8 @@
               v-model="item.credits"
               type="number"
               min="0"
+              :error="hasError"
+              :error-messages="errorMessage"
               :rules="rulesComp.credits"
               @keyup.enter="saveComponent(item)"
               @focus="resetError"
@@ -197,6 +201,8 @@
               variant="underlined"
               v-model="comp.name"
               :rules="rulesComp.nameComp"
+              :error="NameError"
+              :error-messages="errorName"
               @keyup.enter="saveComponent(comp)"
             />
           </span>
@@ -615,12 +621,16 @@ async function saveComponent(component) {
     updateCredits()
     editIndex.value = null
   } catch (error) {
-    console.log('ERROR1', error.response.data)
-    if (error.response.data.error === 'too much credits') {
-      console.log('PPPPPPPPPPPP', error.response.data)
-      hasError.value = true
+    const errorFromServer = error.response.data.error
+    if (errorFromServer === 'eduprog component with this name already exists') {
+      errorName.value = 'Компонент з такою назвою вже існує'
+      NameError.value = true
+    } else {
       errorMessage.value = 'Забагато кредитів'
+      hasError.value = true
     }
+
+    return
   }
 }
 </script>
