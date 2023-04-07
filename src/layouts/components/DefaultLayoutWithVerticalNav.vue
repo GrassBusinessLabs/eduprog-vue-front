@@ -19,13 +19,13 @@ const exportToExcel = () => {
   <VerticalNavLayout>
     <!-- 👉 navbar -->
     <template #navbar>
-      <VTextField
+      <!-- <VTextField
         rounded
         prepend-inner-icon="mdi-magnify"
         density="compact"
         max-width="100px"
         class="app-bar-search d-none d-sm-block"
-      />
+      /> -->
 
       <VSpacer />
       <VBtn class="mr-5"

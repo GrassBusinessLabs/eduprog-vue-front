@@ -13,7 +13,7 @@
   <VTable v-if="components && components.mandatory">
     <thead class="thead-light">
       <tr>
-        <th style="width: 8%">
+        <th style="width: 5%;">
           Код <br />
           н/д
         </th>
@@ -44,13 +44,14 @@
         v-for="(item, index) in components.mandatory"
         :key="index"
       >
-        <td>{{ 'ОК ' + item.code }}</td>
+        <td style="white-space: nowrap">{{ 'ОК ' + item.code }}</td>
         <td>
           <span v-if="editIndex !== item.id">
             {{ item.name }}
           </span>
           <span v-if="editIndex === item.id">
             <VTextField
+              variant="underlined"
               v-model="item.name"
               :rules="rulesComp.nameComp"
               @keyup.enter="saveComponent(item)"
@@ -61,6 +62,7 @@
           <span v-if="editIndex !== item.id"> {{ item.credits }}</span>
           <span v-if="editIndex === item.id">
             <VTextField
+              variant="underlined"
               v-model="item.credits"
               type="number"
               min="0"
@@ -76,6 +78,7 @@
           </span>
           <span v-if="editIndex === item.id">
             <VSelect
+              variant="underlined"
               v-model="item.control_type"
               :items="control_types"
               :rules="rulesComp.typeExam"
@@ -138,10 +141,10 @@
       </tr>
     </thead>
   </VTable>
-  <VTable>
+  <VTable class="table-vb-blocks">
     <thead class="thead-light">
       <tr>
-        <th style="width: 8%">
+        <th style="width: 5%">
           Код <br />
           н/д
         </th>
@@ -184,13 +187,14 @@
         v-for="(comp, compIndex) in block.comps_in_block"
         :key="'comp-' + compIndex"
       >
-        <td>{{ 'ВБ ' + comp.block_num + '.' + comp.code }}</td>
+        <td style="white-space: nowrap">{{ 'ВБ ' + comp.block_num + '.' + comp.code }}</td>
         <td>
           <span v-if="editIndex !== comp.id">
             {{ comp.name }}
           </span>
           <span v-if="editIndex === comp.id">
             <VTextField
+              variant="underlined"
               v-model="comp.name"
               :rules="rulesComp.nameComp"
               @keyup.enter="saveComponent(comp)"
@@ -200,7 +204,8 @@
         <td>
           <span v-if="editIndex !== comp.id"> {{ comp.credits }}</span>
           <span v-if="editIndex === comp.id">
-            <VTextField
+            <VTextField 
+              variant="underlined"
               v-model="comp.credits"
               type="number"
               :error="hasError"
@@ -218,6 +223,7 @@
           </span>
           <span v-if="editIndex === comp.id">
             <VSelect
+              variant="underlined"
               v-model="comp.control_type"
               :items="control_types"
               :rules="rulesComp.typeExam"
@@ -293,6 +299,7 @@
               <VTextField
                 v-model="newComponent.credits"
                 type="number"
+                min="0"
                 label="Кількість кредитів"
                 :rules="rulesComp.credits"
                 :error="hasError"
@@ -356,6 +363,7 @@
               <VTextField
                 v-model="newComponent.credits"
                 type="number"
+                min="0"
                 label="Кількість кредитів"
                 :rules="rulesComp.credits"
                 :error="hasError"
@@ -618,11 +626,24 @@ async function saveComponent(component) {
 </script>
 
 <style>
-input[type='number'] {
-  text-align: right;
-}
 .eduprog-item {
   cursor: pointer;
+}
+input.v-field__input, .v-select__selection-text{
+  font-size:0.875rem;
+}
+tr td .v-field__input{
+  padding: 0 !important
+}
+tr td span.v-select__selection-text{
+  display: flex;
+  align-items: center;
+}
+.table-vb-blocks table tbody{
+  border-top: 1px solid rgb(58, 53, 65, .12);
+}
+.table-vb-blocks table{
+  border-collapse: collapse;
 }
 </style>
 
