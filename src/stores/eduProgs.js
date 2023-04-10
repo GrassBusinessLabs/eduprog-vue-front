@@ -212,6 +212,18 @@ export const useEduProgsStore = defineStore({
         link.click()
       })
     },
+    async exportToPng(eduId) {
+      await getFile('/eduprogs/compsToPng/' + eduId).then(response => {
+        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'ОПП ' + eduId + '.png')
+        document.body.appendChild(link)
+        link.click()
+      })
+    },
+
+
     async fetchRelations(eduId) {
       const response = await getData('/eduprogs/compRelations/' + eduId)
       return response

@@ -92,7 +92,7 @@ const closeCombobox = async () =>{
       </tr>
     </thead>
   </VTable>
-  <VTable>
+  <VTable v-if='components.mandatory > 0'>
     <thead class="thead-light">
       <tr>
         <th>Код н/д</th>
@@ -123,17 +123,19 @@ const closeCombobox = async () =>{
             @update:modelValue="handleChanges($event, component)"
             @blur="closeCombobox"
           />
-          <v-alert
-            v-else
-            type="info"
-            text="Вибачте, але щоб тут зявилися можливі звязки, потрібно спочатку заповнити сторінку розподілу по семестрам"
-            variant="tonal"
-            class="my-4"
-          ></v-alert>
         </td>
       </tr>
     </tbody>
   </VTable>
+  <v-alert
+    v-else
+    type="info"
+    variant="tonal"
+    class="my-4"
+  >
+    Для того щоб тут з'явилися можливі зв'язки, потрібно спочатку заповнити
+    <u><a href="schema" style='color: inherit'> сторінку розподілу по семестрам.</a></u>
+  </v-alert>
 </template>
 <route lang="yaml">
 name: sequence
