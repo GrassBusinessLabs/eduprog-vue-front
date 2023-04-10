@@ -13,7 +13,7 @@
   <VTable v-if="components && components.mandatory">
     <thead class="thead-light">
       <tr>
-        <th style="width: 5%;">
+        <th style="width: 5%">
           Код <br />
           н/д
         </th>
@@ -22,11 +22,11 @@
           програми
         </th>
         <th style="width: 10%">
-          Кількість <br>
+          Кількість <br />
           кредитів
         </th>
         <th style="width: 10%">
-          Форма підсумку <br>
+          Форма підсумку <br />
           контролю
         </th>
         <th style="width: 10%">
@@ -153,11 +153,11 @@
           н/д
         </th>
         <th>
-          Компонент освітньої <br>
+          Компонент освітньої <br />
           програми
         </th>
         <th style="width: 10%">
-          Кількість <br>
+          Кількість <br />
           кредитів
         </th>
         <th style="width: 10%">
@@ -182,9 +182,43 @@
           colspan="4"
           class="text-center"
         >
-          <h3>{{ block.block_name }}</h3>
+          <span v-if="editIndex !== block.block_num">
+            <h3>{{ block.block_name }}</h3>
+          </span>
+          <span v-if="editIndex === block.block_num">
+            <VTextField
+              :rules="rulesVB.maxLength"
+              class="vb-blocks-name"
+              variant="underlined"
+              v-model="block.block_name"
+              @keyup.enter="saveComponent(item)"
+              maxlength="100"
+            />
+          </span>
         </th>
-        <th />
+
+        <th>
+          <span v-if="editIndex !== block.block_num">
+          <VBtn
+            icon="mdi-pencil"
+            size="x-small"
+            @click="edit(block, 'Block')"
+          />
+          </span>
+          <span v-else>
+            <VBtn
+              icon="mdi-check-bold"
+              size="x-small"
+              style="margin-right: 2%"
+              @click="saveBlockName(block)"
+            />
+            <VBtn
+              icon="mdi-close-thick"
+              size="x-small"
+              @click="cancel(block)"
+            />
+          </span>
+        </th>
       </tr>
       <tr
         style="height: 65px"
@@ -210,7 +244,7 @@
         <td>
           <span v-if="editIndex !== comp.id"> {{ comp.credits }}</span>
           <span v-if="editIndex === comp.id">
-            <VTextField 
+            <VTextField
               variant="underlined"
               v-model="comp.credits"
               type="number"
@@ -480,7 +514,11 @@ const rulesComp = ref({
     },
   ],
 })
-
+const rulesVB = ref({
+  maxLength: [
+    v => v.length <= 99|| 'Максимум 100 символів'
+  ]
+})
 const hasError = ref(false)
 const errorMessage = ref('')
 const NameError = ref(false)
@@ -517,11 +555,11 @@ function changeDialog(type) {
   resetError()
   resetErrorN()
   setTimeout(() => {
-    newComponent.name=""
-    newComponent.credits=0
-    newComponent.control_type=""
-    newComponent.block_name=""
-    newComponent.block_num=""
+    newComponent.name = ''
+    newComponent.credits = 0
+    newComponent.control_type = ''
+    newComponent.block_name = ''
+    newComponent.block_num = ''
   }, 500)
 }
 
@@ -593,9 +631,13 @@ async function createComponent() {
   await updateCredits()
 }
 
-function edit(item) {
+function edit(item, type="Component") {
   originValue = Object.assign({}, item)
-  editIndex.value = item.id
+  if(type==="Block"){
+    editIndex.value = item.block_num
+  }else if(type==="Component"){
+    editIndex.value = item.id
+  }
 }
 
 function cancel(item) {
@@ -629,9 +671,15 @@ async function saveComponent(component) {
       errorMessage.value = 'Забагато кредитів'
       hasError.value = true
     }
-
     return
   }
+  originValue = {}
+}
+const saveBlockName= async (block)=>{
+  editIndex.value = null
+  console.log("Блок",block)
+  await eduProgsStore.updateVbBlockName(route.params.pages, block.block_num, block.block_name)
+  originValue = {}
 }
 </script>
 
@@ -639,21 +687,27 @@ async function saveComponent(component) {
 .eduprog-item {
   cursor: pointer;
 }
-input.v-field__input, .v-select__selection-text{
-  font-size:0.875rem;
+input.v-field__input,
+.v-select__selection-text {
+  font-size: 0.875rem;
 }
-tr td .v-field__input{
-  padding: 0 !important
+tr td .v-field__input {
+  padding: 0 !important;
 }
-tr td span.v-select__selection-text{
+tr td span.v-select__selection-text {
   display: flex;
   align-items: center;
 }
-.table-vb-blocks table tbody{
-  border-top: 1px solid rgb(58, 53, 65, .12);
+.table-vb-blocks table tbody {
+  border-top: 1px solid rgb(58, 53, 65, 0.12);
 }
-.table-vb-blocks table{
+.table-vb-blocks table {
   border-collapse: collapse;
+}
+.vb-blocks-name .v-field__input{
+  text-align: center;
+  padding: 0;
+  height: 80%;
 }
 </style>
 
