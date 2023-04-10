@@ -211,6 +211,7 @@
               size="x-small"
               style="margin-right: 2%"
               @click="saveBlockName(block)"
+              :disabled="!block.block_name"
             />
             <VBtn
               icon="mdi-close-thick"
@@ -516,7 +517,8 @@ const rulesComp = ref({
 })
 const rulesVB = ref({
   maxLength: [
-    v => v.length <= 99|| 'Максимум 100 символів'
+    v => v.length <= 99|| 'Максимум 100 символів',
+    v => v.length >= 1|| 'Мінімум 1 символ'
   ]
 })
 const hasError = ref(false)

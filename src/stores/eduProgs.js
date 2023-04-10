@@ -143,6 +143,14 @@ export const useEduProgsStore = defineStore({
       }
       const response = await postData('/eduprogs/competenciesMatrix/create', newRelation)
     },
+    async createCompetencyResultRelation(eduprogId, componentId, competencyId) {
+      const newRelation = {
+        eduprog_id: eduprogId,
+        component_id: componentId,
+        eduprogresult_id: competencyId,
+      }
+      const response = await postData('/eduprogs/resultsMatrix/create', newRelation)
+    },
     async deleteCompetencyRelation(eduprogId, componentId, competencyId) {
       const response = await deleteData('/eduprogs/competenciesMatrix/' + componentId + '/' + competencyId)
     },
