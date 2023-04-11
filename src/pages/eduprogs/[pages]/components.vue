@@ -14,22 +14,22 @@
     <thead class="thead-light">
       <tr>
         <th style="width: 5%">
-          Код <br>
+          Код <br />
           н/д
         </th>
         <th>
-          Компонент освітньої <br>
+          Компонент освітньої <br />
           програми
         </th>
         <th style="width: 10%">
-          Кількість <br>
+          Кількість <br />
           кредитів
         </th>
         <th style="width: 10%">
-          Форма підсумку <br>
+          Форма підсумку <br />
           контролю
         </th>
-        <th style="width: 15%">
+        <th style="width: 10%">
           <VBtn
             icon="mdi-plus"
             size="x-small"
@@ -40,18 +40,22 @@
     </thead>
     <tbody>
       <tr
+        style="height: 65px"
         v-for="(item, index) in components.mandatory"
         :key="index"
       >
-        <td>{{ 'ОК ' + item.code }}</td>
+        <td style="white-space: nowrap">{{ 'ОК ' + item.code }}</td>
         <td>
           <span v-if="editIndex !== item.id">
             {{ item.name }}
           </span>
           <span v-if="editIndex === item.id">
             <VTextField
+              variant="underlined"
               v-model="item.name"
               :rules="rulesComp.nameComp"
+              :error="NameError"
+              :error-messages="errorName"
               @keyup.enter="saveComponent(item)"
             />
           </span>
@@ -60,9 +64,12 @@
           <span v-if="editIndex !== item.id"> {{ item.credits }}</span>
           <span v-if="editIndex === item.id">
             <VTextField
+              variant="underlined"
               v-model="item.credits"
               type="number"
               min="0"
+              :error="hasError"
+              :error-messages="errorMessage"
               :rules="rulesComp.credits"
               @keyup.enter="saveComponent(item)"
               @focus="resetError"
@@ -75,6 +82,7 @@
           </span>
           <span v-if="editIndex === item.id">
             <VSelect
+              variant="underlined"
               v-model="item.control_type"
               :items="control_types"
               :rules="rulesComp.typeExam"
@@ -84,8 +92,8 @@
         </td>
         <td>
           <span
-            v-if="editIndex !== item.id"
             class="my-4"
+            v-if="editIndex !== item.id"
           >
             <VBtn
               icon="mdi-pencil"
@@ -119,18 +127,9 @@
     <thead>
       <tr>
         <th colspan="5">
-          <div style="float: left">
-            Загальний обсяг обов’язкових компонентів:
-          </div>
-          <div style="float: left">
-            <input
-              class="text-right"
-              disabled
-              :value="creditsInfo.mandatory_credits"
-            >/<span>
-              {{ creditsInfo.mandatory_credits + creditsInfo.mandatory_free_credits }}
-            </span>
-          </div>
+          Загальний обсяг обов’язкових компонентів:
+          {{ creditsInfo.mandatory_credits }}/
+          {{ creditsInfo.mandatory_credits + creditsInfo.mandatory_free_credits }}
         </th>
       </tr>
     </thead>
@@ -146,26 +145,26 @@
       </tr>
     </thead>
   </VTable>
-  <VTable>
+  <VTable class="table-vb-blocks">
     <thead class="thead-light">
       <tr>
         <th style="width: 5%">
-          Код <br>
+          Код <br />
           н/д
         </th>
         <th>
-          Компонент освітньої <br>
+          Компонент освітньої <br />
           програми
         </th>
         <th style="width: 10%">
-          Кількість <br>
+          Кількість <br />
           кредитів
         </th>
-        <th>
-          Форма підсумку <br>
+        <th style="width: 10%">
+          Форма підсумку <br />
           контролю
         </th>
-        <th style="width: 15%">
+        <th style="width: 10%">
           <VBtn
             icon="mdi-plus"
             size="x-small"
@@ -183,24 +182,62 @@
           colspan="4"
           class="text-center"
         >
-          <h3>{{ block.block_name }}</h3>
+          <span v-if="editIndex !== block.block_num">
+            <h3>{{ block.block_name }}</h3>
+          </span>
+          <span v-if="editIndex === block.block_num">
+            <VTextField
+              :rules="rulesVB.maxLength"
+              class="vb-blocks-name"
+              variant="underlined"
+              v-model="block.block_name"
+              @keyup.enter="saveComponent(item)"
+              maxlength="100"
+            />
+          </span>
         </th>
-        <th />
+
+        <th>
+          <span v-if="editIndex !== block.block_num">
+          <VBtn
+            icon="mdi-pencil"
+            size="x-small"
+            @click="edit(block, 'Block')"
+          />
+          </span>
+          <span v-else>
+            <VBtn
+              icon="mdi-check-bold"
+              size="x-small"
+              style="margin-right: 2%"
+              @click="saveBlockName(block)"
+              :disabled="!block.block_name"
+            />
+            <VBtn
+              icon="mdi-close-thick"
+              size="x-small"
+              @click="cancel(block)"
+            />
+          </span>
+        </th>
       </tr>
       <tr
+        style="height: 65px"
         v-for="(comp, compIndex) in block.comps_in_block"
         :key="'comp-' + compIndex"
       >
-        <td>{{ 'ВБ ' + comp.block_num + '.' + comp.code }}</td>
+        <td style="white-space: nowrap">{{ 'ВБ ' + comp.block_num + '.' + comp.code }}</td>
         <td>
           <span v-if="editIndex !== comp.id">
             {{ comp.name }}
           </span>
           <span v-if="editIndex === comp.id">
             <VTextField
+              variant="underlined"
               v-model="comp.name"
-              class="my-3"
               :rules="rulesComp.nameComp"
+              :error="NameError"
+              :error-messages="errorName"
               @keyup.enter="saveComponent(comp)"
             />
           </span>
@@ -209,8 +246,8 @@
           <span v-if="editIndex !== comp.id"> {{ comp.credits }}</span>
           <span v-if="editIndex === comp.id">
             <VTextField
+              variant="underlined"
               v-model="comp.credits"
-              class="my-3"
               type="number"
               :error="hasError"
               :error-messages="errorMessage"
@@ -227,8 +264,8 @@
           </span>
           <span v-if="editIndex === comp.id">
             <VSelect
+              variant="underlined"
               v-model="comp.control_type"
-              class="my-3"
               :items="control_types"
               :rules="rulesComp.typeExam"
               @keyup.enter="saveComponent(comp)"
@@ -270,18 +307,9 @@
     <thead>
       <tr>
         <th colspan="5">
-          <div style="float: left">
-            Загальний обсяг вибіркових компонентів:
-          </div>
-          <div style="float: left">
-            <input
-              class="text-right"
-              disabled
-              :value="creditsInfo.selective_credits"
-            >/<span>
-              {{ creditsInfo.selective_credits + creditsInfo.selective_free_credits }}
-            </span>
-          </div>
+          Загальний обсяг вибіркових компонентів:
+          {{ creditsInfo.selective_credits }}/
+          {{ creditsInfo.selective_credits + creditsInfo.selective_free_credits }}
         </th>
       </tr>
     </thead>
@@ -312,6 +340,7 @@
               <VTextField
                 v-model="newComponent.credits"
                 type="number"
+                min="0"
                 label="Кількість кредитів"
                 :rules="rulesComp.credits"
                 :error="hasError"
@@ -375,6 +404,7 @@
               <VTextField
                 v-model="newComponent.credits"
                 type="number"
+                min="0"
                 label="Кількість кредитів"
                 :rules="rulesComp.credits"
                 :error="hasError"
@@ -461,7 +491,7 @@ const newComponent = reactive({
   block_num: '',
   eduprog_id: +route.params.pages,
 })
-const control_types=['залік', 'іспит']
+const control_types = ['залік', 'іспит']
 const rulesComp = ref({
   nameComp: [
     value => {
@@ -485,7 +515,12 @@ const rulesComp = ref({
     },
   ],
 })
-
+const rulesVB = ref({
+  maxLength: [
+    v => v.length <= 99|| 'Максимум 100 символів',
+    v => v.length >= 1|| 'Мінімум 1 символ'
+  ]
+})
 const hasError = ref(false)
 const errorMessage = ref('')
 const NameError = ref(false)
@@ -522,11 +557,11 @@ function changeDialog(type) {
   resetError()
   resetErrorN()
   setTimeout(() => {
-    newComponent.name=""
-    newComponent.credits=0
-    newComponent.control_type=""
-    newComponent.block_name=""
-    newComponent.block_num=""
+    newComponent.name = ''
+    newComponent.credits = 0
+    newComponent.control_type = ''
+    newComponent.block_name = ''
+    newComponent.block_num = ''
   }, 500)
 }
 
@@ -598,9 +633,13 @@ async function createComponent() {
   await updateCredits()
 }
 
-function edit(item) {
+function edit(item, type="Component") {
   originValue = Object.assign({}, item)
-  editIndex.value = item.id
+  if(type==="Block"){
+    editIndex.value = item.block_num
+  }else if(type==="Component"){
+    editIndex.value = item.id
+  }
 }
 
 function cancel(item) {
@@ -626,22 +665,51 @@ async function saveComponent(component) {
     updateCredits()
     editIndex.value = null
   } catch (error) {
-    console.log('ERROR1', error.response.data)
-    if (error.response.data.error === 'too much credits') {
-      console.log('PPPPPPPPPPPP', error.response.data)
-      hasError.value = true
+    const errorFromServer = error.response.data.error
+    if (errorFromServer === 'eduprog component with this name already exists') {
+      errorName.value = 'Компонент з такою назвою вже існує'
+      NameError.value = true
+    } else {
       errorMessage.value = 'Забагато кредитів'
+      hasError.value = true
     }
+    return
   }
+  originValue = {}
+}
+const saveBlockName= async (block)=>{
+  editIndex.value = null
+  console.log("Блок",block)
+  await eduProgsStore.updateVbBlockName(route.params.pages, block.block_num, block.block_name)
+  originValue = {}
 }
 </script>
 
 <style>
-input[type='number'] {
-  text-align: right;
-}
 .eduprog-item {
   cursor: pointer;
+}
+input.v-field__input,
+.v-select__selection-text {
+  font-size: 0.875rem;
+}
+tr td .v-field__input {
+  padding: 0 !important;
+}
+tr td span.v-select__selection-text {
+  display: flex;
+  align-items: center;
+}
+.table-vb-blocks table tbody {
+  border-top: 1px solid rgb(58, 53, 65, 0.12);
+}
+.table-vb-blocks table {
+  border-collapse: collapse;
+}
+.vb-blocks-name .v-field__input{
+  text-align: center;
+  padding: 0;
+  height: 80%;
 }
 </style>
 
