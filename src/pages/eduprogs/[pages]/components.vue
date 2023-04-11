@@ -141,7 +141,7 @@
         <th class="text-center">
           <h3>Вибірковий компонент ОП</h3>
         </th>
-        <th />
+        <th style="width: 10%"/>
       </tr>
     </thead>
   </VTable>
@@ -191,7 +191,7 @@
               class="vb-blocks-name"
               variant="underlined"
               v-model="block.block_name"
-              @keyup.enter="saveComponent(item)"
+              @keyup.enter="saveBlockName(block)"
               maxlength="100"
             />
           </span>
@@ -678,6 +678,9 @@ async function saveComponent(component) {
   originValue = {}
 }
 const saveBlockName= async (block)=>{
+  if(block.block_name.length===0){
+    return
+  }
   editIndex.value = null
   console.log("Блок",block)
   await eduProgsStore.updateVbBlockName(route.params.pages, block.block_num, block.block_name)
