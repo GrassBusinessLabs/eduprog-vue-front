@@ -67,7 +67,7 @@
               variant="underlined"
               v-model="item.credits"
               type="number"
-              min="0"
+              min="1"
               :error="hasError"
               :error-messages="errorMessage"
               :rules="rulesComp.credits"
@@ -199,11 +199,11 @@
 
         <th>
           <span v-if="editIndex !== block.block_num">
-          <VBtn
-            icon="mdi-pencil"
-            size="x-small"
-            @click="edit(block, 'Block')"
-          />
+            <VBtn
+              icon="mdi-pencil"
+              size="x-small"
+              @click="edit(block, 'Block')"
+            />
           </span>
           <span v-else>
             <VBtn
@@ -252,7 +252,7 @@
               :error="hasError"
               :error-messages="errorMessage"
               :rules="rulesComp.credits"
-              min="0"
+              min="1"
               @keyup.enter="saveComponent(comp)"
               @focus="resetError"
             />
@@ -316,7 +316,6 @@
   </VTable>
   <VDialog
     v-model="dialogCreate"
-    persistent
     max-width="600"
   >
     <VCard>
@@ -340,7 +339,7 @@
               <VTextField
                 v-model="newComponent.credits"
                 type="number"
-                min="0"
+                min="1"
                 label="Кількість кредитів"
                 :rules="rulesComp.credits"
                 :error="hasError"
@@ -381,7 +380,6 @@
   </VDialog>
   <VDialog
     v-model="dialogCreateSelective"
-    persistent
     max-width="600"
   >
     <VCard>
@@ -404,7 +402,7 @@
               <VTextField
                 v-model="newComponent.credits"
                 type="number"
-                min="0"
+                min="1"
                 label="Кількість кредитів"
                 :rules="rulesComp.credits"
                 :error="hasError"
@@ -456,6 +454,34 @@
       </VCardText>
     </VCard>
   </VDialog>
+
+  <VDialog
+    v-model="dialogDelete"
+    max-width="290"
+  >
+    <VCard>
+      <VCardTitle> Підтвердіть видалення </VCardTitle>
+      <VCardText> Ви впевнені що хочете видалити компонент: {{ originValue.name }}? </VCardText>
+
+      <VCardActions>
+        <VBtn
+          color="green darken-1"
+          text
+          @click="dialogDelete = false"
+        >
+          Ні
+        </VBtn>
+
+        <VBtn
+          color="green darken-1"
+          text
+          @click="confirmRemove"
+        >
+          Так
+        </VBtn>
+      </VCardActions>
+    </VCard>
+  </VDialog>
 </template>
 
 <script setup>
@@ -475,9 +501,9 @@ const eduProgsStore = useEduProgsStore()
 
 const { components, creditsInfo } = storeToRefs(eduProgsStore)
 const VBblock = ref()
-
+const dialogDelete = ref(false)
 const editIndex = ref(null)
-let originValue = {}
+let originValue = ref({})
 const dialogCreate = ref(false)
 const dialogCreateSelective = ref(false)
 const newComponent = reactive({
@@ -516,10 +542,7 @@ const rulesComp = ref({
   ],
 })
 const rulesVB = ref({
-  maxLength: [
-    v => v.length <= 99|| 'Максимум 100 символів',
-    v => v.length >= 1|| 'Мінімум 1 символ'
-  ]
+  maxLength: [v => v.length <= 99 || 'Максимум 100 символів', v => v.length >= 1 || 'Мінімум 1 символ'],
 })
 const hasError = ref(false)
 const errorMessage = ref('')
@@ -633,11 +656,11 @@ async function createComponent() {
   await updateCredits()
 }
 
-function edit(item, type="Component") {
+function edit(item, type = 'Component') {
   originValue = Object.assign({}, item)
-  if(type==="Block"){
+  if (type === 'Block') {
     editIndex.value = item.block_num
-  }else if(type==="Component"){
+  } else if (type === 'Component') {
     editIndex.value = item.id
   }
 }
@@ -650,15 +673,24 @@ function cancel(item) {
   originValue = {}
 }
 
-async function remove(component, type) {
-  console.log(components.value)
-  await eduProgsStore.deleteComponent(component)
-  components.value[type] = components.value[type].filter(obj => obj.id !== component.id)
-  console.log(components.value[type])
+function remove(comp) {
+  dialogDelete.value = true
+  originValue = Object.assign({}, comp)
+  console.log("ОРИДЖИ?",originValue.id)
+}
+const confirmRemove = async () => {
+  console.log(originValue)
+  dialogDelete.value = false
+  await eduProgsStore.deleteComponent(originValue)
+  let type='mandatory'
+  if(originValue.category==='BLOC'){
+    type='selective'
+  }
+  components.value[type] = components.value[type].filter(obj => obj.id !== originValue.id)
   updateCredits()
   await eduProgsStore.findEduProgById(route.params.pages)
+  originValue={}
 }
-
 async function saveComponent(component) {
   try {
     await eduProgsStore.editComponent(component.id, component)
@@ -677,9 +709,9 @@ async function saveComponent(component) {
   }
   originValue = {}
 }
-const saveBlockName= async (block)=>{
+const saveBlockName = async block => {
   editIndex.value = null
-  console.log("Блок",block)
+  console.log('Блок', block)
   await eduProgsStore.updateVbBlockName(route.params.pages, block.block_num, block.block_name)
   originValue = {}
 }
@@ -706,7 +738,7 @@ tr td span.v-select__selection-text {
 .table-vb-blocks table {
   border-collapse: collapse;
 }
-.vb-blocks-name .v-field__input{
+.vb-blocks-name .v-field__input {
   text-align: center;
   padding: 0;
   height: 80%;
