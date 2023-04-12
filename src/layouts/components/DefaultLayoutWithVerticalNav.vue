@@ -33,17 +33,7 @@ const exportToPng = () => {
       -->
 
       <VSpacer />
-      <VBtn
-        v-if="route.params.pages"
-        class="mr-5"
-        dark
-        variant="flat"
-        @click="exportToExcel"
-      >
-        Експортувати
-      </VBtn>
-
-      <VMenu class="mr-5">
+      <VMenu class="mr-5" v-if="route.params.pages">
         <template #activator="{ props }">
           <VBtn
             color="primary"

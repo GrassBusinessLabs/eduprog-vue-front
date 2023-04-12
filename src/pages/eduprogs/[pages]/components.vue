@@ -14,19 +14,19 @@
     <thead class="thead-light">
       <tr>
         <th style="width: 5%">
-          Код <br />
+          Код <br>
           н/д
         </th>
         <th>
-          Компонент освітньої <br />
+          Компонент освітньої <br>
           програми
         </th>
         <th style="width: 10%">
-          Кількість <br />
+          Кількість <br>
           кредитів
         </th>
         <th style="width: 10%">
-          Форма підсумку <br />
+          Форма підсумку <br>
           контролю
         </th>
         <th style="width: 10%">
@@ -40,19 +40,21 @@
     </thead>
     <tbody>
       <tr
-        style="height: 65px"
         v-for="(item, index) in components.mandatory"
         :key="index"
+        style="height: 65px"
       >
-        <td style="white-space: nowrap">{{ 'ОК ' + item.code }}</td>
+        <td style="white-space: nowrap">
+          {{ 'ОК ' + item.code }}
+        </td>
         <td>
           <span v-if="editIndex !== item.id">
             {{ item.name }}
           </span>
           <span v-if="editIndex === item.id">
             <VTextField
-              variant="underlined"
               v-model="item.name"
+              variant="underlined"
               :rules="rulesComp.nameComp"
               :error="NameError"
               :error-messages="errorName"
@@ -64,8 +66,8 @@
           <span v-if="editIndex !== item.id"> {{ item.credits }}</span>
           <span v-if="editIndex === item.id">
             <VTextField
-              variant="underlined"
               v-model="item.credits"
+              variant="underlined"
               type="number"
               min="1"
               :error="hasError"
@@ -82,8 +84,8 @@
           </span>
           <span v-if="editIndex === item.id">
             <VSelect
-              variant="underlined"
               v-model="item.control_type"
+              variant="underlined"
               :items="control_types"
               :rules="rulesComp.typeExam"
               @keyup.enter="saveComponent(comp)"
@@ -92,8 +94,8 @@
         </td>
         <td>
           <span
-            class="my-4"
             v-if="editIndex !== item.id"
+            class="my-4"
           >
             <VBtn
               icon="mdi-pencil"
@@ -149,19 +151,19 @@
     <thead class="thead-light">
       <tr>
         <th style="width: 5%">
-          Код <br />
+          Код <br>
           н/д
         </th>
         <th>
-          Компонент освітньої <br />
+          Компонент освітньої <br>
           програми
         </th>
         <th style="width: 10%">
-          Кількість <br />
+          Кількість <br>
           кредитів
         </th>
         <th style="width: 10%">
-          Форма підсумку <br />
+          Форма підсумку <br>
           контролю
         </th>
         <th style="width: 10%">
@@ -187,12 +189,12 @@
           </span>
           <span v-if="editIndex === block.block_num">
             <VTextField
+              v-model="block.block_name"
               :rules="rulesVB.maxLength"
               class="vb-blocks-name"
               variant="underlined"
-              v-model="block.block_name"
-              @keyup.enter="saveComponent(item)"
               maxlength="100"
+              @keyup.enter="saveComponent(item)"
             />
           </span>
         </th>
@@ -210,8 +212,8 @@
               icon="mdi-check-bold"
               size="x-small"
               style="margin-right: 2%"
-              @click="saveBlockName(block)"
               :disabled="!block.block_name"
+              @click="saveBlockName(block)"
             />
             <VBtn
               icon="mdi-close-thick"
@@ -222,23 +224,40 @@
         </th>
       </tr>
       <tr
-        style="height: 65px"
         v-for="(comp, compIndex) in block.comps_in_block"
         :key="'comp-' + compIndex"
+        style="height: 65px"
       >
-        <td style="white-space: nowrap">{{ 'ВБ ' + comp.block_num + '.' + comp.code }}</td>
+        <td style="white-space: nowrap">
+          {{ 'ВБ ' + comp.block_num + '.' + comp.code }}
+        </td>
         <td>
           <span v-if="editIndex !== comp.id">
             {{ comp.name }}
           </span>
-          <span v-if="editIndex === comp.id">
+          <span
+            v-if="editIndex === comp.id"
+            style="display: flex; align-items: center;"
+          >
             <VTextField
-              variant="underlined"
               v-model="comp.name"
+              variant="underlined"
               :rules="rulesComp.nameComp"
               :error="NameError"
               :error-messages="errorName"
+              style="width: 50%"
               @keyup.enter="saveComponent(comp)"
+            />
+
+
+            <VCombobox
+              v-model="comp.block_name"
+              :items="VBblock"
+              item-title="block_name"
+              variant="underlined"
+              outlined
+              dense
+              style="width: 50%; margin-left: 20%; margin-right: 20%;"
             />
           </span>
         </td>
@@ -246,8 +265,8 @@
           <span v-if="editIndex !== comp.id"> {{ comp.credits }}</span>
           <span v-if="editIndex === comp.id">
             <VTextField
-              variant="underlined"
               v-model="comp.credits"
+              variant="underlined"
               type="number"
               :error="hasError"
               :error-messages="errorMessage"
@@ -264,8 +283,8 @@
           </span>
           <span v-if="editIndex === comp.id">
             <VSelect
-              variant="underlined"
               v-model="comp.control_type"
+              variant="underlined"
               :items="control_types"
               :rules="rulesComp.typeExam"
               @keyup.enter="saveComponent(comp)"
@@ -411,7 +430,7 @@
               />
             </VCol>
             <VCol cols="12">
-              <VSelect
+              <VCombobox
                 v-model="newComponent.control_type"
                 label="Форма підсумку контролю"
                 :items="control_types"
@@ -705,6 +724,7 @@ async function saveComponent(component) {
       errorMessage.value = 'Забагато кредитів'
       hasError.value = true
     }
+    
     return
   }
   originValue = {}
@@ -713,6 +733,8 @@ const saveBlockName = async block => {
   editIndex.value = null
   console.log('Блок', block)
   await eduProgsStore.updateVbBlockName(route.params.pages, block.block_num, block.block_name)
+  await eduProgsStore.fetchVBblock(route.params.pages)
+  VBblock.value = eduProgsStore.getVBblock
   originValue = {}
 }
 </script>
