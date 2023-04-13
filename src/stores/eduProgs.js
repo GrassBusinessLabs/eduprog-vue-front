@@ -259,5 +259,9 @@ export const useEduProgsStore = defineStore({
       }
       await editData('/eduprogs/comps/updVB/' + eduId, payload)
     },
+    async findCompById(compId) {
+      const response = await getData('/eduprogs/comps/' + compId)
+      return response
+    },
   },
 })
