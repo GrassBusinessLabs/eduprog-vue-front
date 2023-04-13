@@ -54,7 +54,7 @@ export const useEduProgsStore = defineStore({
     async createEduProg(payload) {
       const response = await postData('/eduprogs/create', payload)
       this.fetchEduProgs
-      router.replace('/eduprogs/' + response.id)
+      router.replace('/eduprogs/' + response.id+'/characteristic')
     },
     async editNameEduProg(payload, id) {
       await editData('/eduprogs/' + id, payload)
