@@ -143,7 +143,7 @@
         <th class="text-center">
           <h3>Вибірковий компонент ОП</h3>
         </th>
-        <th style="width: 10%"/>
+        <th style="width: 10%" />
       </tr>
     </thead>
   </VTable>
@@ -189,12 +189,12 @@
           </span>
           <span v-if="editIndex === block.block_num">
             <VTextField
+              v-model="block.block_name"
               :rules="rulesVB.maxLength"
               class="vb-blocks-name"
               variant="underlined"
-              v-model="block.block_name"
-              @keyup.enter="saveBlockName(block)"
               maxlength="100"
+              @keyup.enter="saveBlockName(block)"
             />
           </span>
         </th>
@@ -255,9 +255,8 @@
               :items="VBblock"
               item-title="block_name"
               variant="underlined"
-              outlined
-              dense
-              style="width: 50%; margin-left: 20%; margin-right: 20%;"
+              style="width: 60%; margin-left: 20%; margin-right: 20%;"
+              @keyup.enter="saveComponent(comp)"
             />
           </span>
         </td>
@@ -710,8 +709,42 @@ const confirmRemove = async () => {
   await eduProgsStore.findEduProgById(route.params.pages)
   originValue={}
 }
+
+// function updateSelectedBlockNum() {
+//   const selectedBlock = VBblock.value.find(block => block.block_name === newComponent.block_name)
+//   if (selectedBlock) {
+//     newComponent.block_num = String(selectedBlock.block_num)
+//   } else if (VBblock.value.length === 0) {
+//     newComponent.block_num = String(1)
+//   } else {
+//     const maxBlockNum = Math.max(...VBblock.value.map(block => block.block_num))
+//     newComponent.block_num = String(maxBlockNum + 1)
+//   }
+// }
+
+function editVBcomp(component){
+  const selectedBlock = VBblock.value.find(block => block.block_name === component.block_name)
+  console.log(selectedBlock)
+  if (selectedBlock) {
+    component.block_num = String(selectedBlock.block_num)
+    const maxVBNum = Math.max(...selectedBlock.comps_in_block.map(block => block.block_num))
+    console.log(maxVBNum)
+    component.code = String(maxVBNum + 1)
+    console.log(component.code)
+    console.log(component)
+  }  else {
+    const maxBlockNum = Math.max(...VBblock.value.map(block => block.block_num))
+    component.block_num = String(maxBlockNum + 1)
+    component.code = String(1)
+    console.log(component)
+    console.log(component.code)
+  }
+}
+
 async function saveComponent(component) {
+  editVBcomp(component)
   try {
+    console.log(component)
     await eduProgsStore.editComponent(component.id, component)
     updateCredits()
     editIndex.value = null
@@ -729,7 +762,7 @@ async function saveComponent(component) {
   }
   originValue = {}
 }
-const saveBlockName= async (block)=>{
+const saveBlockName= async block=>{
   if(block.block_name.length===0){
     return
   }
