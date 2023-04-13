@@ -710,18 +710,6 @@ const confirmRemove = async () => {
   originValue={}
 }
 
-// function updateSelectedBlockNum() {
-//   const selectedBlock = VBblock.value.find(block => block.block_name === newComponent.block_name)
-//   if (selectedBlock) {
-//     newComponent.block_num = String(selectedBlock.block_num)
-//   } else if (VBblock.value.length === 0) {
-//     newComponent.block_num = String(1)
-//   } else {
-//     const maxBlockNum = Math.max(...VBblock.value.map(block => block.block_num))
-//     newComponent.block_num = String(maxBlockNum + 1)
-//   }
-// }
-
 function editVBcomp(component){
   const selectedBlock = VBblock.value.find(block => block.block_name === component.block_name)
   console.log(selectedBlock)
