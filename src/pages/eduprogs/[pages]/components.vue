@@ -521,7 +521,7 @@ const eduProgsStore = useEduProgsStore()
 
 const { components, creditsInfo } = storeToRefs(eduProgsStore)
 const VBblock = ref()
-
+const dialogDelete = ref(false)
 const editIndex = ref({})
 let originValue = {}
 const dialogCreate = ref(false)
