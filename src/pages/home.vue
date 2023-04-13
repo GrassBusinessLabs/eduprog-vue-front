@@ -113,7 +113,6 @@ const newEduProg = reactive({
 
   <VDialog
     v-model="dialogCreate"
-    persistent
     max-width="600px"
   >
     <VCard>
@@ -246,7 +245,6 @@ const newEduProg = reactive({
   </VAlert>
   <VDialog
     v-model="dialogRename"
-    persistent
     max-width="600"
   >
     <VCard>

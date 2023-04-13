@@ -14,19 +14,19 @@
     <thead class="thead-light">
       <tr>
         <th style="width: 5%">
-          Код <br />
+          Код <br>
           н/д
         </th>
         <th>
-          Компонент освітньої <br />
+          Компонент освітньої <br>
           програми
         </th>
         <th style="width: 10%">
-          Кількість <br />
+          Кількість <br>
           кредитів
         </th>
         <th style="width: 10%">
-          Форма підсумку <br />
+          Форма підсумку <br>
           контролю
         </th>
         <th style="width: 10%">
@@ -40,19 +40,21 @@
     </thead>
     <tbody>
       <tr
-        style="height: 65px"
         v-for="(item, index) in components.mandatory"
         :key="index"
+        style="height: 65px"
       >
-        <td style="white-space: nowrap">{{ 'ОК ' + item.code }}</td>
+        <td style="white-space: nowrap">
+          {{ 'ОК ' + item.code }}
+        </td>
         <td>
           <span v-if="editIndex !== item.id">
             {{ item.name }}
           </span>
           <span v-if="editIndex === item.id">
             <VTextField
-              variant="underlined"
               v-model="item.name"
+              variant="underlined"
               :rules="rulesComp.nameComp"
               :error="NameError"
               :error-messages="errorName"
@@ -64,10 +66,10 @@
           <span v-if="editIndex !== item.id"> {{ item.credits }}</span>
           <span v-if="editIndex === item.id">
             <VTextField
-              variant="underlined"
               v-model="item.credits"
+              variant="underlined"
               type="number"
-              min="0"
+              min="1"
               :error="hasError"
               :error-messages="errorMessage"
               :rules="rulesComp.credits"
@@ -82,8 +84,8 @@
           </span>
           <span v-if="editIndex === item.id">
             <VSelect
-              variant="underlined"
               v-model="item.control_type"
+              variant="underlined"
               :items="control_types"
               :rules="rulesComp.typeExam"
               @keyup.enter="saveComponent(comp)"
@@ -92,8 +94,8 @@
         </td>
         <td>
           <span
-            class="my-4"
             v-if="editIndex !== item.id"
+            class="my-4"
           >
             <VBtn
               icon="mdi-pencil"
@@ -149,19 +151,19 @@
     <thead class="thead-light">
       <tr>
         <th style="width: 5%">
-          Код <br />
+          Код <br>
           н/д
         </th>
         <th>
-          Компонент освітньої <br />
+          Компонент освітньої <br>
           програми
         </th>
         <th style="width: 10%">
-          Кількість <br />
+          Кількість <br>
           кредитів
         </th>
         <th style="width: 10%">
-          Форма підсумку <br />
+          Форма підсумку <br>
           контролю
         </th>
         <th style="width: 10%">
@@ -199,19 +201,19 @@
 
         <th>
           <span v-if="editIndex !== block.block_num">
-          <VBtn
-            icon="mdi-pencil"
-            size="x-small"
-            @click="edit(block, 'Block')"
-          />
+            <VBtn
+              icon="mdi-pencil"
+              size="x-small"
+              @click="edit(block, 'Block')"
+            />
           </span>
           <span v-else>
             <VBtn
               icon="mdi-check-bold"
               size="x-small"
               style="margin-right: 2%"
-              @click="saveBlockName(block)"
               :disabled="!block.block_name"
+              @click="saveBlockName(block)"
             />
             <VBtn
               icon="mdi-close-thick"
@@ -222,23 +224,40 @@
         </th>
       </tr>
       <tr
-        style="height: 65px"
         v-for="(comp, compIndex) in block.comps_in_block"
         :key="'comp-' + compIndex"
+        style="height: 65px"
       >
-        <td style="white-space: nowrap">{{ 'ВБ ' + comp.block_num + '.' + comp.code }}</td>
+        <td style="white-space: nowrap">
+          {{ 'ВБ ' + comp.block_num + '.' + comp.code }}
+        </td>
         <td>
           <span v-if="editIndex !== comp.id">
             {{ comp.name }}
           </span>
-          <span v-if="editIndex === comp.id">
+          <span
+            v-if="editIndex === comp.id"
+            style="display: flex; align-items: center;"
+          >
             <VTextField
-              variant="underlined"
               v-model="comp.name"
+              variant="underlined"
               :rules="rulesComp.nameComp"
               :error="NameError"
               :error-messages="errorName"
+              style="width: 50%"
               @keyup.enter="saveComponent(comp)"
+            />
+
+
+            <VCombobox
+              v-model="comp.block_name"
+              :items="VBblock"
+              item-title="block_name"
+              variant="underlined"
+              outlined
+              dense
+              style="width: 50%; margin-left: 20%; margin-right: 20%;"
             />
           </span>
         </td>
@@ -246,13 +265,13 @@
           <span v-if="editIndex !== comp.id"> {{ comp.credits }}</span>
           <span v-if="editIndex === comp.id">
             <VTextField
-              variant="underlined"
               v-model="comp.credits"
+              variant="underlined"
               type="number"
               :error="hasError"
               :error-messages="errorMessage"
               :rules="rulesComp.credits"
-              min="0"
+              min="1"
               @keyup.enter="saveComponent(comp)"
               @focus="resetError"
             />
@@ -264,8 +283,8 @@
           </span>
           <span v-if="editIndex === comp.id">
             <VSelect
-              variant="underlined"
               v-model="comp.control_type"
+              variant="underlined"
               :items="control_types"
               :rules="rulesComp.typeExam"
               @keyup.enter="saveComponent(comp)"
@@ -316,7 +335,6 @@
   </VTable>
   <VDialog
     v-model="dialogCreate"
-    persistent
     max-width="600"
   >
     <VCard>
@@ -340,7 +358,7 @@
               <VTextField
                 v-model="newComponent.credits"
                 type="number"
-                min="0"
+                min="1"
                 label="Кількість кредитів"
                 :rules="rulesComp.credits"
                 :error="hasError"
@@ -381,7 +399,6 @@
   </VDialog>
   <VDialog
     v-model="dialogCreateSelective"
-    persistent
     max-width="600"
   >
     <VCard>
@@ -404,7 +421,7 @@
               <VTextField
                 v-model="newComponent.credits"
                 type="number"
-                min="0"
+                min="1"
                 label="Кількість кредитів"
                 :rules="rulesComp.credits"
                 :error="hasError"
@@ -413,7 +430,7 @@
               />
             </VCol>
             <VCol cols="12">
-              <VSelect
+              <VCombobox
                 v-model="newComponent.control_type"
                 label="Форма підсумку контролю"
                 :items="control_types"
@@ -456,6 +473,34 @@
       </VCardText>
     </VCard>
   </VDialog>
+
+  <VDialog
+    v-model="dialogDelete"
+    max-width="290"
+  >
+    <VCard>
+      <VCardTitle> Підтвердіть видалення </VCardTitle>
+      <VCardText> Ви впевнені що хочете видалити компонент: {{ originValue.name }}? </VCardText>
+
+      <VCardActions>
+        <VBtn
+          color="green darken-1"
+          text
+          @click="dialogDelete = false"
+        >
+          Ні
+        </VBtn>
+
+        <VBtn
+          color="green darken-1"
+          text
+          @click="confirmRemove"
+        >
+          Так
+        </VBtn>
+      </VCardActions>
+    </VCard>
+  </VDialog>
 </template>
 
 <script setup>
@@ -475,9 +520,9 @@ const eduProgsStore = useEduProgsStore()
 
 const { components, creditsInfo } = storeToRefs(eduProgsStore)
 const VBblock = ref()
-
+const dialogDelete = ref(false)
 const editIndex = ref(null)
-let originValue = {}
+let originValue = ref({})
 const dialogCreate = ref(false)
 const dialogCreateSelective = ref(false)
 const newComponent = reactive({
@@ -516,10 +561,7 @@ const rulesComp = ref({
   ],
 })
 const rulesVB = ref({
-  maxLength: [
-    v => v.length <= 99|| 'Максимум 100 символів',
-    v => v.length >= 1|| 'Мінімум 1 символ'
-  ]
+  maxLength: [v => v.length <= 99 || 'Максимум 100 символів', v => v.length >= 1 || 'Мінімум 1 символ'],
 })
 const hasError = ref(false)
 const errorMessage = ref('')
@@ -633,11 +675,11 @@ async function createComponent() {
   await updateCredits()
 }
 
-function edit(item, type="Component") {
+function edit(item, type = 'Component') {
   originValue = Object.assign({}, item)
-  if(type==="Block"){
+  if (type === 'Block') {
     editIndex.value = item.block_num
-  }else if(type==="Component"){
+  } else if (type === 'Component') {
     editIndex.value = item.id
   }
 }
@@ -650,15 +692,24 @@ function cancel(item) {
   originValue = {}
 }
 
-async function remove(component, type) {
-  console.log(components.value)
-  await eduProgsStore.deleteComponent(component)
-  components.value[type] = components.value[type].filter(obj => obj.id !== component.id)
-  console.log(components.value[type])
+function remove(comp) {
+  dialogDelete.value = true
+  originValue = Object.assign({}, comp)
+  console.log("ОРИДЖИ?",originValue.id)
+}
+const confirmRemove = async () => {
+  console.log(originValue)
+  dialogDelete.value = false
+  await eduProgsStore.deleteComponent(originValue)
+  let type='mandatory'
+  if(originValue.category==='BLOC'){
+    type='selective'
+  }
+  components.value[type] = components.value[type].filter(obj => obj.id !== originValue.id)
   updateCredits()
   await eduProgsStore.findEduProgById(route.params.pages)
+  originValue={}
 }
-
 async function saveComponent(component) {
   try {
     await eduProgsStore.editComponent(component.id, component)
@@ -673,6 +724,7 @@ async function saveComponent(component) {
       errorMessage.value = 'Забагато кредитів'
       hasError.value = true
     }
+    
     return
   }
   originValue = {}
@@ -682,8 +734,10 @@ const saveBlockName= async (block)=>{
     return
   }
   editIndex.value = null
-  console.log("Блок",block)
+  console.log('Блок', block)
   await eduProgsStore.updateVbBlockName(route.params.pages, block.block_num, block.block_name)
+  await eduProgsStore.fetchVBblock(route.params.pages)
+  VBblock.value = eduProgsStore.getVBblock
   originValue = {}
 }
 </script>
@@ -709,7 +763,7 @@ tr td span.v-select__selection-text {
 .table-vb-blocks table {
   border-collapse: collapse;
 }
-.vb-blocks-name .v-field__input{
+.vb-blocks-name .v-field__input {
   text-align: center;
   padding: 0;
   height: 80%;
