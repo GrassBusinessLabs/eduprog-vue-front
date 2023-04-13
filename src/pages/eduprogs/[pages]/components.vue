@@ -14,19 +14,19 @@
     <thead class="thead-light">
       <tr>
         <th style="width: 5%">
-          Код <br />
+          Код <br>
           н/д
         </th>
         <th>
-          Компонент освітньої <br />
+          Компонент освітньої <br>
           програми
         </th>
         <th style="width: 10%">
-          Кількість <br />
+          Кількість <br>
           кредитів
         </th>
         <th style="width: 10%">
-          Форма підсумку <br />
+          Форма підсумку <br>
           контролю
         </th>
         <th style="width: 10%">
@@ -40,20 +40,22 @@
     </thead>
     <tbody>
       <tr
-        style="height: 65px"
         v-for="(item, index) in components.mandatory"
         :key="index"
+        style="height: 65px"
         :class="[editIndex.id === item.id ? 'active-component' : '']"
       >
-        <td style="white-space: nowrap">{{ 'ОК ' + item.code }}</td>
+        <td style="white-space: nowrap">
+          {{ 'ОК ' + item.code }}
+        </td>
         <td>
           <span v-if="editIndex.id !== item.id">
             {{ item.name }}
           </span>
           <span v-if="editIndex.id === item.id">
             <VTextField
-              variant="underlined"
               v-model="item.name"
+              variant="underlined"
               :rules="rulesComp.nameComp"
               :error="NameError"
               :error-messages="errorName"
@@ -65,8 +67,8 @@
           <span v-if="editIndex.id !== item.id"> {{ item.credits }}</span>
           <span v-if="editIndex.id === item.id">
             <VTextField
-              variant="underlined"
               v-model="item.credits"
+              variant="underlined"
               type="number"
               min="0"
               :error="hasError"
@@ -83,8 +85,8 @@
           </span>
           <span v-if="editIndex.id === item.id">
             <VSelect
-              variant="underlined"
               v-model="item.control_type"
+              variant="underlined"
               :items="control_types"
               :rules="rulesComp.typeExam"
               @keyup.enter="saveComponent(comp)"
@@ -93,8 +95,8 @@
         </td>
         <td>
           <span
-            class="my-4"
             v-if="editIndex.id !== item.id"
+            class="my-4"
           >
             <VBtn
               icon="mdi-pencil"
@@ -142,7 +144,7 @@
         <th class="text-center">
           <h3>Вибірковий компонент ОП</h3>
         </th>
-        <th style="width: 10%"/>
+        <th style="width: 10%" />
       </tr>
     </thead>
   </VTable>
@@ -150,19 +152,19 @@
     <thead class="thead-light">
       <tr>
         <th style="width: 5%">
-          Код <br />
+          Код <br>
           н/д
         </th>
         <th>
-          Компонент освітньої <br />
+          Компонент освітньої <br>
           програми
         </th>
         <th style="width: 10%">
-          Кількість <br />
+          Кількість <br>
           кредитів
         </th>
         <th style="width: 10%">
-          Форма підсумку <br />
+          Форма підсумку <br>
           контролю
         </th>
         <th style="width: 10%">
@@ -188,31 +190,31 @@
           </span>
           <span v-if="editIndex.id === block.block_num">
             <VTextField
+              v-model="block.block_name"
               :rules="rulesVB.maxLength"
               class="vb-blocks-name"
               variant="underlined"
-              v-model="block.block_name"
-              @keyup.enter="saveBlockName(block)"
               maxlength="100"
+              @keyup.enter="saveBlockName(block)"
             />
           </span>
         </th>
 
         <th>
           <span v-if="editIndex.id !== block.block_num">
-          <VBtn
-            icon="mdi-pencil"
-            size="x-small"
-            @click="edit(block, 'Block')"
-          />
+            <VBtn
+              icon="mdi-pencil"
+              size="x-small"
+              @click="edit(block, 'Block')"
+            />
           </span>
           <span v-else>
             <VBtn
               icon="mdi-check-bold"
               size="x-small"
               style="margin-right: 2%"
-              @click="saveBlockName(block)"
               :disabled="!block.block_name"
+              @click="saveBlockName(block)"
             />
             <VBtn
               icon="mdi-close-thick"
@@ -223,20 +225,22 @@
         </th>
       </tr>
       <tr
-        style="height: 65px"
         v-for="(comp, compIndex) in block.comps_in_block"
         :key="'comp-' + compIndex"
+        style="height: 65px"
         :class="[editIndex.id === comp.id ? 'active-component' : '']"
       >
-        <td style="white-space: nowrap">{{ 'ВБ ' + comp.block_num + '.' + comp.code }}</td>
+        <td style="white-space: nowrap">
+          {{ 'ВБ ' + comp.block_num + '.' + comp.code }}
+        </td>
         <td>
           <span v-if="editIndex.id !== comp.id">
             {{ comp.name }}
           </span>
           <span v-if="editIndex.id === comp.id">
             <VTextField
-              variant="underlined"
               v-model="comp.name"
+              variant="underlined"
               :rules="rulesComp.nameComp"
               :error="NameError"
               :error-messages="errorName"
@@ -248,8 +252,8 @@
           <span v-if="editIndex.id !== comp.id"> {{ comp.credits }}</span>
           <span v-if="editIndex.id === comp.id">
             <VTextField
-              variant="underlined"
               v-model="comp.credits"
+              variant="underlined"
               type="number"
               :error="hasError"
               :error-messages="errorMessage"
@@ -266,8 +270,8 @@
           </span>
           <span v-if="editIndex.id === comp.id">
             <VSelect
-              variant="underlined"
               v-model="comp.control_type"
+              variant="underlined"
               :items="control_types"
               :rules="rulesComp.typeExam"
               @keyup.enter="saveComponent(comp)"
@@ -520,8 +524,8 @@ const rulesComp = ref({
 const rulesVB = ref({
   maxLength: [
     v => v.length <= 99|| 'Максимум 100 символів',
-    v => v.length >= 1|| 'Мінімум 1 символ'
-  ]
+    v => v.length >= 1|| 'Мінімум 1 символ',
+  ],
 })
 const hasError = ref(false)
 const errorMessage = ref('')
@@ -643,7 +647,7 @@ function edit(item, type="Component") {
   }else if(type==="Component"){
     editIndex.value.id = item.id
     editIndex.value.category=item.category
-    window.addEventListener('click', closeEdit);
+    window.addEventListener('click', closeEdit)
   }
 }
 function cancel(item) {
@@ -652,7 +656,7 @@ function cancel(item) {
     item[key] = originValue[key]
   }
   originValue = {}
-  window.removeEventListener('click', closeEdit);
+  window.removeEventListener('click', closeEdit)
 }
 async function closeEdit (e){
   console.log('клик')
@@ -667,20 +671,34 @@ async function closeEdit (e){
   let foundComponent={}
   switch (editIndex.value.category) {
   case "MANDATORY":
-    foundComponent = components.value.mandatory.find(item => item.id === editIndex.value.id);
-    break;
+    foundComponent = components.value.mandatory.find(item => item.id === editIndex.value.id)
+    break
   case "BLOC":
-    foundComponent = block.comps_in_block.find(item => item.id === editIndex.value.id);
-    break;
-} 
+    foundComponent = findObjectById(editIndex.value.id,VBblock.value)
+    console.log(foundComponent)
+    break
+  } 
   console.log("ФАУГНД",foundComponent)
   for (let key in foundComponent) {
     foundComponent[key] = originData[key]
   }
   console.log(originData)
   editIndex.value.id = null
-  window.removeEventListener('click', closeEdit);
+  window.removeEventListener('click', closeEdit)
 }
+
+function findObjectById(id, arrayOfObjects) {
+  for (let i = 0; i < arrayOfObjects.length; i++) {
+    const object = arrayOfObjects[i]
+    const result = object.comps_in_block.find(comp => comp.id === id)
+    if (result) {
+      return result
+    }
+  }
+
+  return null
+}
+
 async function remove(component, type) {
   console.log(components.value)
   await eduProgsStore.deleteComponent(component)
@@ -704,12 +722,13 @@ async function saveComponent(component) {
       errorMessage.value = 'Забагато кредитів'
       hasError.value = true
     }
+    
     return
   }
-  window.removeEventListener('click', closeEdit);
+  window.removeEventListener('click', closeEdit)
   originValue = {}
 }
-const saveBlockName= async (block)=>{
+const saveBlockName= async block=>{
   if(block.block_name.length===0){
     return
   }
