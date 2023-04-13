@@ -43,15 +43,16 @@
         v-for="(item, index) in components.mandatory"
         :key="index"
         style="height: 65px"
+        :class="[editIndex.id === item.id ? 'active-component' : '']"
       >
         <td style="white-space: nowrap">
           {{ 'ОК ' + item.code }}
         </td>
         <td>
-          <span v-if="editIndex !== item.id">
+          <span v-if="editIndex.id !== item.id">
             {{ item.name }}
           </span>
-          <span v-if="editIndex === item.id">
+          <span v-if="editIndex.id === item.id">
             <VTextField
               v-model="item.name"
               variant="underlined"
@@ -63,8 +64,8 @@
           </span>
         </td>
         <td>
-          <span v-if="editIndex !== item.id"> {{ item.credits }}</span>
-          <span v-if="editIndex === item.id">
+          <span v-if="editIndex.id !== item.id"> {{ item.credits }}</span>
+          <span v-if="editIndex.id === item.id">
             <VTextField
               v-model="item.credits"
               variant="underlined"
@@ -79,10 +80,10 @@
           </span>
         </td>
         <td>
-          <span v-if="editIndex !== item.id">
+          <span v-if="editIndex.id !== item.id">
             {{ item.control_type }}
           </span>
-          <span v-if="editIndex === item.id">
+          <span v-if="editIndex.id === item.id">
             <VSelect
               v-model="item.control_type"
               variant="underlined"
@@ -94,7 +95,7 @@
         </td>
         <td>
           <span
-            v-if="editIndex !== item.id"
+            v-if="editIndex.id !== item.id"
             class="my-4"
           >
             <VBtn
@@ -184,10 +185,10 @@
           colspan="4"
           class="text-center"
         >
-          <span v-if="editIndex !== block.block_num">
+          <span v-if="editIndex.id !== block.block_num">
             <h3>{{ block.block_name }}</h3>
           </span>
-          <span v-if="editIndex === block.block_num">
+          <span v-if="editIndex.id === block.block_num">
             <VTextField
               v-model="block.block_name"
               :rules="rulesVB.maxLength"
@@ -200,7 +201,7 @@
         </th>
 
         <th>
-          <span v-if="editIndex !== block.block_num">
+          <span v-if="editIndex.id !== block.block_num">
             <VBtn
               icon="mdi-pencil"
               size="x-small"
@@ -224,21 +225,20 @@
         </th>
       </tr>
       <tr
+        style="height: 65px"
         v-for="(comp, compIndex) in block.comps_in_block"
         :key="'comp-' + compIndex"
-        style="height: 65px"
+        :class="[editIndex.id === comp.id ? 'active-component' : '']"
       >
         <td style="white-space: nowrap">
           {{ 'ВБ ' + comp.block_num + '.' + comp.code }}
         </td>
         <td>
-          <span v-if="editIndex !== comp.id">
+          <span v-if="editIndex.id !== comp.id">
             {{ comp.name }}
           </span>
-          <span
-            v-if="editIndex === comp.id"
-            style="display: flex; align-items: center;"
-          >
+          <span v-if="editIndex.id === comp.id"
+                style="display: flex; align-items: center;">
             <VTextField
               v-model="comp.name"
               variant="underlined"
@@ -261,8 +261,8 @@
           </span>
         </td>
         <td>
-          <span v-if="editIndex !== comp.id"> {{ comp.credits }}</span>
-          <span v-if="editIndex === comp.id">
+          <span v-if="editIndex.id !== comp.id"> {{ comp.credits }}</span>
+          <span v-if="editIndex.id === comp.id">
             <VTextField
               v-model="comp.credits"
               variant="underlined"
@@ -277,10 +277,10 @@
           </span>
         </td>
         <td>
-          <span v-if="editIndex !== comp.id">
+          <span v-if="editIndex.id !== comp.id">
             {{ comp.control_type }}
           </span>
-          <span v-if="editIndex === comp.id">
+          <span v-if="editIndex.id === comp.id">
             <VSelect
               v-model="comp.control_type"
               variant="underlined"
@@ -291,7 +291,7 @@
           </span>
         </td>
         <td>
-          <span v-if="editIndex !== comp.id">
+          <span v-if="editIndex.id !== comp.id">
             <VBtn
               icon="mdi-pencil"
               size="x-small"
@@ -334,6 +334,7 @@
   </VTable>
   <VDialog
     v-model="dialogCreate"
+    persistent
     max-width="600"
   >
     <VCard>
@@ -398,6 +399,7 @@
   </VDialog>
   <VDialog
     v-model="dialogCreateSelective"
+    persistent
     max-width="600"
   >
     <VCard>
@@ -519,9 +521,9 @@ const eduProgsStore = useEduProgsStore()
 
 const { components, creditsInfo } = storeToRefs(eduProgsStore)
 const VBblock = ref()
-const dialogDelete = ref(false)
-const editIndex = ref(null)
-let originValue = ref({})
+
+const editIndex = ref({})
+let originValue = {}
 const dialogCreate = ref(false)
 const dialogCreateSelective = ref(false)
 const newComponent = reactive({
@@ -560,7 +562,10 @@ const rulesComp = ref({
   ],
 })
 const rulesVB = ref({
-  maxLength: [v => v.length <= 99 || 'Максимум 100 символів', v => v.length >= 1 || 'Мінімум 1 символ'],
+  maxLength: [
+    v => v.length <= 99|| 'Максимум 100 символів',
+    v => v.length >= 1|| 'Мінімум 1 символ',
+  ],
 })
 const hasError = ref(false)
 const errorMessage = ref('')
@@ -674,21 +679,64 @@ async function createComponent() {
   await updateCredits()
 }
 
-function edit(item, type = 'Component') {
+function edit(item, type="Component") {
+  console.log(item)
   originValue = Object.assign({}, item)
-  if (type === 'Block') {
-    editIndex.value = item.block_num
-  } else if (type === 'Component') {
-    editIndex.value = item.id
+  if(type==="Block"){
+    editIndex.value.id = item.block_num
+  }else if(type==="Component"){
+    editIndex.value.id = item.id
+    editIndex.value.category=item.category
+    window.addEventListener('click', closeEdit)
   }
 }
-
 function cancel(item) {
-  editIndex.value = null
+  editIndex.value.id = null
   for (let key in item) {
     item[key] = originValue[key]
   }
   originValue = {}
+  window.removeEventListener('click', closeEdit)
+}
+async function closeEdit (e){
+  console.log('клик')
+  if(e&&(e.target.closest('.active-component')||e.target.closest('button')||e.target.closest('.v-list-item-title'))){
+    return
+  }
+  if(editIndex.value.category==="BLOCK"){
+    return
+  }
+  console.log('че то делаем')
+  const originData = await eduProgsStore.findCompById(editIndex.value.id)
+  let foundComponent={}
+  switch (editIndex.value.category) {
+  case "MANDATORY":
+    foundComponent = components.value.mandatory.find(item => item.id === editIndex.value.id)
+    break
+  case "BLOC":
+    foundComponent = findObjectById(editIndex.value.id,VBblock.value)
+    console.log(foundComponent)
+    break
+  }
+  console.log("ФАУГНД",foundComponent)
+  for (let key in foundComponent) {
+    foundComponent[key] = originData[key]
+  }
+  console.log(originData)
+  editIndex.value.id = null
+  window.removeEventListener('click', closeEdit)
+}
+
+function findObjectById(id, arrayOfObjects) {
+  for (let i = 0; i < arrayOfObjects.length; i++) {
+    const object = arrayOfObjects[i]
+    const result = object.comps_in_block.find(comp => comp.id === id)
+    if (result) {
+      return result
+    }
+  }
+
+  return null
 }
 
 function remove(comp) {
@@ -735,7 +783,7 @@ async function saveComponent(component) {
     console.log(component)
     await eduProgsStore.editComponent(component.id, component)
     updateCredits()
-    editIndex.value = null
+    editIndex.value.id = null
   } catch (error) {
     const errorFromServer = error.response.data.error
     if (errorFromServer === 'eduprog component with this name already exists') {
@@ -745,17 +793,18 @@ async function saveComponent(component) {
       errorMessage.value = 'Забагато кредитів'
       hasError.value = true
     }
-    
+
     return
   }
+  window.removeEventListener('click', closeEdit)
   originValue = {}
 }
 const saveBlockName= async block=>{
   if(block.block_name.length===0){
     return
   }
-  editIndex.value = null
-  console.log('Блок', block)
+  editIndex.value.id = null
+  console.log("Блок",block)
   await eduProgsStore.updateVbBlockName(route.params.pages, block.block_num, block.block_name)
   await eduProgsStore.fetchVBblock(route.params.pages)
   VBblock.value = eduProgsStore.getVBblock
@@ -784,7 +833,7 @@ tr td span.v-select__selection-text {
 .table-vb-blocks table {
   border-collapse: collapse;
 }
-.vb-blocks-name .v-field__input {
+.vb-blocks-name .v-field__input{
   text-align: center;
   padding: 0;
   height: 80%;
