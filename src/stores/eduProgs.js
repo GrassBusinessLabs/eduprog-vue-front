@@ -162,8 +162,8 @@ export const useEduProgsStore = defineStore({
       const response = await getData(`/eduprogs/competencies/byEduprogId/${eduId}/byType?type=${type}`)
       this.selectedCompetencies = response
     },
-    async fetchCompetencies(type, eduSp) {
-      const response = await getData(`/eduprogs/baseCompetencies/byType?type=${type}&specialty=${eduSp}`)
+    async fetchCompetencies(type) {
+      const response = await getData(`/eduprogs/baseCompetencies/${type}/byType?type=ZK`)
       this.allCompetencies = response
     },
 
