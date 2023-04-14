@@ -429,7 +429,7 @@
               />
             </VCol>
             <VCol cols="12">
-              <VCombobox
+              <VSelect
                 v-model="newComponent.control_type"
                 label="Форма підсумку контролю"
                 :items="control_types"
@@ -475,13 +475,14 @@
 
   <VDialog
     v-model="dialogDelete"
-    max-width="290"
+    max-width="600"
   >
     <VCard>
       <VCardTitle> Підтвердіть видалення </VCardTitle>
       <VCardText> Ви впевнені що хочете видалити компонент: {{ originValue.name }}? </VCardText>
 
       <VCardActions>
+        <VSpacer />
         <VBtn
           color="green darken-1"
           text
