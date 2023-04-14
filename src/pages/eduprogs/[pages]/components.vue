@@ -704,7 +704,6 @@ function cancel(item) {
   window.removeEventListener('click', closeEdit)
 }
 async function closeEdit (e){
-
   console.log('клик')
   if(e&&(e.target.closest('.active-comp-block'))||(e.target.closest('.active-component')||e.target.closest('button')||e.target.closest('.v-list-item-title'))){
     return
