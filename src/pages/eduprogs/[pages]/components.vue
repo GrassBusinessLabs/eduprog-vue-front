@@ -334,7 +334,6 @@
   </VTable>
   <VDialog
     v-model="dialogCreate"
-    persistent
     max-width="600"
   >
     <VCard>
@@ -399,7 +398,6 @@
   </VDialog>
   <VDialog
     v-model="dialogCreateSelective"
-    persistent
     max-width="600"
   >
     <VCard>
