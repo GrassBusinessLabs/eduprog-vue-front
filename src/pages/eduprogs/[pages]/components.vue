@@ -125,6 +125,7 @@
           </span>
         </td>
       </tr>
+      <hr style="border: 0px">
     </tbody>
 
     <thead>
@@ -180,7 +181,7 @@
       v-for="(block, index) in VBblock"
       :key="'block-' + index"
     >
-      <tr>
+      <tr :class="[editIndex.id === block.block_num ? 'active-comp-block' : '']">
         <th
           colspan="4"
           class="text-center"
@@ -193,7 +194,7 @@
               v-model="block.block_name"
               :rules="rulesVB.maxLength"
               class="vb-blocks-name"
-              variant="underlined"
+              variant="plain"
               maxlength="100"
               @keyup.enter="saveBlockName(block)"
             />
@@ -225,9 +226,9 @@
         </th>
       </tr>
       <tr
-        style="height: 65px"
         v-for="(comp, compIndex) in block.comps_in_block"
         :key="'comp-' + compIndex"
+        style="height: 65px"
         :class="[editIndex.id === comp.id ? 'active-component' : '']"
       >
         <td style="white-space: nowrap">
@@ -237,8 +238,10 @@
           <span v-if="editIndex.id !== comp.id">
             {{ comp.name }}
           </span>
-          <span v-if="editIndex.id === comp.id"
-                style="display: flex; align-items: center;">
+          <span
+            v-if="editIndex.id === comp.id"
+            style="display: flex; align-items: center;"
+          >
             <VTextField
               v-model="comp.name"
               variant="underlined"
@@ -255,7 +258,7 @@
               :items="VBblock"
               item-title="block_name"
               variant="underlined"
-              style="width: 60%; margin-left: 20%; margin-right: 20%;"
+              style="width: 60%; margin-left: 20%; margin-right: 20%; font-size: 14px "
               @keyup.enter="saveComponent(comp)"
             />
           </span>
@@ -319,6 +322,7 @@
           </span>
         </td>
       </tr>
+      <hr style="border: 0px">
     </tbody>
   </VTable>
   <VTable>
@@ -334,7 +338,6 @@
   </VTable>
   <VDialog
     v-model="dialogCreate"
-    persistent
     max-width="600"
   >
     <VCard>
@@ -399,7 +402,6 @@
   </VDialog>
   <VDialog
     v-model="dialogCreateSelective"
-    persistent
     max-width="600"
   >
     <VCard>
@@ -684,6 +686,8 @@ function edit(item, type="Component") {
   originValue = Object.assign({}, item)
   if(type==="Block"){
     editIndex.value.id = item.block_num
+    editIndex.value.category= 'BLOCK'
+    window.addEventListener('click', closeEdit)
   }else if(type==="Component"){
     editIndex.value.id = item.id
     editIndex.value.category=item.category
@@ -699,32 +703,38 @@ function cancel(item) {
   window.removeEventListener('click', closeEdit)
 }
 async function closeEdit (e){
+
   console.log('клик')
-  if(e&&(e.target.closest('.active-component')||e.target.closest('button')||e.target.closest('.v-list-item-title'))){
+  if(e&&(e.target.closest('.active-comp-block'))||(e.target.closest('.active-component')||e.target.closest('button')||e.target.closest('.v-list-item-title'))){
     return
   }
   if(editIndex.value.category==="BLOCK"){
-    return
+    console.log('dfgdfgdf')
+    await eduProgsStore.fetchVBblock(route.params.pages)
+    VBblock.value = eduProgsStore.getVBblock
+    editIndex.value.id = null
+    window.removeEventListener('click', closeEdit)
+  } else {
+    console.log('че то делаем')
+    const originData = await eduProgsStore.findCompById(editIndex.value.id)
+    let foundComponent = {}
+    switch (editIndex.value.category) {
+    case "MANDATORY":
+      foundComponent = components.value.mandatory.find(item => item.id === editIndex.value.id)
+      break
+    case "BLOC":
+      foundComponent = findObjectById(editIndex.value.id, VBblock.value)
+      console.log(foundComponent)
+      break
+    }
+    console.log("ФАУГНД", foundComponent)
+    for (let key in foundComponent) {
+      foundComponent[key] = originData[key]
+    }
+    console.log(originData)
+    editIndex.value.id = null
+    window.removeEventListener('click', closeEdit)
   }
-  console.log('че то делаем')
-  const originData = await eduProgsStore.findCompById(editIndex.value.id)
-  let foundComponent={}
-  switch (editIndex.value.category) {
-  case "MANDATORY":
-    foundComponent = components.value.mandatory.find(item => item.id === editIndex.value.id)
-    break
-  case "BLOC":
-    foundComponent = findObjectById(editIndex.value.id,VBblock.value)
-    console.log(foundComponent)
-    break
-  }
-  console.log("ФАУГНД",foundComponent)
-  for (let key in foundComponent) {
-    foundComponent[key] = originData[key]
-  }
-  console.log(originData)
-  editIndex.value.id = null
-  window.removeEventListener('click', closeEdit)
 }
 
 function findObjectById(id, arrayOfObjects) {
@@ -822,6 +832,9 @@ input.v-field__input,
 }
 tr td .v-field__input {
   padding: 0 !important;
+  display: flex;
+  align-items: center;
+  font-size: 0.875rem;
 }
 tr td span.v-select__selection-text {
   display: flex;
@@ -829,9 +842,6 @@ tr td span.v-select__selection-text {
 }
 .table-vb-blocks table tbody {
   border-top: 1px solid rgb(58, 53, 65, 0.12);
-}
-.table-vb-blocks table {
-  border-collapse: collapse;
 }
 .vb-blocks-name .v-field__input{
   text-align: center;
