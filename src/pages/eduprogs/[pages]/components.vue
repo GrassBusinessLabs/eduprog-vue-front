@@ -433,7 +433,7 @@
               />
             </VCol>
             <VCol cols="12">
-              <VCombobox
+              <VSelect
                 v-model="newComponent.control_type"
                 label="Форма підсумку контролю"
                 :items="control_types"
@@ -479,13 +479,14 @@
 
   <VDialog
     v-model="dialogDelete"
-    max-width="290"
+    max-width="600"
   >
     <VCard>
       <VCardTitle> Підтвердіть видалення </VCardTitle>
       <VCardText> Ви впевнені що хочете видалити компонент: {{ originValue.name }}? </VCardText>
 
       <VCardActions>
+        <VSpacer />
         <VBtn
           color="green darken-1"
           text
@@ -703,7 +704,6 @@ function cancel(item) {
   window.removeEventListener('click', closeEdit)
 }
 async function closeEdit (e){
-
   console.log('клик')
   if(e&&(e.target.closest('.active-comp-block'))||(e.target.closest('.active-component')||e.target.closest('button')||e.target.closest('.v-list-item-title'))){
     return
