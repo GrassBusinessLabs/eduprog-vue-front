@@ -11,7 +11,7 @@ const selectedZkCompetencies = ref([])
 const zkCompetenciesValue = reactive({})
 const allSelect= ref(false)
 onBeforeMount(async ()=>{
-   await eduProgsStore.fetchCompetencies(route.params.pages)
+   await eduProgsStore.fetchCompetencies(route.params.pages, "ZK")
    await eduProgsStore.fetchSelectedCompetencies(route.params.pages,"ZK")
    zkCompetencies.value = eduProgsStore.getAllCompetencies
    selectedZkCompetencies.value = eduProgsStore.getSelectedCompetencies
