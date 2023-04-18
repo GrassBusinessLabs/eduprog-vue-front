@@ -11,7 +11,7 @@ const selectedFkCompetencies = ref([])
 const fkCompetenciesValue = reactive({})
 const allSelect= ref(false)
 onBeforeMount(async ()=>{
-  await eduProgsStore.fetchCompetencies("FK",eduProgsStore.eduProgData.speciality_code)
+  await eduProgsStore.fetchCompetencies(route.params.pages)
    await eduProgsStore.fetchSelectedCompetencies(route.params.pages,"FK")
    fkCompetencies.value = eduProgsStore.getAllCompetencies
    selectedFkCompetencies.value = eduProgsStore.getSelectedCompetencies
