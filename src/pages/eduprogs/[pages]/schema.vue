@@ -1,72 +1,103 @@
 <script setup>
-import draggable from 'vuedraggable'
+import { v4 as uuidv4 } from "uuid"
 import { useEduProgsStore } from '@/stores/eduProgs.js'
-import { reactive } from 'vue'
+import { reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
+import Gridstack from '@core/components/Gridstack.vue'
+
 const route = useRoute()
 const disciplines = ref([])
-onBeforeMount(async () => {
-  await eduProgsStore.fetchDisciplines(route.params.pages)
-  disciplines.value = eduProgsStore.getDisciplines
-  initData()
-})
+const eduprogComponents = ref([])
+
 const eduProgsStore = useEduProgsStore()
-const {components} =storeToRefs(eduProgsStore)
-const scheme = eduProgsStore.getScheme
+const { components } = storeToRefs(eduProgsStore)
+const scheme = ref([])
+
+const eduprogId = route.params.pages
 
 const editIndex = ref(null)
 const originalData = ref(null)
 
-const semesters = ref([...Array(8).keys()])
 const changes = reactive({
   subjects: [],
   semester: '',
   discipline: '',
 })
-const selected = reactive({})
-const enabled = ref(true)
-const dragging = ref(false)
 
+const enabled = ref(true)
+
+const items = ref({})
+
+const childComponentRef = ref(null)
+
+function logger(evt) {
+  console.log(evt)
+}
+
+onMounted(async () => {
+  // Get disciplines
+  await eduProgsStore.fetchDisciplines(eduprogId)
+  disciplines.value = eduProgsStore.getDisciplines
+  initGridItems() // TODO - delete this func
+
+  // Get eduprog components
+  await eduProgsStore.fetchComponents(eduprogId)
+  eduprogComponents.value = eduProgsStore.components
+
+  // Get components scheme
+  await eduProgsStore.fetchScheme(eduprogId)
+  scheme.value = eduProgsStore.scheme
+
+  // initGrid()
+  console.log('sscheme: ', scheme.value)
+})
+
+function initGrid() {
+  scheme.value.map(item => {
+    items.value[item.discipline_id].push({
+      w: 1,
+      x: item.semester_num,
+      id: uuidv4(),
+      eduprogcomp: item.eduprogcomp,
+    })
+  })
+}
+function initGridItems() {
+  disciplines.value.map(item => {
+    Object.defineProperty(items.value, item.id, {
+      value: [{
+        w: Math.round(Math.random()),
+        id: uuidv4(),
+      }],
+      writable: true,
+    })
+  })
+}
+
+function addEmptyWidget(discipline, index) {
+  const node = {
+    w: Math.round(Math.random()),
+    id: uuidv4(),
+  }
+  if (childComponentRef.value[index].isAreaEmpty()) {
+    items.value[discipline.id].push(node)
+    childComponentRef.value[index].createWidget(node.id)
+  }
+}
+
+function saveChanges() {
+  childComponentRef.value.map(item => {
+    console.log(item.getGridNodes())
+  })
+}
 async function deleteDiscipline(id) {
+
   await eduProgsStore.deleteDiscipline(id)
   await eduProgsStore.fetchDisciplines(route.params.pages)
   disciplines.value = eduProgsStore.getDisciplines
 }
 
-function initData() {
-  console.log('дисциплина', disciplines)
-  disciplines.value.forEach(el => {
-    selected[el] = [[], [], [], [], [], [], [], []]
-  })
-  Object.keys(selected).map(key => {
-    selected[key].forEach((semester, index) => {
-      selected[key][index].push(...getComponentByDiscipline(key, index + 1))
-    })
-  })
-  console.log(selected)
-}
-function changeDragging() {
-  dragging.value = !dragging.value
-}
-async function addNewComponent(event, discipline, semester) {
-  console.log('Ивент', event)
-  const componentData = event.item.__draggable_context.element
-  const newComponent = {
-    discipline: discipline,
-    semester_num: semester + 1,
-    eduprog_id: componentData.eduprog_id,
-    eduprogcomp_id: componentData.id,
-    credits_per_semester: 10,
-  }
-  console.log(componentData)
-  console.log(newComponent)
-  await eduProgsStore.setComponentToScheme(newComponent)
-  await eduProgsStore.fetchScheme(route.params.pages)
-  console.log('Схема',  scheme)
-  initData()
-}
 async function deleteComponent(event, element) {
-  console.log(event, element)
   await eduProgsStore.deleteComponentFromSheme(element.id)
   await eduProgsStore.fetchScheme(route.params.pages)
 }
@@ -74,6 +105,7 @@ async function deleteComponent(event, element) {
 function edit(item) {
   editIndex.value = item.id
 }
+
 function cancel(item) {
   editIndex.value = null
   Object.assign(item, originalData.value)
@@ -85,47 +117,32 @@ function save(item) {
   editIndex.value = null
   eduProgsStore.editDiscipline(item)
 }
-function getComponentByDiscipline(discipline, semestr) {
-  let array =  scheme.filter(e => {
-    if (e.discipline === discipline && e.semester_num === semestr) {
-      return e.eduprogcomp.name
-    }
-  })
-  array.map(e => {
-    e.name = e.eduprogcomp.name
-  })
-  console.log('Масив по дисицпление', array)
-
-  return array
-}
-
-//const getSubjects =  computed(() => components.value.mandatory.concat(components.value.selective))
-
-function handleSubject(event, semester, discipline) {
-  changes.subjects = event
-  changes.semester = semester + 1
-  changes.discipline = discipline
-}
 
 const createDiscipline = function dialogg() {
-  dialogCreate.value=true
+  dialogCreate.value = true
 }
 const dialogCreate = ref(false)
-const newDiscipline = reactive( {
-  name:"",
+const newDiscipline = reactive({
+  name: '',
   eduprog_id: +route.params.pages,
 })
 
 async function createNewDiscipline() {
   await eduProgsStore.createDiscipline(newDiscipline)
   await eduProgsStore.fetchDisciplines(route.params.pages)
-  newDiscipline.name=''
+  newDiscipline.name = ''
   disciplines.value = eduProgsStore.getDisciplines
-  dialogCreate.value=false
+  dialogCreate.value = false
+  initGridItems()
 }
+
 function cancelNewDiscipline() {
-  newDiscipline.name=''
-  dialogCreate.value=false
+  newDiscipline.name = ''
+  dialogCreate.value = false
+}
+
+function deleteItem(event) {
+  console.log(event)
 }
 </script>
 
@@ -175,32 +192,12 @@ function cancelNewDiscipline() {
   </VDialog>
 
   <VRow>
-    <VCol cols="2">
+    <VCol cols="12">
       <VCard
         title="Всі предмети"
         class="mb-5"
       >
-        <VCardText cols="12">
-          <Draggable
-            :list="getSubjects"
-            :disabled="!enabled"
-            item-key="name"
-            class="list-group"
-            ghost-class="ghost"
-            :group="{ name: 'people', pull: true, put: false }"
-            :sort="false"
-            @start="dragging = true"
-            @end="dragging = false"
-          >
-            <template #item="{ element }">
-              <div :class="{ 'not-draggable': !enabled }">
-                <VChip class="mb-2">
-                  {{ element.name }}
-                </VChip>
-              </div>
-            </template>
-          </Draggable>
-        </VCardText>
+        <VCardText cols="12" />
       </VCard>
     </VCol>
     <VCol>
@@ -271,23 +268,27 @@ function cancelNewDiscipline() {
             </th>
           </tr>
         </thead>
-        <tbody>
-          <tr
-            v-for="item in disciplines"
-            :key="item.id"
-          >
-            <td>
-              <div style="text-align: center">
-                <span v-if="editIndex !== item.id">{{ item.name }}</span>
-                <span v-if="editIndex === item.id">
-                  <VTextField
-                    v-model="item.name"
-                    class="my-3"
-                  />
-                </span>
-              </div>
-              <div style="text-align: center; margin-top: 5%; margin-bottom: 5%">
-                <span v-if="editIndex !== item.id">
+      </VTable>
+
+      <div style="width: 100%">
+        <div
+          v-for="(item, index) in disciplines"
+          :key="item.id"
+          class="discipline-block"
+        >
+          <div style="width: 12%">
+            <div style="text-align: center">
+              <span v-if="editIndex !== item.id">{{ item.name }}</span>
+              <span v-if="editIndex === item.id">
+                <VTextField
+                  v-model="item.name"
+                  class="my-3"
+                />
+              </span>
+            </div>
+            <div style="text-align: center; margin-top: 5%; margin-bottom: 5%">
+              <span v-if="editIndex !== item.id">
+                <div>
                   <VBtn
                     icon="mdi-pencil"
                     size="x-small"
@@ -299,73 +300,74 @@ function cancelNewDiscipline() {
                     size="x-small"
                     @click="deleteDiscipline(item.id)"
                   />
-                </span>
-                <span v-else>
-                  <VBtn
-                    icon="mdi-check-bold"
-                    size="x-small"
-                    style="margin-right:2% "
-                    @click="save(item)"
-                  />
-                  <VBtn
-                    icon="mdi-close-thick"
-                    size="x-small"
-                    @click="cancel(item)"
-                  />
-                </span>
-              </div>
-            </td>
-            <td
-              v-for="semester in semesters"
-              :key="semester"
-            >
-              <Draggable
-                v-if="Object.keys(selected).length"
-                :list="selected[item][semester]"
-                :disabled="!enabled"
-                item-key="name"
-                class="slot-for-components"
-                ghost-class="ghost"
-                :group="{
-                  name: 'people',
-                  put: function (to, from) {
-                    return from.el.children.length < 2 || true
-                  },
-                }"
-                @start="changeDragging"
-                @end="changeDragging"
-                @add="addNewComponent($event, item, semester)"
-              >
-                <template #item="{ element }">
-                  <div :class="{ 'not-draggable': !enabled }">
-                    <VChip
-                      class="my-2"
-                      closable
-                      @click:close="deleteComponent($event, element)"
-                    >
-                      {{ element.name }}
-                    </VChip>
-                  </div>
-                </template>
-              </Draggable>
-            </td>
-          </tr>
-        </tbody>
-      </VTable>
+                </div>
+                <VBtn
+                  icon="mdi-plus"
+                  size="x-small"
+                  @click="addEmptyWidget(item, index)"
+                />
+              </span>
+              <span v-else>
+                <VBtn
+                  icon="mdi-check-bold"
+                  size="x-small"
+                  style="margin-right:2% "
+                  @click="save(item)"
+                />
+                <VBtn
+                  icon="mdi-close-thick"
+                  size="x-small"
+                  @click="cancel(item)"
+                />
+              </span>
+            </div>
+          </div>
+          <div style="width: 100%">
+            <Gridstack
+              ref="childComponentRef"
+              :grid-items="items[item.id]"
+              :components="eduprogComponents"
+              @added="logger"
+              @dragstart="logger"
+              @resizestop="logger"
+              @delete="deleteItem"
+            />
+          </div>
+        </div>
+      </div>
+    </VCol>
+    <VCol cols="12">
+      <VBtn
+        class="mr-2"
+        type="reset"
+        color="secondary"
+        variant="tonal"
+      >
+        Скинути
+      </VBtn>
+      <VBtn
+        dark
+        @click="saveChanges"
+      >
+        Зберегти зміни
+      </VBtn>
     </VCol>
   </VRow>
 </template>
 
 
 <style scoped>
-.slot-for-components {
-  height: 100%;
+.discipline-block {
+  display: flex;
+  background: #fff;
+  width: 100%;
 }
 </style>
-<route lang="yaml">
+
+<route lang='yaml'>
 name: schema
 meta:
-  navActiveLink: pages-account-settings-tab
-  requiresAuth: true
-  test: true
+navActiveLink: pages-account-settings-tab
+requiresAuth: true
+test: true
 </route>
