@@ -79,6 +79,14 @@ onMounted(async () => {
               required
             />
           </VCol>
+          <VCol cols="12">
+            <VTextField
+              disabled
+              v-model="eduProgData.approval_year"
+              label="Рік затвердження"
+              required
+            />
+          </VCol>
         </VRow>
         <VRow justify="end">
           <VBtn
