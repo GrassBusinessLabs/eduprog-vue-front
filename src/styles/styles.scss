@@ -1,1 +1,35 @@
 // Write your overrides
+
+@media (max-width: 1289px) {
+  .v-navigation-drawer{
+    width: 220px !important;
+  }
+  .v-main {
+    padding-left: 0px !important;
+  }
+  .pa-6{
+    padding-top: 24px !important;
+    padding-bottom: 24px !important;
+    padding-right: 24px !important;
+    padding-left: 24px !important;
+  }
+  .nav-item-title {
+    letter-spacing: 0.15px;
+    font-size: 12px;
+  }
+}
+@media (min-width: 1290px) {
+  .v-main {
+    padding-left: 256px !important;
+  }
+  .pa-6{
+    padding-top: 24px !important;
+    padding-bottom: 24px !important;
+    padding-right: 24px !important;
+    padding-left: 10px !important;
+  }
+  .nav-item-title {
+    letter-spacing: 0.15px;
+    font-size: 15px;
+  }
+}

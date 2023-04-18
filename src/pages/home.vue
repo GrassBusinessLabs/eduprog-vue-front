@@ -10,6 +10,7 @@ import moment from 'moment'
 import router from '../router'
 const eduProgsStore = useEduProgsStore()
 const specialities = ref([])
+
 //return { eduProgs: useEduProgsStore.getEduProgs }
 const education_level = ref([])
 onMounted( async () => {
@@ -18,6 +19,8 @@ onMounted( async () => {
   await eduProgsStore.fetchSpecialities()
   education_level.value= eduProgsStore.getLevels
   specialities.value = eduProgsStore.getSpecialities
+  sortedEduProgsByYear ()
+  selectedYear.value = years.value[0]
 })
 const checkValue=    ref('')
 let currentEduProg = null
@@ -27,6 +30,7 @@ const eduProgs = computed(() => eduProgsStore.getEduProgs)
 const deleteEduProg =( async id => {
   await eduProgsStore.deleteEduProg(id)
   await eduProgsStore.fetchEduProgs()
+  sortedEduProgsByYear ()
 })
 const editNameEduProg =( async() => {
   currentEduProg.name = newNameEduProg.value
@@ -36,6 +40,7 @@ const editNameEduProg =( async() => {
 })
 const createEduProg =( async() => {
   updateSelectedSpeciality()
+  newEduProg.approval_year = Number(newEduProg.approval_year)
   await eduProgsStore.createEduProg(newEduProg)
   dialogCreate.value=false
   await eduProgsStore.fetchEduProgs()
@@ -92,28 +97,50 @@ function updateSelectedSpeciality() {
   console.log(newEduProg.speciality_code)
 }
 
+console.log(eduProgs.value)
+
 const newEduProg = reactive({
   name:'',
   education_level :'',
-  stage :'',
   speciality_code :'',
-  knowledge_field :'',
+  approval_year: '',
 })
+
+const sortedByYear = ref()
+const selectedYear = ref()
+const years = ref([])
+
+async function sortedEduProgsByYear (){
+  years.value = [...new Set(eduProgs.value.map(obj => obj.approval_year))].sort()
+
+  console.log(years.value)
+
+  sortedByYear.value = eduProgs.value.reduce((acc, obj) => {
+    if (!acc[obj.approval_year]) {
+      acc[obj.approval_year] = []
+    }
+    acc[obj.approval_year].push(obj)
+    
+    return acc
+  }, {})
+
+  console.log(sortedByYear.value)
+
+}
 </script>
 
 <template>
-    <VBtn
-      dark
-      @click="createEduProgDialog"
-      class="mb-3"
-    >
-      Створити ОПП
-    </VBtn>
+  <VBtn
+    dark
+    class="mb-3"
+    @click="createEduProgDialog"
+  >
+    Створити ОПП
+  </VBtn>
 
 
   <VDialog
     v-model="dialogCreate"
-    persistent
     max-width="600px"
   >
     <VCard>
@@ -159,6 +186,16 @@ const newEduProg = reactive({
                 dense
               />
             </VCol>
+            <VCol
+              cols="12"
+            >
+              <VTextField
+                v-model="newEduProg.approval_year"
+                label="Рік затвердження "
+                required
+                type='number'
+              />
+            </VCol>
           </VRow>
         </VContainer>
       </VCardText>
@@ -173,7 +210,7 @@ const newEduProg = reactive({
         </VBtn>
         <VBtn
           text
-          :disabled="!(newEduProg.speciality_code && newEduProg.name &&newEduProg.education_level)"
+          :disabled="!(newEduProg.speciality_code && newEduProg.name &&newEduProg.education_level &&newEduProg.approval_year)"
           @click="createEduProg"
         >
           Створити
@@ -183,58 +220,75 @@ const newEduProg = reactive({
   </VDialog>
 
 
-  <VTable v-if="eduProgs.length>0">
-    <thead>
-      <tr>
-        <th class="text-uppercase">
-          Назва
-        </th>
-        <th class="text-center text-uppercase">
-          Спеціальність
-        </th>
-        <th class="text-center text-uppercase">
-          Рівень знань
-        </th>
-        <th class="text-center text-uppercase">
-          Дата редагування
-        </th>
-        <th class="text-center text-uppercase" />
-      </tr>
-    </thead>
-    <tbody>
-      <tr 
-        v-for="item in eduProgs"
-        :key="item.id"
-        class="eduprog-item"
-        @click="editEduProg($event, item.id)"
-      >
-        <td>{{ item.name }}</td>
-        <td class="text-center">
-          {{ item.speciality }}
-        </td>
-        <td class="text-center">
-          {{ item.education_level }}
-        </td>
-        <td class="text-center">
-          {{ moment(item.updated_date).format('DD.MM.YYYY HH:mm:ss') }}
-        </td>
-        <td class="text-center">
-          <VBtn
-            icon="mdi-pencil"
-            size="x-small"
-            style="margin-right:2% "
-            @click.stop="renameEduProgDialog(item)"
-          />
+  <VTabs v-model="selectedYear">
+    <VTab
+      v-for="year in years"
+      :key="year"
+      :value='year'
+    >
+      {{ year }}
+    </VTab>
+  </VTabs>
+  <VWindow v-model="selectedYear" v-if="eduProgs.length>0">
+    <VWindowItem
+      v-for="year in years"
+      :key="year"
+      :value="year"
+    >
+      <VTable>
+        <thead>
+          <tr>
+            <th class="text-uppercase">
+              Назва
+            </th>
+            <th class="text-center text-uppercase">
+              Спеціальність
+            </th>
+            <th class="text-center text-uppercase">
+              Рівень знань
+            </th>
+            <th class="text-center text-uppercase">
+              Дата редагування
+            </th>
+            <th class="text-center text-uppercase" />
+          </tr>
+        </thead>
+        <tbody>
+          <tr
+            v-for="item in sortedByYear[year]"
+            :key="item.name"
+            class="eduprog-item"
+            @click="editEduProg($event, item.id)"
+          >
+            <td>{{ item.name }}</td>
+            <td class="text-center">
+              {{ item.speciality }}
+            </td>
+            <td class="text-center">
+              {{ item.education_level }}
+            </td>
+            <td class="text-center">
+              {{ moment(item.updated_date).format('DD.MM.YYYY HH:mm:ss') }}
+            </td>
+            <td class="text-center">
+              <VBtn
+                icon="mdi-pencil"
+                size="x-small"
+                style="margin-right:2% "
+                @click.stop="renameEduProgDialog(item)"
+              />
 
-          <VBtn
-            icon="mdi-trash-can"
-            size="x-small"
-            @click.stop="deleteEduProgDialog(item)"
-          />
-        </td>
-      </tr>
-    </tbody>
-  </VTable>
+              <VBtn
+                icon="mdi-trash-can"
+                size="x-small"
+                @click.stop="deleteEduProgDialog(item)"
+              />
+            </td>
+          </tr>
+        </tbody>
+      </VTable>
+    </VWindowItem>
+  </VWindow>
   <VAlert
     v-else
     border="left"
@@ -246,7 +300,6 @@ const newEduProg = reactive({
   </VAlert>
   <VDialog
     v-model="dialogRename"
-    persistent
     max-width="600"
   >
     <VCard>
@@ -319,11 +372,13 @@ const newEduProg = reactive({
     </VCard>
   </VDialog>
 </template>
+
 <style scoped>
 .eduprog-item{
   cursor: pointer;
 }
 </style>
+
 <route lang="yaml">
 meta:
   requiresAuth: true

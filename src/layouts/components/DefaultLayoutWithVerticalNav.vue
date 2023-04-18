@@ -13,30 +13,46 @@ const eduProgsStore = useEduProgsStore()
 const exportToExcel = () => {
   eduProgsStore.exportToExcel(route.params.pages)
 }
+const exportToPng = () => {
+  eduProgsStore.exportToPng(route.params.pages)
+}
 </script>
 
 <template>
   <VerticalNavLayout>
     <!-- 👉 navbar -->
     <template #navbar>
-      <VTextField
+      <!--
+        <VTextField
         rounded
         prepend-inner-icon="mdi-magnify"
         density="compact"
         max-width="100px"
         class="app-bar-search d-none d-sm-block"
-      />
+        /> 
+      -->
 
       <VSpacer />
-      <VBtn
-        v-if="route.params.pages"
-        dark
-        @click="exportToExcel"
-        variant="flat"
-      >
-        Експортувати
-      </VBtn>
-      <NavbarThemeSwitcher />
+      <VMenu class="mr-5" v-if="route.params.pages">
+        <template #activator="{ props }">
+          <VBtn
+            color="primary"
+            v-bind="props"
+          >
+            Експорт
+          </VBtn>
+        </template>
+        <VList>
+          <VListItem @click="exportToExcel">
+            ОПП
+          </VListItem>
+          <VListItem @click="exportToPng">
+            Малюнок
+          </VListItem>
+        </VList>
+      </VMenu>
+
+      <NavbarThemeSwitcher class="mr-5" />
       <UserProfile />
     </template>
 
@@ -72,5 +88,4 @@ const exportToExcel = () => {
     border-radius: 0 28px 28px 0 !important;
   }
 }
-
 </style>

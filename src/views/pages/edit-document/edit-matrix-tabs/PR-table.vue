@@ -61,7 +61,7 @@ onBeforeMount(async () => {
 const changeCheckbox = (e, componentId, competencyId)=>{
   if(e){
     valuesZK[competencyId]++
-    eduProgsStore.createCompetencyRelation(+route.params.pages, componentId, competencyId)
+    eduProgsStore.createCompetencyResultRelation(+route.params.pages, componentId, competencyId)
   }else if(!e){
     valuesZK[competencyId]--
     eduProgsStore.deleteCompetencyRelation(+route.params.pages, componentId, competencyId)

@@ -31,7 +31,7 @@ const vuetifyTheme = useTheme()
 
       <Transition name="vertical-nav-app-title">
         <h1 class="font-weight-semibold leading-normal text-xl text-uppercase">
-          Materio
+          Edu_Prog
         </h1>
       </Transition>
     </RouterLink>

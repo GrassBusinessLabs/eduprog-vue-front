@@ -13,14 +13,14 @@ export const useEduProgsStore = defineStore({
     disciplines: [],
     competencies: [],
     competencyRelations: [],
-    selectedVfk:[],
-    selectedVpr:[],
-    allCompetencies:[],
-    selectedCompetencies:[],
-    levelsList:[],
-    specialities:[],
-    components:[],
-    VBblock:[],
+    selectedVfk: [],
+    selectedVpr: [],
+    allCompetencies: [],
+    selectedCompetencies: [],
+    levelsList: [],
+    specialities: [],
+    components: [],
+    VBblock: [],
   }),
 
   getters: {
@@ -69,9 +69,9 @@ export const useEduProgsStore = defineStore({
           this.loading = true
           const response = await getData('eduprogs/' + id)
           this.eduProgData = response
-          this.components= response.components
+          this.components = response.components
           this.creditsInfo = await getData('/eduprogs/credits/' + id)
-          console.log("response", response)
+          console.log('response', response)
         } finally {
           this.loading = false
         }
@@ -84,16 +84,15 @@ export const useEduProgsStore = defineStore({
       this.components = await getData('/eduprogs/comps/byEduprogId/' + id)
     },
     async editEduprog(payload) {
-      try{
+      try {
         await editData('eduprogs/' + this.eduProgData.id, payload)
-      }
-      catch(error){
-        throw(error)
+      } catch (error) {
+        throw error
       }
     },
     async createComponent(payload) {
       const response = await postData('eduprogs/comps/create', payload)
-      console.log("FQLB",response)
+      console.log('FQLB', response)
       return response
     },
     async editComponent(id, payload) {
@@ -135,7 +134,7 @@ export const useEduProgsStore = defineStore({
       const response = await getData('/eduprogs/competencies/byEduprogId/' + eduId)
       this.competencies = response
     },
-    
+
     async createCompetencyRelation(eduprogId, componentId, competencyId) {
       const newRelation = {
         eduprog_id: eduprogId,
@@ -144,28 +143,36 @@ export const useEduProgsStore = defineStore({
       }
       const response = await postData('/eduprogs/competenciesMatrix/create', newRelation)
     },
+    async createCompetencyResultRelation(eduprogId, componentId, competencyId) {
+      const newRelation = {
+        eduprog_id: eduprogId,
+        component_id: componentId,
+        eduprogresult_id: competencyId,
+      }
+      const response = await postData('/eduprogs/resultsMatrix/create', newRelation)
+    },
     async deleteCompetencyRelation(eduprogId, componentId, competencyId) {
       const response = await deleteData('/eduprogs/competenciesMatrix/' + componentId + '/' + competencyId)
     },
     async fetchCompetencyRelations(eduId) {
-      const response = await getData('/eduprogs/competenciesMatrix/'+eduId+'?type=ZK')
+      const response = await getData('/eduprogs/competenciesMatrix/' + eduId + '?type=ZK')
       this.competencyRelations = response
     },
     async fetchSelectedCompetencies(eduId, type) {
       const response = await getData(`/eduprogs/competencies/byEduprogId/${eduId}/byType?type=${type}`)
       this.selectedCompetencies = response
     },
-    async fetchCompetencies(type, eduSp) {
-      const response = await getData(`/eduprogs/baseCompetencies/byType?type=${type}&specialty=${eduSp}`)
+    async fetchCompetencies(eduId, type) {
+      const response = await getData(`/eduprogs/baseCompetencies/${eduId}/byType?type=${type}`)
       this.allCompetencies = response
     },
 
     async fetchSelectedVfk(eduId) {
-      const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId+'/byType?type=VFK')
+      const response = await getData('/eduprogs/competencies/byEduprogId/' + eduId + '/byType?type=VFK')
       this.selectedVfk = response
     },
     async fetchSelectedVpr(eduId) {
-      const response = await getData('/eduprogs/competencies/byEduprogId/'+eduId+'/byType?type=VPR')
+      const response = await getData('/eduprogs/competencies/byEduprogId/' + eduId + '/byType?type=VPR')
       this.selectedVpr = response
     },
     async fetchVBblock(eduId) {
@@ -175,12 +182,12 @@ export const useEduProgsStore = defineStore({
 
     async addCompetencyToEduprog(eduprogId, competencyId) {
       const newRelation = {
-        competency_id:competencyId,
+        competency_id: competencyId,
         eduprog_id: eduprogId,
-        definition:"",
+        definition: '',
       }
       const response = await postData('/eduprogs/competencies/add', newRelation)
-      console.log('response',response)
+      console.log('response', response)
 
       return response
     },
@@ -198,39 +205,63 @@ export const useEduProgsStore = defineStore({
       return respone
     },
     async editCustomCompetency(id, payload) {
-      const newDefinition={
-        definition: payload
+      const newDefinition = {
+        definition: payload,
       }
-      await editData('/eduprogs/competencies/'+id, newDefinition)
+      await editData('/eduprogs/competencies/' + id, newDefinition)
     },
     async exportToExcel(eduId) {
-      await getFile('/eduprogs/toExcel/'+eduId).then(response => {
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', 'ОПП '+eduId+'.xlsx');
-        document.body.appendChild(link);
-        link.click();
-      })},
-    async fetchRelations(eduId){
-      const response = await getData('/eduprogs/compRelations/'+eduId);
+      await getFile('/eduprogs/toExcel/' + eduId).then(response => {
+        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'ОПП ' + eduId + '.xlsx')
+        document.body.appendChild(link)
+        link.click()
+      })
+    },
+    async exportToPng(eduId) {
+      await getFile('/eduprogs/compsToPng/' + eduId).then(response => {
+        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'ОПП ' + eduId + '.png')
+        document.body.appendChild(link)
+        link.click()
+      })
+    },
+
+
+    async fetchRelations(eduId) {
+      const response = await getData('/eduprogs/compRelations/' + eduId)
       return response
     },
-    async createRelation(payload){
-      const response = await postData('/eduprogs/compRelations/create', payload);
+    async createRelation(payload) {
+      const response = await postData('/eduprogs/compRelations/create', payload)
       return response
     },
-    async deleteRelation(baseId, childId){
-      const response = await deleteData('/eduprogs/compRelations/'+baseId+'/'+childId);
+    async deleteRelation(baseId, childId) {
+      const response = await deleteData('/eduprogs/compRelations/' + baseId + '/' + childId)
       return response
     },
-    async fetchLevelsList(eduId){
-      const response = await getData('/eduprogs/levelsList');
-      this.levelsList=response
+    async fetchLevelsList(eduId) {
+      const response = await getData('/eduprogs/levelsList')
+      this.levelsList = response
     },
-    async fetchSpecialities(eduId){
-      const response = await getData('/eduprogs/specialties/all');
-      this.specialities=response
+    async fetchSpecialities(eduId) {
+      const response = await getData('/eduprogs/specialties/all')
+      this.specialities = response
+    },
+    async updateVbBlockName(eduId, num, name) {
+      const payload = {
+        block_num: num,
+        block_name: name,
+      }
+      await editData('/eduprogs/comps/updVB/' + eduId, payload)
+    },
+    async findCompById(compId) {
+      const response = await getData('/eduprogs/comps/' + compId)
+      return response
     },
   },
 })

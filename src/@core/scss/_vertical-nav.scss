@@ -98,6 +98,7 @@
     .nav-link {
       overflow: hidden;
 
+
       > :first-child {
         @extend %vertical-nav-item;
         @extend %vertical-nav-item-interactive;
