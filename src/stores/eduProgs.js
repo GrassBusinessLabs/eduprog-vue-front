@@ -204,6 +204,9 @@ export const useEduProgsStore = defineStore({
       const respone = await postData('/eduprogs/competencies/addCustom', payload)
       return respone
     },
+    async copyEduprog(payload) {
+      await postData('/eduprogs/copy/' + payload)
+    },
     async editCustomCompetency(id, payload) {
       const newDefinition = {
         definition: payload,
