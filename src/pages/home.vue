@@ -20,7 +20,12 @@ onMounted( async () => {
   education_level.value= eduProgsStore.getLevels
   specialities.value = eduProgsStore.getSpecialities
   sortedEduProgsByYear ()
-  selectedYear.value = years.value[0]
+
+  if (localStorage.getItem('TabValue').length>0){
+    selectedYear.value =Number( localStorage.getItem('TabValue'))
+  } else {
+    selectedYear.value = years.value[0]
+  }
 })
 const checkValue=    ref('')
 let currentEduProg = null
@@ -44,7 +49,16 @@ const createEduProg =( async() => {
   await eduProgsStore.createEduProg(newEduProg)
   dialogCreate.value=false
   await eduProgsStore.fetchEduProgs()
+  localStorage.setItem('TabValue', newEduProg.approval_year)
 })
+
+const CopyEduProg =( async item => {
+  await eduProgsStore.copyEduprog(item.id)
+  await eduProgsStore.fetchEduProgs()
+  sortedEduProgsByYear ()
+})
+
+
 const cancelCreate = () =>{
   dialogCreate.value=false
 }
@@ -103,7 +117,7 @@ const newEduProg = reactive({
   name:'',
   education_level :'',
   speciality_code :'',
-  approval_year: '',
+  approval_year: null,
 })
 
 const sortedByYear = ref()
@@ -112,8 +126,6 @@ const years = ref([])
 
 async function sortedEduProgsByYear (){
   years.value = [...new Set(eduProgs.value.map(obj => obj.approval_year))].sort()
-
-  console.log(years.value)
 
   sortedByYear.value = eduProgs.value.reduce((acc, obj) => {
     if (!acc[obj.approval_year]) {
@@ -124,8 +136,14 @@ async function sortedEduProgsByYear (){
     return acc
   }, {})
 
-  console.log(sortedByYear.value)
+}
 
+const chooseYear = Array.from({ length: 21 }, (v, i) => new Date().getFullYear() - 10 + i)
+
+function onTabChanged(){
+  const TabValue = ref(localStorage.getItem('TabValue'))
+  localStorage.setItem('TabValue', selectedYear.value)
+  TabValue.value = localStorage.getItem('TabValue')
 }
 </script>
 
@@ -189,11 +207,13 @@ async function sortedEduProgsByYear (){
             <VCol
               cols="12"
             >
-              <VTextField
+              <VSelect
                 v-model="newEduProg.approval_year"
-                label="Рік затвердження "
+                :items="chooseYear"
+                label="Рік затвердження"
                 required
-                type='number'
+                density="comfortable"
+                :menu-props="{maxHeight: '400'}"
               />
             </VCol>
           </VRow>
@@ -220,16 +240,22 @@ async function sortedEduProgsByYear (){
   </VDialog>
 
 
-  <VTabs v-model="selectedYear">
+  <VTabs
+    v-model="selectedYear"
+    @click="onTabChanged()"
+  >
     <VTab
       v-for="year in years"
       :key="year"
-      :value='year'
+      :value="year"
     >
       {{ year }}
     </VTab>
   </VTabs>
-  <VWindow v-model="selectedYear" v-if="eduProgs.length>0">
+  <VWindow
+    v-if="eduProgs.length>0"
+    v-model="selectedYear"
+  >
     <VWindowItem
       v-for="year in years"
       :key="year"
@@ -274,14 +300,19 @@ async function sortedEduProgsByYear (){
               <VBtn
                 icon="mdi-pencil"
                 size="x-small"
-                style="margin-right:2% "
+                style="margin-right:2%"
                 @click.stop="renameEduProgDialog(item)"
               />
-
               <VBtn
+                style="margin-right:2%"
                 icon="mdi-trash-can"
                 size="x-small"
                 @click.stop="deleteEduProgDialog(item)"
+              />
+              <VBtn
+                icon="mdi-content-copy"
+                size="x-small"
+                @click.stop="CopyEduProg(item)"
               />
             </td>
           </tr>
