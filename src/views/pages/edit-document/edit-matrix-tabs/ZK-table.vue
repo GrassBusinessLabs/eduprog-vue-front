@@ -46,6 +46,7 @@ onBeforeMount(async () => {
     })
   })
   selZk.value = eduProgsStore.getSelectedCompetencies
+  console.log(selZk)
 })
 
 const changeCheckbox = (e, componentId, competencyId) => {
@@ -156,6 +157,15 @@ watch(valuesZK, newValue => {
         </tbody>
       </VTable>
     </VCol>
+    <VAlert
+      v-else-if="!components.mandatory?.length  && !components.mandatory?.length > 0 && !selZk?.length "
+      border="left"
+      text
+      type="info"
+      prominent
+    >
+      Поки що не додано жодної загальної компетентності і жодного основного компоненту до ОПП.
+    </VAlert>
     <VAlert
       v-else-if="components.mandatory?.length  && components.mandatory?.length > 0 && !selZk?.length "
       border="left"

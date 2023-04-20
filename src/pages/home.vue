@@ -13,54 +13,60 @@ const specialities = ref([])
 
 //return { eduProgs: useEduProgsStore.getEduProgs }
 const education_level = ref([])
-onMounted( async () => {
+onMounted(async () => {
   await eduProgsStore.fetchEduProgs()
   await eduProgsStore.fetchLevelsList()
   await eduProgsStore.fetchSpecialities()
-  education_level.value= eduProgsStore.getLevels
+  education_level.value = eduProgsStore.getLevels
   specialities.value = eduProgsStore.getSpecialities
-  sortedEduProgsByYear ()
+  sortedEduProgsByYear()
 
-  if (localStorage.getItem('TabValue').length>0){
-    selectedYear.value =Number( localStorage.getItem('TabValue'))
+  if (localStorage.getItem('TabValue').length > 0) {
+    selectedYear.value = Number(localStorage.getItem('TabValue'))
   } else {
     selectedYear.value = years.value[0]
   }
 })
-const checkValue=    ref('')
+const checkValue = ref('')
 let currentEduProg = null
 let newNameEduProg = ref(null)
 const eduProgs = computed(() => eduProgsStore.getEduProgs)
 
-const deleteEduProg =( async id => {
+const deleteEduProg = async id => {
   await eduProgsStore.deleteEduProg(id)
   await eduProgsStore.fetchEduProgs()
-  sortedEduProgsByYear ()
-})
-const editNameEduProg =( async() => {
+  sortedEduProgsByYear()
+  dialogDelete.value = false
+  console.log(years)
+
+  //selectedYear.value = years.value[0]
+}
+const editNameEduProg = async () => {
   currentEduProg.name = newNameEduProg.value
   await eduProgsStore.editNameEduProg(currentEduProg, currentEduProg.id)
-  newNameEduProg.value=null
-  dialogRename.value=false
-})
-const createEduProg =( async() => {
+  newNameEduProg.value = null
+  dialogRename.value = false
+}
+const createEduProg = async () => {
   updateSelectedSpeciality()
   newEduProg.approval_year = Number(newEduProg.approval_year)
   await eduProgsStore.createEduProg(newEduProg)
-  dialogCreate.value=false
+  dialogCreate.value = false
   await eduProgsStore.fetchEduProgs()
   localStorage.setItem('TabValue', newEduProg.approval_year)
-})
+}
 
-const CopyEduProg =( async item => {
-  await eduProgsStore.copyEduprog(item.id)
+const copyEduProg = async (id)=> {
+  await eduProgsStore.copyEduprog(currentEduProg.id, EduProgCopy)
   await eduProgsStore.fetchEduProgs()
-  sortedEduProgsByYear ()
-})
+  sortedEduProgsByYear()
+  dialogCopy.value=false
+  EduProgCopy.name=''
+  EduProgCopy.approval_year=''
+}
 
-
-const cancelCreate = () =>{
-  dialogCreate.value=false
+const cancelCreate = () => {
+  dialogCreate.value = false
 }
 
 // const createEduProg =( async() => {
@@ -84,24 +90,24 @@ const cancelCreate = () =>{
 //   }
 // })
 
-
 const dialogCreate = ref(false)
 const dialogRename = ref(false)
 const dialogDelete = ref(false)
+const dialogCopy = ref(false)
 const createEduProgDialog = function dialogg() {
-  dialogCreate.value=true
+  dialogCreate.value = true
 }
-const renameEduProgDialog = function dialogg(id) {
-  dialogRename.value=true
-  currentEduProg = id
+const showDialog = (dialog) => (eduProg) => {
+  dialog.value = true;
+  currentEduProg = eduProg;
 }
-const deleteEduProgDialog= function dialogg(id) {
-  dialogDelete.value=true
-  currentEduProg = id
-}
+
+const renameEduProgDialog = showDialog(dialogRename);
+const deleteEduProgDialog = showDialog(dialogDelete);
+const copyEduProgDialog = showDialog(dialogCopy);
 const editEduProg = function edit(event, id) {
   console.log(event)
-  router.replace('/eduprogs/'+id+'/characteristic')
+  router.replace('/eduprogs/' + id + '/characteristic')
 }
 
 function updateSelectedSpeciality() {
@@ -114,17 +120,20 @@ function updateSelectedSpeciality() {
 console.log(eduProgs.value)
 
 const newEduProg = reactive({
-  name:'',
-  education_level :'',
-  speciality_code :'',
+  name: '',
+  education_level: '',
+  speciality_code: '',
   approval_year: null,
 })
-
+const EduProgCopy = reactive({
+  name: '',
+  approval_year: null,
+})
 const sortedByYear = ref()
 const selectedYear = ref()
 const years = ref([])
 
-async function sortedEduProgsByYear (){
+async function sortedEduProgsByYear() {
   years.value = [...new Set(eduProgs.value.map(obj => obj.approval_year))].sort()
 
   sortedByYear.value = eduProgs.value.reduce((acc, obj) => {
@@ -132,15 +141,14 @@ async function sortedEduProgsByYear (){
       acc[obj.approval_year] = []
     }
     acc[obj.approval_year].push(obj)
-    
+
     return acc
   }, {})
-
 }
 
 const chooseYear = Array.from({ length: 21 }, (v, i) => new Date().getFullYear() - 10 + i)
 
-function onTabChanged(){
+function onTabChanged() {
   const TabValue = ref(localStorage.getItem('TabValue'))
   localStorage.setItem('TabValue', selectedYear.value)
   TabValue.value = localStorage.getItem('TabValue')
@@ -156,7 +164,6 @@ function onTabChanged(){
     Створити ОПП
   </VBtn>
 
-
   <VDialog
     v-model="dialogCreate"
     max-width="600px"
@@ -168,18 +175,14 @@ function onTabChanged(){
       <VCardText>
         <VContainer>
           <VRow>
-            <VCol
-              cols="12"
-            >
+            <VCol cols="12">
               <VTextField
                 v-model="newEduProg.name"
                 label="Назва документу "
                 required
               />
             </VCol>
-            <VCol
-              cols="12"
-            >
+            <VCol cols="12">
               <VCombobox
                 v-model="newEduProg.education_level"
                 :items="education_level"
@@ -190,9 +193,7 @@ function onTabChanged(){
                 dense
               />
             </VCol>
-            <VCol
-              cols="12"
-            >
+            <VCol cols="12">
               <VCombobox
                 v-model="newEduProg.speciality_code"
                 :items="specialities"
@@ -204,16 +205,14 @@ function onTabChanged(){
                 dense
               />
             </VCol>
-            <VCol
-              cols="12"
-            >
+            <VCol cols="12">
               <VSelect
                 v-model="newEduProg.approval_year"
                 :items="chooseYear"
                 label="Рік затвердження"
                 required
                 density="comfortable"
-                :menu-props="{maxHeight: '400'}"
+                :menu-props="{ maxHeight: '400' }"
               />
             </VCol>
           </VRow>
@@ -230,7 +229,9 @@ function onTabChanged(){
         </VBtn>
         <VBtn
           text
-          :disabled="!(newEduProg.speciality_code && newEduProg.name &&newEduProg.education_level &&newEduProg.approval_year)"
+          :disabled="
+            !(newEduProg.speciality_code && newEduProg.name && newEduProg.education_level && newEduProg.approval_year)
+          "
           @click="createEduProg"
         >
           Створити
@@ -238,7 +239,6 @@ function onTabChanged(){
       </VCardActions>
     </VCard>
   </VDialog>
-
 
   <VTabs
     v-model="selectedYear"
@@ -253,7 +253,7 @@ function onTabChanged(){
     </VTab>
   </VTabs>
   <VWindow
-    v-if="eduProgs.length>0"
+    v-if="eduProgs.length > 0"
     v-model="selectedYear"
   >
     <VWindowItem
@@ -264,18 +264,10 @@ function onTabChanged(){
       <VTable>
         <thead>
           <tr>
-            <th class="text-uppercase">
-              Назва
-            </th>
-            <th class="text-center text-uppercase">
-              Спеціальність
-            </th>
-            <th class="text-center text-uppercase">
-              Рівень знань
-            </th>
-            <th class="text-center text-uppercase">
-              Дата редагування
-            </th>
+            <th class="text-uppercase">Назва</th>
+            <th class="text-center text-uppercase">Спеціальність</th>
+            <th class="text-center text-uppercase">Рівень знань</th>
+            <th class="text-center text-uppercase">Дата редагування</th>
             <th class="text-center text-uppercase" />
           </tr>
         </thead>
@@ -300,11 +292,11 @@ function onTabChanged(){
               <VBtn
                 icon="mdi-pencil"
                 size="x-small"
-                style="margin-right:2%"
+                style="margin-right: 2%"
                 @click.stop="renameEduProgDialog(item)"
               />
               <VBtn
-                style="margin-right:2%"
+                style="margin-right: 2%"
                 icon="mdi-trash-can"
                 size="x-small"
                 @click.stop="deleteEduProgDialog(item)"
@@ -312,7 +304,7 @@ function onTabChanged(){
               <VBtn
                 icon="mdi-content-copy"
                 size="x-small"
-                @click.stop="CopyEduProg(item)"
+                @click.stop="copyEduProgDialog(item)"
               />
             </td>
           </tr>
@@ -338,9 +330,7 @@ function onTabChanged(){
       <VCardText>
         <VContainer>
           <VRow>
-            <VCol
-              cols="12"
-            >
+            <VCol cols="12">
               <VTextField
                 v-model="newNameEduProg"
                 label="Введіть нову назву ОПП"
@@ -360,8 +350,54 @@ function onTabChanged(){
           </VBtn>
           <VBtn
             text
-            @click="editNameEduProg(); 
-                    dialogRename = false"
+            @click="editNameEduProg()"
+          >
+            Зберегти
+          </VBtn>
+        </VCardActions>
+      </VCardText>
+    </VCard>
+  </VDialog>
+  <VDialog
+    v-model="dialogCopy"
+    max-width="600"
+  >
+    <VCard>
+      <VCardTitle>Копіювання ОПП: {{ currentEduProg.name }}</VCardTitle>
+      <VCardText>
+        <VContainer>
+          <VRow>
+            <VCol cols="12">
+              <VTextField
+                v-model="EduProgCopy.name"
+                label="Назва для копії"
+                required
+              />
+            </VCol>
+            <VCol cols="12">
+              <VSelect
+                v-model="EduProgCopy.approval_year"
+                :items="chooseYear"
+                label="Рік затвердження"
+                required
+                density="comfortable"
+                :menu-props="{ maxHeight: '400' }"
+              />
+            </VCol>
+          </VRow>
+        </VContainer>
+
+        <VCardActions>
+          <VSpacer />
+          <VBtn
+            text
+            @click="dialogCopy = false"
+          >
+            Відмінити
+          </VBtn>
+          <VBtn
+            text
+            @click="copyEduProg()"
           >
             Зберегти
           </VBtn>
@@ -370,18 +406,13 @@ function onTabChanged(){
     </VCard>
   </VDialog>
 
-
   <VDialog
     v-model="dialogDelete"
     max-width="290"
   >
     <VCard>
-      <VCardTitle>
-        Підтвердіть видалення
-      </VCardTitle>
-      <VCardText>
-        Ви впевнені  що хочете видалити ОПП: {{ currentEduProg.name }}?
-      </VCardText>
+      <VCardTitle> Підтвердіть видалення </VCardTitle>
+      <VCardText> Ви впевнені що хочете видалити ОПП: {{ currentEduProg.name }}? </VCardText>
 
       <VCardActions>
         <VBtn
@@ -395,7 +426,7 @@ function onTabChanged(){
         <VBtn
           color="green darken-1"
           text
-          @click="deleteEduProg(currentEduProg.id); dialogDelete = false"
+          @click="deleteEduProg(currentEduProg.id)"
         >
           Так
         </VBtn>
@@ -405,7 +436,7 @@ function onTabChanged(){
 </template>
 
 <style scoped>
-.eduprog-item{
+.eduprog-item {
   cursor: pointer;
 }
 </style>
