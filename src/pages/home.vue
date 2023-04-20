@@ -421,6 +421,9 @@ function onTabChanged() {
           </VBtn>
           <VBtn
             text
+            :disabled="
+            !(EduProgCopy.name && EduProgCopy.approval_year)
+          "
             @click="copyEduProg"
           >
             Зберегти
