@@ -21,8 +21,15 @@ onMounted(async () => {
   specialities.value = eduProgsStore.getSpecialities
   sortedEduProgsByYear()
 
-  if (localStorage.getItem('TabValue').length > 0) {
-    selectedYear.value = Number(localStorage.getItem('TabValue'))
+  if (Boolean(localStorage.getItem('TabValue'))) {
+    if (years.value.includes(selectedYear.value)){
+      selectedYear.value = Number(localStorage.getItem('TabValue'))
+    }
+    else {
+      selectedYear.value =  years.value.reduce((prev, curr) => {
+        return (Math.abs(curr - selectedYear.value) < Math.abs(prev - selectedYear.value) ? curr : prev)
+      })
+    }
   } else {
     selectedYear.value = years.value[0]
   }
@@ -37,9 +44,15 @@ const deleteEduProg = async id => {
   await eduProgsStore.fetchEduProgs()
   sortedEduProgsByYear()
   dialogDelete.value = false
-  console.log(years)
-
-  //selectedYear.value = years.value[0]
+  console.log(selectedYear.value)
+  console.log(years.value)
+  if (years.value.includes(selectedYear.value)){
+    selectedYear.value = selectedYear.value
+  } else {
+    selectedYear.value =  years.value.reduce((prev, curr) => {
+      return (Math.abs(curr - selectedYear.value) < Math.abs(prev - selectedYear.value) ? curr : prev)
+    })
+  }
 }
 const editNameEduProg = async () => {
   currentEduProg.name = newNameEduProg.value
@@ -56,7 +69,7 @@ const createEduProg = async () => {
   localStorage.setItem('TabValue', newEduProg.approval_year)
 }
 
-const copyEduProg = async (id)=> {
+const copyEduProg = async id=> {
   await eduProgsStore.copyEduprog(currentEduProg.id, EduProgCopy)
   await eduProgsStore.fetchEduProgs()
   sortedEduProgsByYear()
@@ -97,14 +110,14 @@ const dialogCopy = ref(false)
 const createEduProgDialog = function dialogg() {
   dialogCreate.value = true
 }
-const showDialog = (dialog) => (eduProg) => {
-  dialog.value = true;
-  currentEduProg = eduProg;
+const showDialog = dialog => eduProg => {
+  dialog.value = true
+  currentEduProg = eduProg
 }
 
-const renameEduProgDialog = showDialog(dialogRename);
-const deleteEduProgDialog = showDialog(dialogDelete);
-const copyEduProgDialog = showDialog(dialogCopy);
+const renameEduProgDialog = showDialog(dialogRename)
+const deleteEduProgDialog = showDialog(dialogDelete)
+const copyEduProgDialog = showDialog(dialogCopy)
 const editEduProg = function edit(event, id) {
   console.log(event)
   router.replace('/eduprogs/' + id + '/characteristic')
@@ -123,11 +136,11 @@ const newEduProg = reactive({
   name: '',
   education_level: '',
   speciality_code: '',
-  approval_year: null,
+  approval_year: new Date().getFullYear(),
 })
 const EduProgCopy = reactive({
   name: '',
-  approval_year: null,
+  approval_year: new Date().getFullYear(),
 })
 const sortedByYear = ref()
 const selectedYear = ref()
@@ -242,7 +255,7 @@ function onTabChanged() {
 
   <VTabs
     v-model="selectedYear"
-    @click="onTabChanged()"
+    @click="onTabChanged"
   >
     <VTab
       v-for="year in years"
@@ -264,10 +277,18 @@ function onTabChanged() {
       <VTable>
         <thead>
           <tr>
-            <th class="text-uppercase">Назва</th>
-            <th class="text-center text-uppercase">Спеціальність</th>
-            <th class="text-center text-uppercase">Рівень знань</th>
-            <th class="text-center text-uppercase">Дата редагування</th>
+            <th class="text-uppercase">
+              Назва
+            </th>
+            <th class="text-center text-uppercase">
+              Спеціальність
+            </th>
+            <th class="text-center text-uppercase">
+              Рівень знань
+            </th>
+            <th class="text-center text-uppercase">
+              Дата редагування
+            </th>
             <th class="text-center text-uppercase" />
           </tr>
         </thead>
@@ -350,7 +371,10 @@ function onTabChanged() {
           </VBtn>
           <VBtn
             text
-            @click="editNameEduProg()"
+            :disabled="
+            !(newNameEduProg)
+          "
+            @click="editNameEduProg"
           >
             Зберегти
           </VBtn>
@@ -397,7 +421,7 @@ function onTabChanged() {
           </VBtn>
           <VBtn
             text
-            @click="copyEduProg()"
+            @click="copyEduProg"
           >
             Зберегти
           </VBtn>
