@@ -122,11 +122,11 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes })
           </template>
 
           <VList>
-            <VListItem>
-              <VListItemTitle>Remove</VListItemTitle>
+            <VListItem @click="deleteComponent(component.id)">
+              Remove
             </VListItem>
             <VListItem>
-              <VListItemTitle>Edit</VListItemTitle>
+              Edit
             </VListItem>
           </VList>
         </VMenu>
