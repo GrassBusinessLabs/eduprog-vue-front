@@ -63,6 +63,7 @@ function initGrid() {
   })
 }
 function initGridItems() {
+   console.log("ДИСЦИПЛИНЫ",disciplines.value)
   disciplines.value.map(item => {
     Object.defineProperty(items.value, item.id, {
       value: [{
@@ -72,6 +73,7 @@ function initGridItems() {
       writable: true,
     })
   })
+  console.log("ДИСЦИПЛИНЫ",disciplines.value)
 }
 
 function addEmptyWidget(discipline, index) {

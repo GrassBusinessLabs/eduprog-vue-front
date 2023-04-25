@@ -14,19 +14,19 @@
     <thead class="thead-light">
       <tr>
         <th style="width: 5%">
-          Код <br>
+          Код <br />
           н/д
         </th>
         <th>
-          Компонент освітньої <br>
+          Компонент освітньої <br />
           програми
         </th>
         <th style="width: 10%">
-          Кількість <br>
+          Кількість <br />
           кредитів
         </th>
         <th style="width: 10%">
-          Форма підсумку <br>
+          Форма підсумку <br />
           контролю
         </th>
         <th style="width: 10%">
@@ -38,8 +38,8 @@
         </th>
       </tr>
     </thead>
-    <tbody>
-      <tr
+    <!--<tbody>
+    <tr
         v-for="(item, index) in components.mandatory"
         :key="index"
         style="height: 65px"
@@ -126,8 +126,15 @@
         </td>
       </tr>
       <hr style="border: 0px">
+    </tbody> -->
+    <tbody>
+      <th colspan="5">
+        <ComponentsGridStack
+          @remove="remove"
+          :components="components"
+        ></ComponentsGridStack>
+      </th>
     </tbody>
-
     <thead>
       <tr>
         <th colspan="5">
@@ -153,19 +160,19 @@
     <thead class="thead-light">
       <tr>
         <th style="width: 5%">
-          Код <br>
+          Код <br />
           н/д
         </th>
         <th>
-          Компонент освітньої <br>
+          Компонент освітньої <br />
           програми
         </th>
         <th style="width: 10%">
-          Кількість <br>
+          Кількість <br />
           кредитів
         </th>
         <th style="width: 10%">
-          Форма підсумку <br>
+          Форма підсумку <br />
           контролю
         </th>
         <th style="width: 10%">
@@ -240,7 +247,7 @@
           </span>
           <span
             v-if="editIndex.id === comp.id"
-            style="display: flex; align-items: center;"
+            style="display: flex; align-items: center"
           >
             <VTextField
               v-model="comp.name"
@@ -252,13 +259,12 @@
               @keyup.enter="saveComponent(comp)"
             />
 
-
             <VCombobox
               v-model="comp.block_name"
               :items="VBblock"
               item-title="block_name"
               variant="underlined"
-              style="width: 60%; margin-left: 20%; margin-right: 20%; font-size: 14px "
+              style="width: 60%; margin-left: 20%; margin-right: 20%; font-size: 14px"
               @keyup.enter="saveComponent(comp)"
             />
           </span>
@@ -322,7 +328,7 @@
           </span>
         </td>
       </tr>
-      <hr style="border: 0px">
+      <hr style="border: 0px" />
     </tbody>
   </VTable>
   <VTable>
@@ -513,11 +519,11 @@ import { useRoute } from 'vue-router'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 import { editData } from '@/api/http/apiService'
 import { storeToRefs } from 'pinia'
+import ComponentsGridStack from '@core/components/ComponentsGridStack.vue'
 onMounted(async () => {
   await eduProgsStore.findEduProgById(route.params.pages)
   await eduProgsStore.fetchVBblock(route.params.pages)
   VBblock.value = eduProgsStore.getVBblock
-  console.log('getVBblock', VBblock.value)
 })
 const route = useRoute()
 const eduProgsStore = useEduProgsStore()
@@ -565,10 +571,7 @@ const rulesComp = ref({
   ],
 })
 const rulesVB = ref({
-  maxLength: [
-    v => v.length <= 99|| 'Максимум 100 символів',
-    v => v.length >= 1|| 'Мінімум 1 символ',
-  ],
+  maxLength: [v => v.length <= 99 || 'Максимум 100 символів', v => v.length >= 1 || 'Мінімум 1 символ'],
 })
 const hasError = ref(false)
 const errorMessage = ref('')
@@ -682,16 +685,16 @@ async function createComponent() {
   await updateCredits()
 }
 
-function edit(item, type="Component") {
+function edit(item, type = 'Component') {
   console.log(item)
   originValue = Object.assign({}, item)
-  if(type==="Block"){
+  if (type === 'Block') {
     editIndex.value.id = item.block_num
-    editIndex.value.category= 'BLOCK'
+    editIndex.value.category = 'BLOCK'
     window.addEventListener('click', closeEdit)
-  }else if(type==="Component"){
+  } else if (type === 'Component') {
     editIndex.value.id = item.id
-    editIndex.value.category=item.category
+    editIndex.value.category = item.category
     window.addEventListener('click', closeEdit)
   }
 }
@@ -703,12 +706,17 @@ function cancel(item) {
   originValue = {}
   window.removeEventListener('click', closeEdit)
 }
-async function closeEdit (e){
+async function closeEdit(e) {
   console.log('клик')
-  if(e&&(e.target.closest('.active-comp-block'))||(e.target.closest('.active-component')||e.target.closest('button')||e.target.closest('.v-list-item-title'))){
+  if (
+    (e && e.target.closest('.active-comp-block')) ||
+    e.target.closest('.active-component') ||
+    e.target.closest('button') ||
+    e.target.closest('.v-list-item-title')
+  ) {
     return
   }
-  if(editIndex.value.category==="BLOCK"){
+  if (editIndex.value.category === 'BLOCK') {
     console.log('dfgdfgdf')
     await eduProgsStore.fetchVBblock(route.params.pages)
     VBblock.value = eduProgsStore.getVBblock
@@ -719,15 +727,15 @@ async function closeEdit (e){
     const originData = await eduProgsStore.findCompById(editIndex.value.id)
     let foundComponent = {}
     switch (editIndex.value.category) {
-    case "MANDATORY":
-      foundComponent = components.value.mandatory.find(item => item.id === editIndex.value.id)
-      break
-    case "BLOC":
-      foundComponent = findObjectById(editIndex.value.id, VBblock.value)
-      console.log(foundComponent)
-      break
+      case 'MANDATORY':
+        foundComponent = components.value.mandatory.find(item => item.id === editIndex.value.id)
+        break
+      case 'BLOC':
+        foundComponent = findObjectById(editIndex.value.id, VBblock.value)
+        console.log(foundComponent)
+        break
     }
-    console.log("ФАУГНД", foundComponent)
+    console.log('ФАУГНД', foundComponent)
     for (let key in foundComponent) {
       foundComponent[key] = originData[key]
     }
@@ -752,23 +760,23 @@ function findObjectById(id, arrayOfObjects) {
 function remove(comp) {
   dialogDelete.value = true
   originValue = Object.assign({}, comp)
-  console.log("ОРИДЖИ?",originValue.id)
+  console.log('ОРИДЖИ?', originValue.id)
 }
 const confirmRemove = async () => {
   console.log(originValue)
   dialogDelete.value = false
   await eduProgsStore.deleteComponent(originValue)
-  let type='mandatory'
-  if(originValue.category==='BLOC'){
-    type='selective'
+  let type = 'mandatory'
+  if (originValue.category === 'BLOC') {
+    type = 'selective'
   }
   components.value[type] = components.value[type].filter(obj => obj.id !== originValue.id)
   updateCredits()
   await eduProgsStore.findEduProgById(route.params.pages)
-  originValue={}
+  originValue = {}
 }
 
-function editVBcomp(component){
+function editVBcomp(component) {
   const selectedBlock = VBblock.value.find(block => block.block_name === component.block_name)
   console.log(selectedBlock)
   if (selectedBlock) {
@@ -778,7 +786,7 @@ function editVBcomp(component){
     component.code = String(maxVBNum + 1)
     console.log(component.code)
     console.log(component)
-  }  else {
+  } else {
     const maxBlockNum = Math.max(...VBblock.value.map(block => block.block_num))
     component.block_num = String(maxBlockNum + 1)
     component.code = String(1)
@@ -809,12 +817,12 @@ async function saveComponent(component) {
   window.removeEventListener('click', closeEdit)
   originValue = {}
 }
-const saveBlockName= async block=>{
-  if(block.block_name.length===0){
+const saveBlockName = async block => {
+  if (block.block_name.length === 0) {
     return
   }
   editIndex.value.id = null
-  console.log("Блок",block)
+  console.log('Блок', block)
   await eduProgsStore.updateVbBlockName(route.params.pages, block.block_num, block.block_name)
   await eduProgsStore.fetchVBblock(route.params.pages)
   VBblock.value = eduProgsStore.getVBblock
@@ -843,7 +851,7 @@ tr td span.v-select__selection-text {
 .table-vb-blocks table tbody {
   border-top: 1px solid rgb(58, 53, 65, 0.12);
 }
-.vb-blocks-name .v-field__input{
+.vb-blocks-name .v-field__input {
   text-align: center;
   padding: 0;
   height: 80%;

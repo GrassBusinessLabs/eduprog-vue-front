@@ -27,6 +27,7 @@ const gridref = ref(null)
 const hoveredWidget = ref(null)
 
 onMounted(() => {
+  console.log("ГРИДРЕФ",gridref.value)
   grid = GridStack.init(
     {
       float: true,
@@ -136,7 +137,6 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes })
           item-value="id"
           item-title="name"
           menu-icon=""
-          multiple
           :items="props.components"
         />
       </div>
