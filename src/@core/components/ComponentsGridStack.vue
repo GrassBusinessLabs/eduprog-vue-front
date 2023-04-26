@@ -26,10 +26,6 @@ function remove(comp) {
 watch(props, (newValue, oldValue) => {
   console.log(`Значение изменилось с ${oldValue} на ${newValue}`);
   nextTick(()=>{
-    console.log("ОПТИОНС1 ", grid)
-    console.log("ОПТИОНС1 ", grid.opts.maxRow)
-    grid.opts.row=5
-    console.log("ОПТИОНС2 ", grid.opts.maxRow)
     grid.load(grid.getGridItems())
   })
 });
@@ -37,7 +33,7 @@ watch(props, (newValue, oldValue) => {
 onMounted(() => {
   grid = GridStack.init(
     {
-      float: true,
+      float: false,
       column: 1,
       cellHeight: '65px',
       disableResize: true,
@@ -112,6 +108,7 @@ onMounted(() => {
       :gs-y="component.code - 1"
       :gs-h="1"
       :gs-w="1"
+      
     >
       <div class="grid-stack-item-content" style="overflow: hidden">
         <div style="width: 5%; white-space: nowrap">
