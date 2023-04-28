@@ -28,6 +28,7 @@ const hoveredWidget = ref(null)
 
 
 onMounted(() => {
+  console.log("ГРИДРЕФ",gridref.value)
   grid = GridStack.init(
     {
       float: false,

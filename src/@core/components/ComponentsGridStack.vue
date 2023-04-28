@@ -2,91 +2,96 @@
 import { GridStack } from 'gridstack'
 import 'gridstack/dist/gridstack.min.css'
 import 'gridstack/dist/gridstack-extra.min.css'
-import { defineExpose, ref } from 'vue'
+import { defineExpose, ref, toRef, defineProps, watch, nextTick} from 'vue'
 
-const props = defineProps({
-  gridItems: {
+const props =defineProps({
+  components: {
     type: Object,
     required: true,
-  },
-  components: {
-    type: Array,
-    required: false,
     default: () => [],
   },
 })
-
-const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete'])
-
-const GRID_COLUMN = 8
-const GRID_MIN_ROW = 1
-const GRID_MAX_ROW = 1
-
+const componentsRef =toRef(props, 'components');
+// const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete'])
+const emit = defineEmits(['remove'])
+const editIndex = {
+  id: 0,
+}
 let grid
 const gridref = ref(null)
-const hoveredWidget = ref(null)
+
+function remove(comp) {
+  emit('remove', comp)
+}
+watch(props, (newValue, oldValue) => {
+  console.log(`Значение изменилось с ${oldValue} на ${newValue}`);
+  nextTick(()=>{
+    grid.load(grid.getGridItems())
+  })
+});
 
 onMounted(() => {
   grid = GridStack.init(
     {
-      float: true,
-      column: GRID_COLUMN,
-      minRow: GRID_MIN_ROW,
-      maxRow: GRID_MAX_ROW,
+      float: false,
+      column: 1,
+      cellHeight: '65px',
+      disableResize: true,
+      row: props.components.mandatory.length,
     },
     gridref.value,
   )
+  console.log("ПРООПСЫ",componentsRef.value)
+  // grid.on('added', function(event, items) {
+  //   emit('added', [event, items])
+  // })
 
-  grid.on('added', function(event, items) {
-    emit('added', [event, items])
-  })
+  // grid.on('dragstart', function(event, items) {
+  //   emit('dragstart', [event, items])
+  // })
 
-  grid.on('dragstart', function(event, items) {
-    emit('dragstart', [event, items])
-  })
+  // grid.on('dragstop', (event, element) => {
+  //   console.log('move event!', event, element)
+  // })
 
-  grid.on('dragstop', (event, element) => {
-    console.log('move event!', event, element)
-  })
-
-  grid.on('resizestop', function(event, items) {
-    emit('resizestop', [event, items])
-  })
+  // grid.on('resizestop', function(event, items) {
+  //   emit('resizestop', [event, items])
+  // })
 })
 
-function mouseleave() {
-  hoveredWidget.value = null
-}
+// function mouseleave() {
+//   hoveredWidget.value = null
+// }
 
-function mouseover(idWidget) {
-  hoveredWidget.value = idWidget
-}
-function deleteComponent(idWidget) {
-  const foundWidget = grid.getGridItems()
-    .find(item => item.gridstackNode.id.toString() === idWidget.toString())
-  if (foundWidget) {
-    grid.removeWidget(foundWidget, true)
-  }
-}
+// function mouseover(idWidget) {
+//   hoveredWidget.value = idWidget
+// }
+// function deleteComponent(idWidget) {
+//   const foundWidget = grid.getGridItems()
+//     .find(item => item.gridstackNode.id.toString() === idWidget.toString())
+//   if (foundWidget) {
+//     grid.removeWidget(foundWidget, true)
+//   }
+// }
 
-const createWidget = idWidget => {
-  nextTick(() => {
-    grid.load(grid.getGridItems())
-  })
-}
+// const createWidget = idWidget => {
+//   nextTick(() => {
+//     grid.load(grid.getGridItems())
+//   })
+// }
 
-const isAreaEmpty = () => {
-  let sumNodeWidth = 0
-  grid.getGridItems().map(item => sumNodeWidth += item.gridstackNode.w)
+// const isAreaEmpty = () => {
+//   let sumNodeWidth = 0
+//   grid.getGridItems().map(item => (sumNodeWidth += item.gridstackNode.w))
 
-  return sumNodeWidth < GRID_COLUMN
-}
+//   return sumNodeWidth < GRID_COLUMN
+// }
 
-const getGridNodes = () => {
-  return grid.getGridItems()
-}
+// const getGridNodes = () => {
+//   return grid.getGridItems()
+// }
 
-defineExpose({ createWidget, isAreaEmpty, getGridNodes })
+//defineExpose({ createWidget, isAreaEmpty, getGridNodes })
 </script>
 
 <template>
@@ -95,50 +100,42 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes })
     class="grid-stack"
   >
     <div
-      v-for="(component, key, index) in props.gridItems"
-      :key="'component'+index"
+      v-for="component in props.components.mandatory"
+      :key="component.id"
       class="grid-stack-item"
       :gs-id="component.id"
-      :gs-x="component.x"
-      :gs-y="component.y"
-      :gs-h="component.h"
-      :gs-w="component.w"
+      :gs-x="0"
+      :gs-y="component.code - 1"
+      :gs-h="1"
+      :gs-w="1"
+      
     >
-      <div
-        class="grid-stack-item-content"
-        @mouseover="mouseover(component.id)"
-        @mouseleave="mouseleave"
-      >
-        <VMenu activator="parent" location="top" offset="0px">
-          <template v-slot:activator="{ props }">
-            <VBtn
-              v-show="hoveredWidget === component.id"
-              v-bind="props"
-              class="grid-stack-item__edit-btn"
-              density="compact"
-              icon="mdi-dots-horizontal"
-            />
-          </template>
-
-          <VList>
-            <VListItem>
-              <VListItemTitle>Remove</VListItemTitle>
-            </VListItem>
-            <VListItem>
-              <VListItemTitle>Edit</VListItemTitle>
-            </VListItem>
-          </VList>
-        </VMenu>
-        <!--    :variant="hoveredWidget === component.id ? 'underlined' : 'plain'"    -->
-        <VSelect
-          class="grid-stack-item__select"
-          variant="underlined"
-          item-value="id"
-          item-title="name"
-          menu-icon=""
-          multiple
-          :items="props.components"
-        />
+      <div class="grid-stack-item-content" style="overflow: hidden">
+        <div style="width: 5%; white-space: nowrap">
+          {{ 'OK ' + component.code }}
+        </div>
+        <div style="width: 65%">
+          {{ component.name }}
+        </div>
+        <div style="width: 10%">
+          {{ component.credits }}
+        </div>
+        <div style="width: 10%">
+          {{ component.control_type }}
+        </div>
+        <div style="width: 10%" class="my-4 grid-stack-item-buttons">
+          <VBtn
+            icon="mdi-pencil"
+            size="x-small"
+            style="margin-right: 2%"
+            @click="edit(item)"
+          />
+          <VBtn
+            icon="mdi-trash-can"
+            size="x-small"
+            @click="remove(component)"
+          />
+        </div>
       </div>
     </div>
   </div>
@@ -146,38 +143,35 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes })
 
 <style>
 .grid-stack {
-
+  display: flex;
+  width: 100%;
 }
 
-.grid-stack-item {
+.grid-stack-item{
+  width: 100% !important;
+} 
+.grid-stack-item-buttons{
+  display: flex;
 }
-
 .grid-stack-item-content {
   display: flex;
   align-items: center;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 3px;
-
-}
-
-.grid-stack-item__select {
+  font-weight: normal;
+  font-size: 14px;
+  border-bottom: 1px solid rgb(202, 202, 202);
+  top: 0 !important;
+  left: 0 !important;
   height: 100%;
-  text-align: center;
+  width: 100% !important}
+.grid-stack-item-content div{
+  text-align: left;
+  padding: 0 16px;
 }
-
-.v-field__field{
+.v-field__field {
   align-items: center;
 }
 
-.v-field__prepend-inner{
+.v-field__prepend-inner {
   align-items: center;
-}
-
-.grid-stack-item__edit-btn {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  z-index: 10000;
 }
 </style>
