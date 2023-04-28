@@ -48,30 +48,75 @@ onMounted(async () => {
   await eduProgsStore.fetchScheme(eduprogId)
   scheme.value = eduProgsStore.scheme
 
-  // initGrid()
+  initGrid()
   console.log('sscheme: ', scheme.value)
+  console.log('components',eduProgsStore.components)
+  console.log('disciplines.value',disciplines.value)
 })
+
+
+// function initGrid() {
+//   scheme.value.map(item => {
+//     const widgetIndex = items.value[item.discipline_id].findIndex(w => w.eduprogcomp === item.eduprogcomp)
+//     const widget = {
+//       w: Math.round(Math.random()),
+//       x: item.semester_num - 1 ,
+//       y: item.row - 1,
+//       id: widgetIndex !== -1 ? items.value[item.discipline_id][widgetIndex].id : uuidv4(),
+//       eduprogcomp: item.eduprogcomp,
+//     }
+//     if (widgetIndex !== -1) {
+//       Object.assign(items.value[item.discipline_id][widgetIndex], widget)
+//       childComponentRef.value[0].update(items.value[item.discipline_id][widgetIndex].id, widget)
+//     } else {
+//       items.value[item.discipline_id].unshift(widget)
+//       childComponentRef.value[0].createWidget(widget.id)
+//     }
+//   })
+// }
+
+async function updateContent(){
+  // Get eduprog components
+  await eduProgsStore.fetchComponents(eduprogId)
+  eduprogComponents.value = eduProgsStore.components
+
+  // Get components scheme
+  await eduProgsStore.fetchScheme(eduprogId)
+  scheme.value = eduProgsStore.scheme
+
+  initGrid()
+}
+
+
 
 function initGrid() {
   scheme.value.map(item => {
-    items.value[item.discipline_id].push({
-      w: 1,
-      x: item.semester_num,
+    const widget = {
+      w: Math.round(Math.random()),
+      x: item.semester_num - 1 ,
+      y: item.row - 1,
       id: uuidv4(),
       eduprogcomp: item.eduprogcomp,
-    })
+      eduprogcomp_id: item.id,
+    }
+    items.value[item.discipline_id].unshift(widget)
   })
+  disciplines.value.forEach((item,index)=>
+    childComponentRef.value[index].createWidget())
 }
+
 function initGridItems() {
-  disciplines.value.map(item => {
+  disciplines.value.map((item,index) => {
     Object.defineProperty(items.value, item.id, {
-      value: [{
-        w: Math.round(Math.random()),
-        id: uuidv4(),
-      }],
+      value: [],
+      writable: true,
+    })
+    Object.defineProperty(items.value, item.index, {
+      value: index,
       writable: true,
     })
   })
+  console.log(disciplines.value)
 }
 
 function addEmptyWidget(discipline, index) {
@@ -95,11 +140,21 @@ async function deleteDiscipline(id) {
   await eduProgsStore.deleteDiscipline(id)
   await eduProgsStore.fetchDisciplines(route.params.pages)
   disciplines.value = eduProgsStore.getDisciplines
+
+  await updateContent()
 }
 
-async function deleteComponent(event, element) {
-  await eduProgsStore.deleteComponentFromSheme(element.id)
-  await eduProgsStore.fetchScheme(route.params.pages)
+async function deleteComponent(component) {
+
+  if(component.eduprogcomp_id === undefined || null || 0){
+    console.log(component.eduprogcomp_id)
+  } else {
+    await eduProgsStore.deleteComponentFromSheme(component.eduprogcomp_id)
+    await eduProgsStore.fetchScheme(route.params.pages)
+
+    await updateContent()
+  }
+
 }
 
 function edit(item) {
@@ -144,6 +199,7 @@ function cancelNewDiscipline() {
 function deleteItem(event) {
   console.log(event)
 }
+
 </script>
 
 <template>
@@ -288,7 +344,7 @@ function deleteItem(event) {
             </div>
             <div style="text-align: center; margin-top: 5%; margin-bottom: 5%">
               <span v-if="editIndex !== item.id">
-                <div>
+                <div style="margin-bottom: 2%">
                   <VBtn
                     icon="mdi-pencil"
                     size="x-small"
@@ -304,6 +360,7 @@ function deleteItem(event) {
                 <VBtn
                   icon="mdi-plus"
                   size="x-small"
+                  style="margin-right:2% "
                   @click="addEmptyWidget(item, index)"
                 />
               </span>
@@ -325,12 +382,14 @@ function deleteItem(event) {
           <div style="width: 100%">
             <Gridstack
               ref="childComponentRef"
+              gs-current-row="item.rows"
               :grid-items="items[item.id]"
               :components="eduprogComponents"
               @added="logger"
               @dragstart="logger"
               @resizestop="logger"
               @delete="deleteItem"
+              @delComp='deleteComponent'
             />
           </div>
         </div>

@@ -20,21 +20,23 @@ const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete'])
 
 const GRID_COLUMN = 8
 const GRID_MIN_ROW = 1
-const GRID_MAX_ROW = 1
+const GRID_MAX_ROW = 8
 
 let grid
 const gridref = ref(null)
 const hoveredWidget = ref(null)
 
+
 onMounted(() => {
   grid = GridStack.init(
     {
-      float: true,
+      float: false,
       column: GRID_COLUMN,
       minRow: GRID_MIN_ROW,
       maxRow: GRID_MAX_ROW,
     },
     gridref.value,
+    console.log(gridref.value),
   )
 
   grid.on('added', function(event, items) {
@@ -61,21 +63,25 @@ function mouseleave() {
 function mouseover(idWidget) {
   hoveredWidget.value = idWidget
 }
-function deleteComponent(idWidget) {
+
+function deleteComponent(component) {
   const foundWidget = grid.getGridItems()
-    .find(item => item.gridstackNode.id.toString() === idWidget.toString())
+    .find(item => item.gridstackNode.id.toString() === component.id.toString())
   if (foundWidget) {
     grid.removeWidget(foundWidget, true)
+    emit('delComp', component)
+
   }
 }
 
-const createWidget = idWidget => {
+const createWidget = () => {
   nextTick(() => {
     grid.load(grid.getGridItems())
   })
 }
 
 const isAreaEmpty = () => {
+  console.log(grid.getRow())
   let sumNodeWidth = 0
   grid.getGridItems().map(item => sumNodeWidth += item.gridstackNode.w)
 
@@ -86,7 +92,26 @@ const getGridNodes = () => {
   return grid.getGridItems()
 }
 
-defineExpose({ createWidget, isAreaEmpty, getGridNodes })
+function editWidget(component){
+  console.log(component.id)
+}
+
+function change(component){
+  console.log(component)
+  console.log(component.id)
+  console.log(props.gridItems)
+  const items = this.grid.getGridItems()
+  const item = items.find(item => item.gridstackNode.id === component.id)
+  console.log('Widget с мисива на прямую', items[0].gridstackNode)
+  console.log('Widget который нашел ', item.gridstackNode)
+
+}
+
+
+
+
+
+defineExpose({ createWidget, isAreaEmpty, getGridNodes})
 </script>
 
 <template>
@@ -109,8 +134,12 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes })
         @mouseover="mouseover(component.id)"
         @mouseleave="mouseleave"
       >
-        <VMenu activator="parent" location="top" offset="0px">
-          <template v-slot:activator="{ props }">
+        <VMenu
+          activator="parent"
+          location="top"
+          offset="0px"
+        >
+          <template #activator="{ props }">
             <VBtn
               v-show="hoveredWidget === component.id"
               v-bind="props"
@@ -121,23 +150,24 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes })
           </template>
 
           <VList>
-            <VListItem @click="deleteComponent(component.id)">
+            <VListItem @click="deleteComponent(component)">
               Remove
             </VListItem>
-            <VListItem>
+            <VListItem @click="editWidget(component)">
               Edit
             </VListItem>
           </VList>
         </VMenu>
         <!--    :variant="hoveredWidget === component.id ? 'underlined' : 'plain'"    -->
         <VSelect
+          v-model="component.eduprogcomp"
           class="grid-stack-item__select"
           variant="underlined"
           item-value="id"
           item-title="name"
           menu-icon=""
-          multiple
           :items="props.components"
+          @update:modelValue="change(component)"
         />
       </div>
     </div>
@@ -146,7 +176,7 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes })
 
 <style>
 .grid-stack {
-
+ gs-current-row : 2
 }
 
 .grid-stack-item {
