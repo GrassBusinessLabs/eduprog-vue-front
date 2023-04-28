@@ -28,7 +28,7 @@ const hoveredWidget = ref(null)
 
 
 onMounted(() => {
-  console.log("ГРИДРЕФ",gridref.value)
+
   grid = GridStack.init(
     {
       float: false,
@@ -100,11 +100,23 @@ function editWidget(component){
 function change(component){
   console.log(component)
   console.log(component.id)
-  console.log(props.gridItems)
   const items = this.grid.getGridItems()
   const item = items.find(item => item.gridstackNode.id === component.id)
   console.log('Widget с мисива на прямую', items[0].gridstackNode)
   console.log('Widget который нашел ', item.gridstackNode)
+
+  const newComp = {
+    discipline_id: component.disc_id,
+    row: item.gridstackNode.y + 1,
+    semester_num: item.gridstackNode.x + 1,
+    eduprog_id: 0,
+    eduprogcomp_id: component.eduprogcomp,
+    credits_per_semester: 0,
+
+  }
+
+
+  emit('createComp', newComp)
 
 }
 

@@ -5,6 +5,7 @@ import { reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import Gridstack from '@core/components/Gridstack.vue'
 
+
 const route = useRoute()
 const disciplines = ref([])
 const eduprogComponents = ref([])
@@ -55,25 +56,6 @@ onMounted(async () => {
 })
 
 
-// function initGrid() {
-//   scheme.value.map(item => {
-//     const widgetIndex = items.value[item.discipline_id].findIndex(w => w.eduprogcomp === item.eduprogcomp)
-//     const widget = {
-//       w: Math.round(Math.random()),
-//       x: item.semester_num - 1 ,
-//       y: item.row - 1,
-//       id: widgetIndex !== -1 ? items.value[item.discipline_id][widgetIndex].id : uuidv4(),
-//       eduprogcomp: item.eduprogcomp,
-//     }
-//     if (widgetIndex !== -1) {
-//       Object.assign(items.value[item.discipline_id][widgetIndex], widget)
-//       childComponentRef.value[0].update(items.value[item.discipline_id][widgetIndex].id, widget)
-//     } else {
-//       items.value[item.discipline_id].unshift(widget)
-//       childComponentRef.value[0].createWidget(widget.id)
-//     }
-//   })
-// }
 
 async function updateContent(){
   // Get eduprog components
@@ -88,22 +70,64 @@ async function updateContent(){
 }
 
 
-
 function initGrid() {
-  scheme.value.map(item => {
-    const widget = {
-      w: Math.round(Math.random()),
-      x: item.semester_num - 1 ,
-      y: item.row - 1,
-      id: uuidv4(),
-      eduprogcomp: item.eduprogcomp,
-      eduprogcomp_id: item.id,
+  console.log(items.value)
+  scheme.value.forEach(item => {
+    const widgetIndex = items.value[item.discipline_id].findIndex(w => w.eduprogcomp_id === item.id)
+    if (widgetIndex === -1) {
+      const widget = {
+        w: Math.round(Math.random()),
+        x: item.semester_num - 1 ,
+        y: item.row - 1,
+        id: uuidv4(),
+        eduprogcomp: item.eduprogcomp,
+        eduprogcomp_id: item.id,
+        disc_id: item.discipline_id,
+      }
+      items.value[item.discipline_id].unshift(widget)
+    } else {
+      const widget = items.value[item.discipline_id][widgetIndex]
+      console.log(widget)
+      console.log(items.value)
     }
-    items.value[item.discipline_id].unshift(widget)
   })
   disciplines.value.forEach((item,index)=>
     childComponentRef.value[index].createWidget())
 }
+
+
+// function initGrid() {
+//   scheme.value.forEach(item => {
+//     const widgetIndex = items.value[item.discipline_id].findIndex(w => w.eduprogcomp_id === item.id)
+//     if (widgetIndex === -1) {
+//       const widget = {
+//         w: Math.round(Math.random()),
+//         x: item.semester_num - 1 ,
+//         y: item.row - 1,
+//         id: uuidv4(),
+//         eduprogcomp: item.eduprogcomp,
+//         eduprogcomp_id: item.id,
+//         disc_id: item.discipline_id,
+//       }
+//       items.value[item.discipline_id].unshift(widget)
+//       disciplines.value.forEach((item,index)=>
+//         childComponentRef.value[index].createWidget())
+//     } else {
+//       // Если элемент уже существует, его можно обновить, если это необходимо
+//       const widget = items.value[item.discipline_id][widgetIndex]
+//       widget.w = Math.round(Math.random())
+//       widget.x = item.semester_num - 1
+//       widget.y = item.row - 1
+//       widget.eduprogcomp_id = item.id
+//       console.log(widget)
+//       disciplines.value.forEach((item,index)=>
+//         childComponentRef.value[index].update(widget.id, widget))
+//     }
+//   })
+// }
+
+
+
 
 function initGridItems() {
   disciplines.value.map((item,index) => {
@@ -123,6 +147,7 @@ function addEmptyWidget(discipline, index) {
   const node = {
     w: Math.round(Math.random()),
     id: uuidv4(),
+    disc_id:discipline.id,
   }
   if (childComponentRef.value[index].isAreaEmpty()) {
     items.value[discipline.id].push(node)
@@ -146,8 +171,11 @@ async function deleteDiscipline(id) {
 
 async function deleteComponent(component) {
 
+  console.log(component)
+
   if(component.eduprogcomp_id === undefined || null || 0){
     console.log(component.eduprogcomp_id)
+    console.log(items.value)
   } else {
     await eduProgsStore.deleteComponentFromSheme(component.eduprogcomp_id)
     await eduProgsStore.fetchScheme(route.params.pages)
@@ -156,6 +184,23 @@ async function deleteComponent(component) {
   }
 
 }
+
+async function createCompToSheme(newComp){
+
+
+  const obj = eduprogComponents.value.find(item => item.id === newComp.eduprogcomp_id)
+
+  newComp.eduprog_id = Number(route.params.pages)
+  newComp.credits_per_semester = obj.credits
+
+  console.log(newComp)
+  
+  await eduProgsStore.setComponentToScheme(newComp)
+  await updateContent()
+}
+
+
+
 
 function edit(item) {
   editIndex.value = item.id
@@ -199,7 +244,6 @@ function cancelNewDiscipline() {
 function deleteItem(event) {
   console.log(event)
 }
-
 </script>
 
 <template>
@@ -389,7 +433,8 @@ function deleteItem(event) {
               @dragstart="logger"
               @resizestop="logger"
               @delete="deleteItem"
-              @delComp='deleteComponent'
+              @delComp="deleteComponent"
+              @createComp="createCompToSheme"
             />
           </div>
         </div>
