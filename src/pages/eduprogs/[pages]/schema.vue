@@ -93,6 +93,7 @@ function initGrid() {
   })
   disciplines.value.forEach((item,index)=>
     childComponentRef.value[index].createWidget())
+
 }
 
 
@@ -234,6 +235,7 @@ async function createNewDiscipline() {
   disciplines.value = eduProgsStore.getDisciplines
   dialogCreate.value = false
   initGridItems()
+  updateContent()
 }
 
 function cancelNewDiscipline() {
@@ -432,6 +434,7 @@ function deleteItem(event) {
               @added="logger"
               @dragstart="logger"
               @resizestop="logger"
+              @dropped="logger"
               @delete="deleteItem"
               @delComp="deleteComponent"
               @createComp="createCompToSheme"

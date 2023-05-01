@@ -16,7 +16,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete'])
+const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete','dropped'])
 
 const GRID_COLUMN = 8
 const GRID_MIN_ROW = 1
@@ -35,6 +35,8 @@ onMounted(() => {
       column: GRID_COLUMN,
       minRow: GRID_MIN_ROW,
       maxRow: GRID_MAX_ROW,
+      acceptWidgets: '.grid-stack-item',
+      dragIn: '.grid-stack',
     },
     gridref.value,
     console.log(gridref.value),
@@ -54,6 +56,9 @@ onMounted(() => {
 
   grid.on('resizestop', function(event, items) {
     emit('resizestop', [event, items])
+  })
+  grid.on('dropped', function (event, previousWidget, newWidget) {
+    emit('dropped', [event, previousWidget, newWidget])
   })
 })
 
@@ -103,7 +108,7 @@ function change(component){
   const items = this.grid.getGridItems()
   const item = items.find(item => item.gridstackNode.id === component.id)
   console.log('Widget с мисива на прямую', items[0].gridstackNode)
-  console.log('Widget который нашел ', item.gridstackNode)
+  console.log('Widget который нашел ', item)
 
   const newComp = {
     discipline_id: component.disc_id,
