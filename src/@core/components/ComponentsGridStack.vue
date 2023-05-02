@@ -37,7 +37,6 @@ onMounted(() => {
       column: 1,
       cellHeight: '65px',
       disableResize: true,
-      row: props.components.mandatory.length,
     },
     gridref.value,
   )
