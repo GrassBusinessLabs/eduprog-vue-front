@@ -70,15 +70,6 @@ function mouseover(idWidget) {
   hoveredWidget.value = idWidget
 }
 
-function deleteComponent(component) {
-  const foundWidget = grid.getGridItems()
-    .find(item => item.gridstackNode.id.toString() === component.id.toString())
-  if (foundWidget) {
-    grid.removeWidget(foundWidget, true)
-    emit('delComp', component)
-
-  }
-}
 
 const createWidget = () => {
   nextTick(() => {
@@ -98,9 +89,6 @@ const getGridNodes = () => {
   return grid.getGridItems()
 }
 
-function editWidget(component){
-  console.log(component.id)
-}
 
 function change(component){
   console.log(component)
@@ -164,15 +152,6 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes})
               icon="mdi-dots-horizontal"
             />
           </template>
-
-          <VList>
-            <VListItem @click="deleteComponent(component)">
-              Remove
-            </VListItem>
-            <VListItem @click="editWidget(component)">
-              Edit
-            </VListItem>
-          </VList>
         </VMenu>
         <!--    :variant="hoveredWidget === component.id ? 'underlined' : 'plain'"    -->
         <VSelect
@@ -192,7 +171,7 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes})
 
 <style>
 .grid-stack {
- gs-current-row : 2
+  gs-current-row : 2
 }
 
 .grid-stack-item {
