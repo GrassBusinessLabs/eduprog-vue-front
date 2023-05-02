@@ -4,6 +4,7 @@ import { useEduProgsStore } from '@/stores/eduProgs.js'
 import { reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import Gridstack from '@core/components/Gridstack.vue'
+import GridstackForComponents from '@core/components/GridstackForComponents.vue'
 
 
 const route = useRoute()
@@ -299,6 +300,9 @@ function deleteItem(event) {
         title="Всі предмети"
         class="mb-5"
       >
+
+        <GridstackForComponents grid-items=''/>
+
         <VCardText cols="12" />
       </VCard>
     </VCol>
@@ -439,6 +443,7 @@ function deleteItem(event) {
               @delComp="deleteComponent"
               @createComp="createCompToSheme"
             />
+            <hr style='transform: scaleY(0.3)'>
           </div>
         </div>
       </div>
