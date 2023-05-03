@@ -71,8 +71,7 @@ function mouseover(idWidget) {
 }
 
 function deleteComponent(component) {
-  const foundWidget = grid.getGridItems()
-    .find(item => item.gridstackNode.id.toString() === component.id.toString())
+  const foundWidget = grid.getGridItems().find(item => item.gridstackNode.id.toString() === component.id.toString())
   if (foundWidget) {
     grid.removeWidget(foundWidget, true)
     emit('delComp', component)

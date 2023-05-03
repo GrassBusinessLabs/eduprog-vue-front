@@ -21,6 +21,7 @@ export const useEduProgsStore = defineStore({
     specialities: [],
     components: [],
     VBblock: [],
+    freeCompSheme:[],
   }),
 
   getters: {
@@ -40,6 +41,7 @@ export const useEduProgsStore = defineStore({
     getSpecialities: state => state.specialities,
     getComponents: state => state.components,
     getVBblock: state => state.VBblock,
+    getfreeCompSheme: state => state.freeCompSheme,
   },
 
   actions: {
@@ -134,6 +136,11 @@ export const useEduProgsStore = defineStore({
       const response = await getData('/eduprogs/competencies/byEduprogId/' + eduId)
       this.competencies = response
     },
+    async fetchFreeCompSheme(eduId) {
+      const response = await getData('/eduprogs/scheme/freeComps/' + eduId)
+      this.freeCompSheme = response
+    },
+
 
     async createCompetencyRelation(eduprogId, componentId, competencyId) {
       const newRelation = {

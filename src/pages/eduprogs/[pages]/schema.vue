@@ -32,6 +32,9 @@ const items = ref({})
 
 const childComponentRef = ref(null)
 
+const freeCompSheme = ref()
+const FreeCompItems = ref([])
+
 function logger(evt) {
   console.log(evt)
 }
@@ -49,6 +52,13 @@ onMounted(async () => {
   // Get components scheme
   await eduProgsStore.fetchScheme(eduprogId)
   scheme.value = eduProgsStore.scheme
+
+  await eduProgsStore.fetchFreeCompSheme(eduprogId)
+  freeCompSheme.value = eduProgsStore.freeCompSheme
+
+  console.log('freeCompSheme',freeCompSheme.value)
+
+  initCopmGrid()
 
   initGrid()
   console.log('sscheme: ', scheme.value)
@@ -70,31 +80,39 @@ async function updateContent(){
   initGrid()
 }
 
+function initCopmGrid(){
+  freeCompSheme.value.forEach((item, index )=> {
+    const widget = {
+      w: Math.round(Math.random()),
+      x: Math.round(Math.random()),
+      y: Math.round(Math.random()),
+      id: uuidv4(),
+      free_credit: item.free_credits,
+      eduprogcomp_id: item.id,
+      name: item.name,
+    }
+    FreeCompItems.value.push(widget)
+  })
+  console.log(FreeCompItems.value)
+}
+
 
 function initGrid() {
   console.log(items.value)
   scheme.value.forEach(item => {
-    const widgetIndex = items.value[item.discipline_id].findIndex(w => w.eduprogcomp_id === item.id)
-    if (widgetIndex === -1) {
-      const widget = {
-        w: Math.round(Math.random()),
-        x: item.semester_num - 1 ,
-        y: item.row - 1,
-        id: uuidv4(),
-        eduprogcomp: item.eduprogcomp,
-        eduprogcomp_id: item.id,
-        disc_id: item.discipline_id,
-      }
-      items.value[item.discipline_id].unshift(widget)
-    } else {
-      const widget = items.value[item.discipline_id][widgetIndex]
-      console.log(widget)
-      console.log(items.value)
+    const widget = {
+      w: Math.round(Math.random()),
+      x: item.semester_num - 1 ,
+      y: item.row - 1,
+      id: uuidv4(),
+      eduprogcomp: item.eduprogcomp,
+      eduprogcomp_id: item.id,
+      disc_id: item.discipline_id,
     }
+    items.value[item.discipline_id].unshift(widget)
   })
   disciplines.value.forEach((item,index)=>
     childComponentRef.value[index].createWidget())
-
 }
 
 
@@ -187,8 +205,9 @@ async function deleteComponent(component) {
 
 }
 
-async function createCompToSheme(newComp){
 
+
+async function createCompToSheme(newComp){
 
   const obj = eduprogComponents.value.find(item => item.id === newComp.eduprogcomp_id)
 
@@ -200,8 +219,6 @@ async function createCompToSheme(newComp){
   await eduProgsStore.setComponentToScheme(newComp)
   await updateContent()
 }
-
-
 
 
 function edit(item) {
@@ -295,18 +312,17 @@ function deleteItem(event) {
   </VDialog>
 
   <VRow>
-    <VCol cols="12">
+    <VCol cols="2">
       <VCard
         title="Всі предмети"
         class="mb-5"
       >
-
-        <GridstackForComponents grid-items=''/>
+        <GridstackForComponents :components="FreeCompItems" />
 
         <VCardText cols="12" />
       </VCard>
     </VCol>
-    <VCol>
+    <VCol cols='10'>
       <VTable>
         <thead>
           <tr>
@@ -443,7 +459,7 @@ function deleteItem(event) {
               @delComp="deleteComponent"
               @createComp="createCompToSheme"
             />
-            <hr style='transform: scaleY(0.3)'>
+            <hr style="transform: scaleY(0.3)">
           </div>
         </div>
       </div>
