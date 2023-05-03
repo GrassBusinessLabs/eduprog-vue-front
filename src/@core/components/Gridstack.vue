@@ -71,8 +71,7 @@ function mouseover(idWidget) {
 }
 
 function deleteComponent(component) {
-  const foundWidget = grid.getGridItems()
-    .find(item => item.gridstackNode.id.toString() === component.id.toString())
+  const foundWidget = grid.getGridItems().find(item => item.gridstackNode.id.toString() === component.id.toString())
   if (foundWidget) {
     grid.removeWidget(foundWidget, true)
     emit('delComp', component)
@@ -100,6 +99,7 @@ const getGridNodes = () => {
 
 function editWidget(component){
   console.log(component.id)
+
 }
 
 function change(component){
@@ -175,16 +175,12 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes})
           </VList>
         </VMenu>
         <!--    :variant="hoveredWidget === component.id ? 'underlined' : 'plain'"    -->
-        <VSelect
-          v-model="component.eduprogcomp"
-          class="grid-stack-item__select"
-          variant="underlined"
-          item-value="id"
-          item-title="name"
-          menu-icon=""
-          :items="props.components"
-          @update:modelValue="change(component)"
-        />
+        <div style="width: 65%; margin-left: 10%">
+          {{ component.eduprogcomp.name }}
+        </div>
+        <div style="width: 10%">
+          {{ component.eduprogcomp.credits}}
+        </div>
       </div>
     </div>
   </div>

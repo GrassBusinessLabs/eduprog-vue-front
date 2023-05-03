@@ -2,46 +2,43 @@
 import { GridStack } from 'gridstack'
 import 'gridstack/dist/gridstack.min.css'
 import 'gridstack/dist/gridstack-extra.min.css'
-import { defineExpose, ref } from 'vue'
+import { defineExpose, ref, toRef, defineProps, watch, nextTick} from 'vue'
 
-const props = defineProps({
-  gridItems: {
+const props =defineProps({
+  components: {
     type: Object,
     required: true,
-  },
-  components: {
-    type: Array,
-    required: false,
     default: () => [],
   },
 })
 
 const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete','dropped'])
 
-const GRID_COLUMN = 8
-const GRID_MIN_ROW = 1
-const GRID_MAX_ROW = 8
-
 let grid
 const gridref = ref(null)
-const hoveredWidget = ref(null)
+
+watch(props, (newValue, oldValue) => {
+  console.log(`Значение изменилось с ${oldValue} на ${newValue}`)
+  nextTick(()=>{
+    grid.load(grid.getGridItems())
+  })
+})
+
 
 
 onMounted(() => {
-
   grid = GridStack.init(
     {
       float: false,
-      column: GRID_COLUMN,
-      minRow: GRID_MIN_ROW,
-      maxRow: GRID_MAX_ROW,
+      column: 1,
+      cellHeight: '65px',
+      disableResize: true,
       acceptWidgets: '.grid-stack-item',
       dragIn: '.grid-stack',
     },
     gridref.value,
     console.log(gridref.value),
   )
-
   grid.on('added', function(event, items) {
     emit('added', [event, items])
   })
@@ -60,62 +57,8 @@ onMounted(() => {
   grid.on('dropped', function (event, previousWidget, newWidget) {
     emit('dropped', [event, previousWidget, newWidget])
   })
+  console.log(props.components)
 })
-
-function mouseleave() {
-  hoveredWidget.value = null
-}
-
-function mouseover(idWidget) {
-  hoveredWidget.value = idWidget
-}
-
-
-const createWidget = () => {
-  nextTick(() => {
-    grid.load(grid.getGridItems())
-  })
-}
-
-const isAreaEmpty = () => {
-  console.log(grid.getRow())
-  let sumNodeWidth = 0
-  grid.getGridItems().map(item => sumNodeWidth += item.gridstackNode.w)
-
-  return sumNodeWidth < GRID_COLUMN
-}
-
-const getGridNodes = () => {
-  return grid.getGridItems()
-}
-
-
-function change(component){
-  console.log(component)
-  console.log(component.id)
-  const items = this.grid.getGridItems()
-  const item = items.find(item => item.gridstackNode.id === component.id)
-  console.log('Widget с мисива на прямую', items[0].gridstackNode)
-  console.log('Widget который нашел ', item)
-
-  const newComp = {
-    discipline_id: component.disc_id,
-    row: item.gridstackNode.y + 1,
-    semester_num: item.gridstackNode.x + 1,
-    eduprog_id: 0,
-    eduprogcomp_id: component.eduprogcomp,
-    credits_per_semester: 0,
-
-  }
-  emit('createComp', newComp)
-
-}
-
-
-
-
-
-defineExpose({ createWidget, isAreaEmpty, getGridNodes})
 </script>
 
 <template>
@@ -124,8 +67,8 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes})
     class="grid-stack"
   >
     <div
-      v-for="(component, key, index) in props.gridItems"
-      :key="'component'+index"
+      v-for="component in props.components"
+      :key="component.id"
       class="grid-stack-item"
       :gs-id="component.id"
       :gs-x="component.x"
@@ -135,74 +78,18 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes})
     >
       <div
         class="grid-stack-item-content"
-        @mouseover="mouseover(component.id)"
-        @mouseleave="mouseleave"
+        style="overflow: hidden"
       >
-        <VMenu
-          activator="parent"
-          location="top"
-          offset="0px"
-        >
-          <template #activator="{ props }">
-            <VBtn
-              v-show="hoveredWidget === component.id"
-              v-bind="props"
-              class="grid-stack-item__edit-btn"
-              density="compact"
-              icon="mdi-dots-horizontal"
-            />
-          </template>
-        </VMenu>
-        <!--    :variant="hoveredWidget === component.id ? 'underlined' : 'plain'"    -->
-        <VSelect
-          v-model="component.eduprogcomp"
-          class="grid-stack-item__select"
-          variant="underlined"
-          item-value="id"
-          item-title="name"
-          menu-icon=""
-          :items="props.components"
-          @update:modelValue="change(component)"
-        />
+        <div style="width: 65%; margin-left: 10%">
+          {{ component.name }}
+        </div>
+        <div style="width: 10%">
+          {{ component.free_credit}}
+        </div>
+
       </div>
     </div>
   </div>
 </template>
 
-<style>
-.grid-stack {
-  gs-current-row : 2
-}
 
-.grid-stack-item {
-}
-
-.grid-stack-item-content {
-  display: flex;
-  align-items: center;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  padding: 3px;
-
-}
-
-.grid-stack-item__select {
-  height: 100%;
-  text-align: center;
-}
-
-.v-field__field{
-  align-items: center;
-}
-
-.v-field__prepend-inner{
-  align-items: center;
-}
-
-.grid-stack-item__edit-btn {
-  position: absolute;
-  top: 3px;
-  right: 3px;
-  z-index: 10000;
-}
-</style>
