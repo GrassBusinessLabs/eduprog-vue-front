@@ -5,6 +5,7 @@ import { reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import Gridstack from '@core/components/Gridstack.vue'
 import GridstackForComponents from '@core/components/GridstackForComponents.vue'
+import { it } from 'vuetify/locale'
 
 
 const route = useRoute()
@@ -37,6 +38,27 @@ const FreeCompItems = ref([])
 
 function logger(evt) {
   console.log(evt)
+  if (evt[0].type === 'dropped'){
+
+    const result = FreeCompItems.value.find(item => item.id === evt[2].id)
+    console.log(result)
+
+    const newComp = {
+      discipline_id: evt.itemId,
+      row: evt[2].y + 1,
+      semester_num: evt[2].x + 1,
+      eduprog_id: Number(eduprogId),
+      eduprogcomp_id: result.eduprogcomp_id,
+      credits_per_semester: result.free_credit,
+    }
+    createCompToSheme(newComp)
+
+    console.log('ypa')
+    console.log('ID',evt.itemId)
+    console.log('DISTIPLINES',disciplines.value)
+    console.log('ITEMS',items.value)
+    console.log('ITEMS',FreeCompItems.value)
+  }
 }
 
 onMounted(async () => {
@@ -109,6 +131,7 @@ function initGrid() {
       eduprogcomp_id: item.id,
       disc_id: item.discipline_id,
     }
+    console.log(widget)
     items.value[item.discipline_id].unshift(widget)
   })
   disciplines.value.forEach((item,index)=>
@@ -186,7 +209,6 @@ async function deleteDiscipline(id) {
   await eduProgsStore.fetchDisciplines(route.params.pages)
   disciplines.value = eduProgsStore.getDisciplines
 
-  await updateContent()
 }
 
 async function deleteComponent(component) {
@@ -200,7 +222,6 @@ async function deleteComponent(component) {
     await eduProgsStore.deleteComponentFromSheme(component.eduprogcomp_id)
     await eduProgsStore.fetchScheme(route.params.pages)
 
-    await updateContent()
   }
 
 }
@@ -209,15 +230,9 @@ async function deleteComponent(component) {
 
 async function createCompToSheme(newComp){
 
-  const obj = eduprogComponents.value.find(item => item.id === newComp.eduprogcomp_id)
-
-  newComp.eduprog_id = Number(route.params.pages)
-  newComp.credits_per_semester = obj.credits
-
   console.log(newComp)
   
   await eduProgsStore.setComponentToScheme(newComp)
-  await updateContent()
 }
 
 
@@ -253,7 +268,7 @@ async function createNewDiscipline() {
   disciplines.value = eduProgsStore.getDisciplines
   dialogCreate.value = false
   initGridItems()
-  updateContent()
+  initGrid()
 }
 
 function cancelNewDiscipline() {
@@ -316,13 +331,23 @@ function deleteItem(event) {
       <VCard
         title="Всі предмети"
         class="mb-5"
+        style="max-width: 200px"
       >
+        <VTable>
+          <thead>
+            <tr>
+              <th>Назвва компонента</th>
+              <th>Вільні кредити</th>
+            </tr>
+          </thead>
+        </VTable>
+
         <GridstackForComponents :components="FreeCompItems" />
 
         <VCardText cols="12" />
       </VCard>
     </VCol>
-    <VCol cols='10'>
+    <VCol cols="10">
       <VTable>
         <thead>
           <tr>
@@ -454,7 +479,7 @@ function deleteItem(event) {
               @added="logger"
               @dragstart="logger"
               @resizestop="logger"
-              @dropped="logger"
+              @dropped=" event => logger({...event, itemId: item.id})"
               @delete="deleteItem"
               @delComp="deleteComponent"
               @createComp="createCompToSheme"

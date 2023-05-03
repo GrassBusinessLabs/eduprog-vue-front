@@ -12,7 +12,7 @@ const props =defineProps({
   },
 })
 
-const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete'])
+const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete','dropped'])
 
 let grid
 const gridref = ref(null)
@@ -24,16 +24,15 @@ watch(props, (newValue, oldValue) => {
   })
 })
 
-const GRID_COLUMN = 20
-const GRID_MIN_ROW = 1
 
 
 onMounted(() => {
   grid = GridStack.init(
     {
       float: false,
-      column: GRID_COLUMN,
-      minRow: GRID_MIN_ROW,
+      column: 1,
+      cellHeight: '65px',
+      disableResize: true,
       acceptWidgets: '.grid-stack-item',
       dragIn: '.grid-stack',
     },
@@ -55,6 +54,10 @@ onMounted(() => {
   grid.on('resizestop', function(event, items) {
     emit('resizestop', [event, items])
   })
+  grid.on('dropped', function (event, previousWidget, newWidget) {
+    emit('dropped', [event, previousWidget, newWidget])
+  })
+  console.log(props.components)
 })
 </script>
 
@@ -68,21 +71,22 @@ onMounted(() => {
       :key="component.id"
       class="grid-stack-item"
       :gs-id="component.id"
-      :gs-x="0"
-      :gs-y="component.code - 1"
-      :gs-h="1"
-      :gs-w="1"
+      :gs-x="component.x"
+      :gs-y="component.y"
+      :gs-h="component.h"
+      :gs-w="component.w"
     >
       <div
         class="grid-stack-item-content"
         style="overflow: hidden"
       >
-        <div style="width: 65%">
+        <div style="width: 65%; margin-left: 10%">
           {{ component.name }}
         </div>
         <div style="width: 10%">
-          {{ component.credits }}
+          {{ component.free_credit}}
         </div>
+
       </div>
     </div>
   </div>
