@@ -130,6 +130,7 @@
     <tbody>
       <th colspan="5">
         <ComponentsGridStack
+          @changeOrder="changeOrder"
           @remove="remove"
           :components="components"
         ></ComponentsGridStack>
@@ -827,6 +828,11 @@ const saveBlockName = async block => {
   await eduProgsStore.fetchVBblock(route.params.pages)
   VBblock.value = eduProgsStore.getVBblock
   originValue = {}
+}
+const changeOrder = async (compId, position) => {
+  console.log(compId, position)
+  await eduProgsStore.replaceCompAfter(compId, position)
+  await eduProgsStore.findEduProgById(route.params.pages)
 }
 </script>
 

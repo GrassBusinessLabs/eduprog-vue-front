@@ -191,12 +191,6 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes})
 </template>
 
 <style>
-.grid-stack {
- gs-current-row : 2
-}
-
-.grid-stack-item {
-}
 
 .grid-stack-item-content {
   display: flex;

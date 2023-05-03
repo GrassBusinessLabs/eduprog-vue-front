@@ -2,18 +2,19 @@
 import { GridStack } from 'gridstack'
 import 'gridstack/dist/gridstack.min.css'
 import 'gridstack/dist/gridstack-extra.min.css'
-import { defineExpose, ref, toRef, defineProps, watch, nextTick} from 'vue'
-
-const props =defineProps({
+import { defineExpose, ref, toRef, defineProps, watch, nextTick } from 'vue'
+import { useEduProgsStore } from '@/stores/eduProgs.js'
+const eduProgsStore = useEduProgsStore()
+const props = defineProps({
   components: {
     type: Object,
     required: true,
     default: () => [],
   },
 })
-const componentsRef =toRef(props, 'components');
+const componentsRef = toRef(props, 'components')
 // const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete'])
-const emit = defineEmits(['remove'])
+const emit = defineEmits(['remove', 'changeOrder'])
 const editIndex = {
   id: 0,
 }
@@ -24,11 +25,11 @@ function remove(comp) {
   emit('remove', comp)
 }
 watch(props, (newValue, oldValue) => {
-  console.log(`Значение изменилось с ${oldValue} на ${newValue}`);
-  nextTick(()=>{
+  console.log(`Значение изменилось с ${oldValue} на ${newValue}`)
+  nextTick(() => {
     grid.load(grid.getGridItems())
   })
-});
+})
 
 onMounted(() => {
   grid = GridStack.init(
@@ -40,57 +41,14 @@ onMounted(() => {
     },
     gridref.value,
   )
-  console.log("ПРООПСЫ",componentsRef.value)
-  // grid.on('added', function(event, items) {
-  //   emit('added', [event, items])
-  // })
-
-  // grid.on('dragstart', function(event, items) {
-  //   emit('dragstart', [event, items])
-  // })
-
-  // grid.on('dragstop', (event, element) => {
-  //   console.log('move event!', event, element)
-  // })
-
-  // grid.on('resizestop', function(event, items) {
-  //   emit('resizestop', [event, items])
-  // })
+  console.log('ПРООПСЫ', componentsRef.value)
+  grid.on('dragstop', function (event, el) {
+    console.log('Ивент', event)
+    console.log('El', el.gridstackNode)
+    emit('changeOrder', el.gridstackNode.id, el.gridstackNode.y)
+  })
 })
 
-// function mouseleave() {
-//   hoveredWidget.value = null
-// }
-
-// function mouseover(idWidget) {
-//   hoveredWidget.value = idWidget
-// }
-// function deleteComponent(idWidget) {
-//   const foundWidget = grid.getGridItems()
-//     .find(item => item.gridstackNode.id.toString() === idWidget.toString())
-//   if (foundWidget) {
-//     grid.removeWidget(foundWidget, true)
-//   }
-// }
-
-// const createWidget = idWidget => {
-//   nextTick(() => {
-//     grid.load(grid.getGridItems())
-//   })
-// }
-
-// const isAreaEmpty = () => {
-//   let sumNodeWidth = 0
-//   grid.getGridItems().map(item => (sumNodeWidth += item.gridstackNode.w))
-
-//   return sumNodeWidth < GRID_COLUMN
-// }
-
-// const getGridNodes = () => {
-//   return grid.getGridItems()
-// }
-
-//defineExpose({ createWidget, isAreaEmpty, getGridNodes })
 </script>
 
 <template>
@@ -107,9 +65,11 @@ onMounted(() => {
       :gs-y="component.code - 1"
       :gs-h="1"
       :gs-w="1"
-      
     >
-      <div class="grid-stack-item-content" style="overflow: hidden">
+      <div
+        class="grid-stack-item-content"
+        style="overflow: hidden"
+      >
         <div style="width: 5%; white-space: nowrap">
           {{ 'OK ' + component.code }}
         </div>
@@ -122,7 +82,10 @@ onMounted(() => {
         <div style="width: 10%">
           {{ component.control_type }}
         </div>
-        <div style="width: 10%" class="my-4 grid-stack-item-buttons">
+        <div
+          style="width: 10%"
+          class="my-4 grid-stack-item-buttons"
+        >
           <VBtn
             icon="mdi-pencil"
             size="x-small"
@@ -146,10 +109,10 @@ onMounted(() => {
   width: 100%;
 }
 
-.grid-stack-item{
+.grid-stack-item {
   width: 100% !important;
-} 
-.grid-stack-item-buttons{
+}
+.grid-stack-item-buttons {
   display: flex;
 }
 .grid-stack-item-content {
@@ -161,8 +124,9 @@ onMounted(() => {
   top: 0 !important;
   left: 0 !important;
   height: 100%;
-  width: 100% !important}
-.grid-stack-item-content div{
+  width: 100% !important;
+}
+.grid-stack-item-content div {
   text-align: left;
   padding: 0 16px;
 }

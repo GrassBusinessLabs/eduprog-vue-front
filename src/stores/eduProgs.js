@@ -263,5 +263,9 @@ export const useEduProgsStore = defineStore({
       const response = await getData('/eduprogs/comps/' + compId)
       return response
     },
+    async replaceCompAfter(eduId, putAfterId) {
+      console.log("replace")
+      await editData(`/eduprogs/comps/replace?edcompId=${eduId}&putAfter=${putAfterId}`)
+    },
   },
 })
