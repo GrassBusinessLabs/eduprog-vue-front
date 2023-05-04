@@ -70,7 +70,8 @@ function mouseover(idWidget) {
   hoveredWidget.value = idWidget
 }
 
-function deleteComponent(component) {
+function deleteGridComponent(component) {
+  console.log(component)
   const foundWidget = grid.getGridItems().find(item => item.gridstackNode.id.toString() === component.id.toString())
   if (foundWidget) {
     grid.removeWidget(foundWidget, true)
@@ -127,7 +128,7 @@ function change(component){
 
 
 
-defineExpose({ createWidget, isAreaEmpty, getGridNodes})
+defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent})
 </script>
 
 <template>
@@ -166,7 +167,7 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes})
           </template>
 
           <VList>
-            <VListItem @click="deleteComponent(component)">
+            <VListItem @click="deleteGridComponent(component)">
               Remove
             </VListItem>
             <VListItem @click="editWidget(component)">
