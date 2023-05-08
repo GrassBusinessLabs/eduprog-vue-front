@@ -2,7 +2,7 @@
 import { GridStack } from 'gridstack'
 import 'gridstack/dist/gridstack.min.css'
 import 'gridstack/dist/gridstack-extra.min.css'
-import { defineExpose, ref, toRef, defineProps, watch, nextTick } from 'vue'
+import { ref, toRef, defineProps, watch, nextTick } from 'vue'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 const eduProgsStore = useEduProgsStore()
 const props = defineProps({
@@ -41,7 +41,6 @@ onMounted(() => {
     },
     gridref.value,
   )
-  console.log('ПРООПСЫ', componentsRef.value)
   grid.on('dragstop', function (event, el) {
     console.log('Ивент', event)
     console.log('El', el.gridstackNode)
