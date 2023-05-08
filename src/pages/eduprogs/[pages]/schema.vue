@@ -54,7 +54,6 @@ const free_comp_id = ref()
 const del_index = ref()
 const last_ID = ref()
 
-
 onMounted(async () => {
   // Get disciplines
   await eduProgsStore.fetchDisciplines(eduprogId)
@@ -85,10 +84,13 @@ onMounted(async () => {
 function lastID (evt){
   last_ID.value = evt.itemId
   console.log(last_ID.value)
+  console.log(evt)
+
 }
 
 function logger(evt) {
   console.log(evt)
+
   if (evt[0].type === 'dropped') {
     const result = FreeCompItems.value.find(item => item.id === evt[2].id)
 
@@ -103,9 +105,10 @@ function logger(evt) {
       credits_semestr.value.credits_per_semester = component.eduprogcomp.credits
 
       console.log(credits_semestr.value)
+      console.log("NE DRISNA",result)
 
       updateComponent()
-    } else {
+    } else if (result !== undefined){
       credits_semestr.value.discipline_id = evt.itemId,
       credits_semestr.value.row = evt[2].y + 1,
       credits_semestr.value.semester_num = evt[2].x + 1,
@@ -114,13 +117,24 @@ function logger(evt) {
       credits_semestr.value.credits_per_semester = result.free_credit
       free_comp_id.value = evt[2]
       del_index.value = disciplines.value.findIndex(item => item.id === evt.itemId)
+      console.log("DRISNA", result)
 
       createCompToSheme()
     }
-  }
-}
+  } else if (evt[0].type === 'dragstop') {
+    const component = items[last_ID.value].find(item => item.id === evt[1].gridstackNode.id)
 
-function dragStart (){
+    credits_semestr.value.discipline_id = evt.itemId,
+    credits_semestr.value.row = evt[1].gridstackNode.y + 1,
+    credits_semestr.value.semester_num = evt[1].gridstackNode.x + 1,
+    credits_semestr.value.eduprog_id = Number(eduprogId),
+    credits_semestr.value.eduprogcomp_id = component.eduprogcomp_id,
+    credits_semestr.value.credits_per_semester = component.eduprogcomp.credits
+
+    console.log(credits_semestr.value)
+
+    updateComponent()
+  }
 
 }
 
@@ -568,6 +582,7 @@ function deleteItem(event) {
               @resizestop="logger"
               @dropped=" event => logger({...event, itemId: item.id})"
               @dragstart="event => lastID({...event, itemId: item.id})"
+              @dragstop=" event => logger({...event, itemId: item.id})"
               @delete="deleteItem"
               @delComp="deleteComponent"
               @createComp="createCompToSheme"

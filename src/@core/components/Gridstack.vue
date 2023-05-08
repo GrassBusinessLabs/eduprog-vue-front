@@ -16,7 +16,7 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete','dropped'])
+const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete','dropped','dragstop'])
 
 const GRID_COLUMN = 8
 const GRID_MIN_ROW = 1
@@ -51,7 +51,7 @@ onMounted(() => {
   })
 
   grid.on('dragstop', (event, element) => {
-    console.log('move event!', event, element)
+    emit('dragstop', [event, element])
   })
 
   grid.on('resizestop', function(event, items) {
