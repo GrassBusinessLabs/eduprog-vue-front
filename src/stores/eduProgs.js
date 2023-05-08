@@ -108,6 +108,9 @@ export const useEduProgsStore = defineStore({
     async setComponentToScheme(payload) {
       const response = await postData('/eduprogs/scheme/setCompToSemester', payload)
     },
+    async UpdateComponentInScheme(id, payload) {
+      const response = await editData('/eduprogs/scheme/' + id, payload)
+    },
     async createDiscipline(payload) {
       const response = await postData('/eduprogs/scheme/disciplines/create', payload)
     },

@@ -29,15 +29,15 @@ const changes = reactive({
 
 const enabled = ref(true)
 
-const items = ref({})
+let items = reactive([])
 
 const childComponentRef = ref(null)
+const childFreeCompRef = ref(null)
 
 const freeCompSheme = ref()
 const FreeCompItems = ref([])
 
 
-const dialogCredits = ref(false)
 
 const credits_semestr = ref({
   discipline_id: '',
@@ -48,45 +48,12 @@ const credits_semestr = ref({
   credits_per_semester: '',
 })
 
-function clencelCompToSheme (){
-  dialogCredits.value = false
-  credits_semestr.value.credits_per_semester=''
-}
 
-const free_cred = ref()
+
 const free_comp_id = ref()
 const del_index = ref()
+const last_ID = ref()
 
-function logger(evt) {
-  console.log(evt)
-  if (evt[0].type === 'dropped'){
-
-    const result = FreeCompItems.value.find(item => item.id === evt[2].id)
-
-    free_cred.value = result.free_credit
-    
-    dialogCredits.value = true
-
-    console.log(free_cred.value)
-
-    credits_semestr.value.discipline_id = evt.itemId,
-    credits_semestr.value.row = evt[2].y + 1,
-    credits_semestr.value.semester_num = evt[2].x + 1,
-    credits_semestr.value.eduprog_id = Number(eduprogId),
-    credits_semestr.value.eduprogcomp_id = result.eduprogcomp_id, 
-    free_comp_id.value = evt[2]
-    del_index.value = disciplines.value.findIndex(item => item.id === evt.itemId)
-    console.log('ID DISTIPLUNA', del_index.value)
-
-    console.log(result)
-    console.log('ypa')
-    console.log('ID',evt.itemId)
-    console.log('ID',evt[2].id)
-    console.log('DISTIPLINES',disciplines.value)
-    console.log('ITEMS',items.value)
-    console.log('ITEMS',FreeCompItems.value)
-  }
-}
 
 onMounted(async () => {
   // Get disciplines
@@ -115,7 +82,52 @@ onMounted(async () => {
   console.log('disciplines.value',disciplines.value)
 })
 
+function lastID (evt){
+  last_ID.value = evt.itemId
+  console.log(last_ID.value)
+}
 
+function logger(evt) {
+  console.log(evt)
+  if (evt[0].type === 'dropped') {
+    const result = FreeCompItems.value.find(item => item.id === evt[2].id)
+
+    if (result === undefined) {
+      const component = items[last_ID.value].find(item => item.id === evt[2].id)
+
+      credits_semestr.value.discipline_id = evt.itemId,
+      credits_semestr.value.row = evt[2].y + 1,
+      credits_semestr.value.semester_num = evt[2].x + 1,
+      credits_semestr.value.eduprog_id = Number(eduprogId),
+      credits_semestr.value.eduprogcomp_id = component.eduprogcomp_id,
+      credits_semestr.value.credits_per_semester = component.eduprogcomp.credits
+
+      console.log(credits_semestr.value)
+
+      updateComponent()
+    } else {
+      credits_semestr.value.discipline_id = evt.itemId,
+      credits_semestr.value.row = evt[2].y + 1,
+      credits_semestr.value.semester_num = evt[2].x + 1,
+      credits_semestr.value.eduprog_id = Number(eduprogId),
+      credits_semestr.value.eduprogcomp_id = result.eduprogcomp_id,
+      credits_semestr.value.credits_per_semester = result.free_credit
+      free_comp_id.value = evt[2]
+      del_index.value = disciplines.value.findIndex(item => item.id === evt.itemId)
+
+      createCompToSheme()
+    }
+  }
+}
+
+function dragStart (){
+
+}
+
+
+async function updateComponent(){
+  await eduProgsStore.UpdateComponentInScheme(eduprogId,credits_semestr.value)
+}
 
 async function updateContent(){
   // Get eduprog components
@@ -129,21 +141,49 @@ async function updateContent(){
   initGrid()
 }
 
-function initCopmGrid(){
-  freeCompSheme.value.forEach((item, index )=> {
-    const widget = {
-      w: Math.round(Math.random()),
-      x: Math.round(Math.random()),
-      y: Math.round(Math.random()),
-      id: uuidv4(),
-      free_credit: item.free_credits,
-      eduprogcomp_id: item.id,
-      name: item.name,
+function initCopmGrid() {
+  freeCompSheme.value.forEach((item, index) => {
+    const existingWidget = FreeCompItems.value.find(widget => widget.eduprogcomp_id === item.id)
+    if (existingWidget) {
+      // Обновление свойств существующего элемента
+      existingWidget.free_credit = item.free_credits
+      existingWidget.name = item.name
+    } else {
+      // Добавление нового элемента в массив
+      const widget = {
+        w: Math.round(Math.random()),
+        x: Math.round(Math.random()),
+        y: Math.round(Math.random()),
+        id: uuidv4(),
+        free_credit: item.free_credits,
+        eduprogcomp_id: item.id,
+        name: item.name,
+      }
+      FreeCompItems.value.push(widget)
     }
-    FreeCompItems.value.push(widget)
   })
   console.log(FreeCompItems.value)
+  console.log(childFreeCompRef.value)
+  FreeCompItems.value.forEach((item,index)=>
+    childFreeCompRef.value.createFreeWidget())
 }
+
+
+// function initCopmGrid(){
+//   freeCompSheme.value.forEach((item, index )=> {
+//     const widget = {
+//       w: Math.round(Math.random()),
+//       x: Math.round(Math.random()),
+//       y: Math.round(Math.random()),
+//       id: uuidv4(),
+//       free_credit: item.free_credits,
+//       eduprogcomp_id: item.id,
+//       name: item.name,
+//     }
+//     FreeCompItems.value.push(widget)
+//   })
+//   console.log(FreeCompItems.value)
+// }
 
 
 // function initGrid() {
@@ -168,7 +208,7 @@ function initCopmGrid(){
 
 function initGrid() {
   scheme.value.forEach(item => {
-    const widgetIndex = items.value[item.discipline_id].findIndex(w => w.eduprogcomp_id === item.id)
+    const widgetIndex = items[item.discipline_id].findIndex(w => w.eduprogcomp_id === item.id)
     if (widgetIndex === -1) {
       const widget = {
         w: Math.round(Math.random()),
@@ -179,7 +219,9 @@ function initGrid() {
         eduprogcomp_id: item.id,
         disc_id: item.discipline_id,
       }
-      items.value[item.discipline_id].unshift(widget)
+      console.log(items)
+      console.log(scheme.value)
+      items[item.discipline_id].unshift(widget)
       disciplines.value.forEach((item,index)=>
         childComponentRef.value[index].createWidget())
     }
@@ -191,11 +233,11 @@ function initGrid() {
 
 function initGridItems() {
   disciplines.value.map((item,index) => {
-    Object.defineProperty(items.value, item.id, {
+    Object.defineProperty(items, item.id, {
       value: [],
       writable: true,
     })
-    Object.defineProperty(items.value, item.index, {
+    Object.defineProperty(items, item.index, {
       value: index,
       writable: true,
     })
@@ -210,7 +252,7 @@ function addEmptyWidget(discipline, index) {
     disc_id:discipline.id,
   }
   if (childComponentRef.value[index].isAreaEmpty()) {
-    items.value[discipline.id].push(node)
+    items[discipline.id].push(node)
     childComponentRef.value[index].createWidget(node.id)
   }
 }
@@ -221,6 +263,7 @@ function saveChanges() {
   })
 }
 async function deleteDiscipline(id) {
+
 
   await eduProgsStore.deleteDiscipline(id)
   await eduProgsStore.fetchDisciplines(route.params.pages)
@@ -233,14 +276,24 @@ async function deleteComponent(component) {
   console.log(component)
 
   if(component.eduprogcomp_id === undefined || null || 0){
-    console.log(component.eduprogcomp_id)
-    console.log(items.value)
+
   } else {
     await eduProgsStore.deleteComponentFromSheme(component.eduprogcomp_id)
     await eduProgsStore.fetchScheme(route.params.pages)
+    await eduProgsStore.fetchFreeCompSheme(eduprogId)
+    freeCompSheme.value = eduProgsStore.freeCompSheme
+    scheme.value = eduProgsStore.scheme
+
+
+    console.log(component.eduprogcomp_id)
+    console.log(items[component.disc_id])
+    items[component.disc_id] = items[component.disc_id].filter(item => item.eduprogcomp_id !== component.eduprogcomp_id)
+    console.log('items[component.disc_id]',items[component.disc_id])
+    console.log('items',items)
 
   }
-
+  initCopmGrid()
+  initGrid()
 }
 
 
@@ -248,6 +301,8 @@ async function createCompToSheme(){
 
   console.log('credits_semestr',credits_semestr.value)
   console.log(free_comp_id.value)
+
+  console.log(credits_semestr.value)
 
   await eduProgsStore.setComponentToScheme(credits_semestr.value)
 
@@ -259,10 +314,7 @@ async function createCompToSheme(){
   console.log('childComponentRef.value',childComponentRef.value)
   childComponentRef.value[del_index.value].deleteGridComponent(free_comp_id.value)
   initGrid()
-  clencelCompToSheme ()
-
-  // initCopmGrid()
-  credits_semestr.value.credits_per_semester=''
+  initCopmGrid()
 }
 
 
@@ -356,52 +408,7 @@ function deleteItem(event) {
     </VCard>
   </VDialog>
 
-  <VDialog
-    v-model="dialogCredits"
-    persistent
-    max-width="600px"
-  >
-    <VCard>
-      <VCardTitle>
-        <span class="text-h5">Виберіть кількість кредитів</span>
-      </VCardTitle>
-      <VCardText>
-        <VContainer>
-          <VCol cols="12">
-            <span>Доступно кредитів: {{ free_cred }} </span>
-          </VCol>
-          <VCol
-            cols="12"
-          >
-            <VTextField
-              v-model="credits_semestr.credits_per_semester"
-              label="Кількість кредитів"
-              required
-              min="1"
-              type="number"
-            />
-          </VCol>
-        </VContainer>
-      </VCardText>
-      <VCardActions>
-        <VSpacer />
-        <VBtn
-          color="blue darken-1"
-          text
-          @click="clencelCompToSheme"
-        >
-          Закрити
-        </VBtn>
-        <VBtn
-          text
-          :disabled="!credits_semestr.credits_per_semester"
-          @click="createCompToSheme"
-        >
-          Зберегти
-        </VBtn>
-      </VCardActions>
-    </VCard>
-  </VDialog>
+
 
 
 
@@ -421,7 +428,10 @@ function deleteItem(event) {
             </tr>
           </thead>
         </VTable>
-        <GridstackForComponents :components="FreeCompItems" />
+        <GridstackForComponents
+          ref="childFreeCompRef"
+          :components="FreeCompItems"
+        />
         <VCardText cols="12" />
       </VCard>
     </VCol>
@@ -555,9 +565,9 @@ function deleteItem(event) {
               :grid-items="items[item.id]"
               :components="eduprogComponents"
               @added="logger"
-              @dragstart="logger"
               @resizestop="logger"
               @dropped=" event => logger({...event, itemId: item.id})"
+              @dragstart="event => lastID({...event, itemId: item.id})"
               @delete="deleteItem"
               @delComp="deleteComponent"
               @createComp="createCompToSheme"

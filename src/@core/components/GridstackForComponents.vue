@@ -12,18 +12,17 @@ const props =defineProps({
   },
 })
 
-const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete','dropped'])
+const emit = defineEmits(['added', 'dragstart', 'delete','dropped'])
 
 let grid
 const gridref = ref(null)
 
-watch(props, (newValue, oldValue) => {
+watch(props.components, (newValue, oldValue) => {
   console.log(`Значение изменилось с ${oldValue} на ${newValue}`)
   nextTick(()=>{
     grid.load(grid.getGridItems())
   })
 })
-
 
 
 onMounted(() => {
@@ -51,14 +50,20 @@ onMounted(() => {
     console.log('move event!', event, element)
   })
 
-  grid.on('resizestop', function(event, items) {
-    emit('resizestop', [event, items])
-  })
   grid.on('dropped', function (event, previousWidget, newWidget) {
     emit('dropped', [event, previousWidget, newWidget])
   })
   console.log(props.components)
 })
+
+
+const createFreeWidget = () => {
+  nextTick(() => {
+    grid.load(grid.getGridItems())
+  })
+}
+
+defineExpose({ createFreeWidget })
 </script>
 
 <template>
