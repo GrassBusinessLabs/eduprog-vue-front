@@ -107,7 +107,7 @@ onMounted(() => {
   </div>
 </template>
 
-<style>
+<style scoped>
 .grid-stack {
   display: flex;
   width: 100%;
