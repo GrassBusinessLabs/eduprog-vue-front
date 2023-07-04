@@ -74,6 +74,7 @@ function deleteGridComponent(component) {
   console.log(component)
   const foundWidget = grid.getGridItems().find(item => item.gridstackNode.id.toString() === component.id.toString())
   if (foundWidget) {
+    console.log(foundWidget)
     grid.removeWidget(foundWidget, true)
     emit('delComp', component)
 
@@ -176,6 +177,7 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent})
           </VList>
         </VMenu>
         <!--    :variant="hoveredWidget === component.id ? 'underlined' : 'plain'"    -->
+
         <div style="width: 65%; margin-left: 10%">
           {{ component.eduprogcomp.name }}
         </div>

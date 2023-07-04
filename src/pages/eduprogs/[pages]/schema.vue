@@ -37,7 +37,7 @@ const childFreeCompRef = ref(null)
 const freeCompSheme = ref()
 const FreeCompItems = ref([])
 
-
+const edu_id = ref()
 
 const credits_semestr = ref({
   discipline_id: '',
@@ -104,7 +104,6 @@ function logger(evt) {
       credits_semestr.value.eduprogcomp_id = component.eduprogcomp_id,
       credits_semestr.value.credits_per_semester = component.eduprogcomp.credits
 
-      console.log(credits_semestr.value)
       console.log("NE DRISNA",result)
 
       updateComponent()
@@ -118,17 +117,20 @@ function logger(evt) {
       free_comp_id.value = evt[2]
       del_index.value = disciplines.value.findIndex(item => item.id === evt.itemId)
       console.log("DRISNA", result)
+      console.log(credits_semestr.value)
 
       createCompToSheme()
     }
   } else if (evt[0].type === 'dragstop') {
     const component = items[last_ID.value].find(item => item.id === evt[1].gridstackNode.id)
 
+    console.log(component.eduprogcomp_id)
+    edu_id.value = component.eduprogcomp_id
     credits_semestr.value.discipline_id = evt.itemId,
     credits_semestr.value.row = evt[1].gridstackNode.y + 1,
     credits_semestr.value.semester_num = evt[1].gridstackNode.x + 1,
     credits_semestr.value.eduprog_id = Number(eduprogId),
-    credits_semestr.value.eduprogcomp_id = component.eduprogcomp_id,
+    credits_semestr.value.eduprogcomp_id = component.eduprogcomp.id,
     credits_semestr.value.credits_per_semester = component.eduprogcomp.credits
 
     console.log(credits_semestr.value)
@@ -140,7 +142,7 @@ function logger(evt) {
 
 
 async function updateComponent(){
-  await eduProgsStore.UpdateComponentInScheme(eduprogId,credits_semestr.value)
+  await eduProgsStore.UpdateComponentInScheme(edu_id.value,credits_semestr.value)
 }
 
 async function updateContent(){
@@ -228,6 +230,7 @@ function initGrid() {
         w: Math.round(Math.random()),
         x: item.semester_num - 1 ,
         y: item.row - 1,
+        h: 1,
         id: uuidv4(),
         eduprogcomp: item.eduprogcomp,
         eduprogcomp_id: item.id,
@@ -298,16 +301,15 @@ async function deleteComponent(component) {
     freeCompSheme.value = eduProgsStore.freeCompSheme
     scheme.value = eduProgsStore.scheme
 
-
+    console.log(FreeCompItems.value)
     console.log(component.eduprogcomp_id)
     console.log(items[component.disc_id])
-    items[component.disc_id] = items[component.disc_id].filter(item => item.eduprogcomp_id !== component.eduprogcomp_id)
     console.log('items[component.disc_id]',items[component.disc_id])
     console.log('items',items)
 
+    initCopmGrid()
+    initGrid()
   }
-  initCopmGrid()
-  initGrid()
 }
 
 
@@ -385,7 +387,7 @@ function deleteItem(event) {
   >
     <VCard>
       <VCardTitle>
-        <span class="text-h5">Створення нової ОПП</span>
+        <span class="text-h5">Створення нової Дисципліни</span>
       </VCardTitle>
       <VCardText>
         <VContainer>
