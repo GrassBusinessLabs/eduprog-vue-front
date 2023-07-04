@@ -278,6 +278,7 @@ function saveChanges() {
 }
 async function deleteDiscipline(id) {
 
+
   await eduProgsStore.deleteDiscipline(id)
   await eduProgsStore.fetchDisciplines(route.params.pages)
   disciplines.value = eduProgsStore.getDisciplines
@@ -427,7 +428,7 @@ function deleteItem(event) {
 
 
   <VRow>
-    <VCol cols="12">
+    <VCol cols="2">
       <VCard
         title="Всі предмети"
         class="mb-5"
