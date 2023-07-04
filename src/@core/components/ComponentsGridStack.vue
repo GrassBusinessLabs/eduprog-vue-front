@@ -2,7 +2,7 @@
 import { GridStack } from 'gridstack'
 import 'gridstack/dist/gridstack.min.css'
 import 'gridstack/dist/gridstack-extra.min.css'
-import { ref, toRef, defineProps, watch, nextTick } from 'vue'
+import { ref, toRef, defineProps, watch, nextTick, reactive } from 'vue'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 const eduProgsStore = useEduProgsStore()
 const props = defineProps({
@@ -15,15 +15,14 @@ const props = defineProps({
 const componentsRef = toRef(props, 'components')
 // const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete'])
 const emit = defineEmits(['remove', 'changeOrder'])
-const editIndex = {
+const editIndex = reactive({
   id: 0,
-}
+  value: {},
+})
 let grid
 const gridref = ref(null)
+const control_types = ref(['залік', 'іспит'])
 
-function remove(comp) {
-  emit('remove', comp)
-}
 watch(props, (newValue, oldValue) => {
   console.log(`Значение изменилось с ${oldValue} на ${newValue}`)
   nextTick(() => {
@@ -32,6 +31,14 @@ watch(props, (newValue, oldValue) => {
 })
 const edit = comp => {
   editIndex.id = comp.id
+  editIndex.value = comp
+}
+function remove(comp) {
+  emit('remove', comp)
+}
+const cancel = comp => {
+  console.log(comp)
+  editIndex.id = 0
 }
 onMounted(() => {
   grid = GridStack.init(
@@ -43,11 +50,6 @@ onMounted(() => {
     },
     gridref.value,
   )
-  // grid.on('dragstop', function (event, el) {
-  //   console.log('Ивент', event)
-  //   console.log('El', el.gridstackNode)
-  //   emit('changeOrder', el.gridstackNode.id, el.gridstackNode.y)
-  // })
   grid.on('dragstop', function (event, newGrid) {
     console.log('GRID', grid.engine.nodes)
   })
@@ -78,29 +80,79 @@ onMounted(() => {
           {{ 'OK ' + component.code }}
         </div>
         <div style="width: 65%">
-          {{ component.name }}
+          <span v-if="editIndex.id !== component.id">
+            {{ component.name }}
+          </span>
+          <span v-if="editIndex.id === component.id">
+            <VTextField
+              class="pa-0"
+              v-model="editIndex.value.name"
+              variant="underlined"
+              @keyup.enter="saveComponent(component)"
+            />
+          </span>
         </div>
         <div style="width: 10%">
-          {{ component.credits }}
+          <span v-if="editIndex.id !== component.id"> {{ component.credits }}</span>
+          <span v-if="editIndex.id === component.id">
+            <VTextField
+              class="pa-0"
+              v-model="component.credits"
+              variant="underlined"
+              type="number"
+              min="1"
+              @keyup.enter="saveComponent(component)"
+              @focus="resetError"
+            />
+          </span>
         </div>
         <div style="width: 10%">
-          {{ component.control_type }}
+          <span v-if="editIndex.id !== component.id">
+            {{ component.control_type }}
+          </span>
+          <span v-if="editIndex.id === component.id">
+            <VSelect
+              class="pa-0"
+              v-model="component.control_type"
+              variant="underlined"
+              :items="control_types"
+              @keyup.enter="saveComponent(component)"
+            />
+          </span>
         </div>
         <div
           style="width: 10%"
-          class="my-4 grid-stack-item-buttons"
+          class="my-4"
         >
-          <VBtn
-            icon="mdi-pencil"
-            size="x-small"
-            style="margin-right: 2%"
-            @click="edit(component)"
-          />
-          <VBtn
-            icon="mdi-trash-can"
-            size="x-small"
-            @click="remove(component)"
-          />
+          <span
+            v-if="editIndex.id !== component.id"
+            class="d-flex"
+          >
+            <VBtn
+              icon="mdi-pencil"
+              size="x-small"
+              style="margin-right: 2%"
+              @click="edit(component)"
+            />
+            <VBtn
+              icon="mdi-trash-can"
+              size="x-small"
+              @click="remove(component)"
+            />
+          </span>
+          <span v-else>
+            <VBtn
+              icon="mdi-check-bold"
+              size="x-small"
+              style="margin-right: 2%"
+              @click="saveComponent(component)"
+            />
+            <VBtn
+              icon="mdi-close-thick"
+              size="x-small"
+              @click="cancel(component)"
+            />
+          </span>
         </div>
       </div>
     </div>
@@ -108,6 +160,9 @@ onMounted(() => {
 </template>
 
 <style scoped>
+.v-field__input {
+  padding: 0;
+}
 .grid-stack {
   display: flex;
   width: 100%;
@@ -115,9 +170,6 @@ onMounted(() => {
 
 .grid-stack-item {
   width: 100% !important;
-}
-.grid-stack-item-buttons {
-  display: flex;
 }
 .grid-stack-item-content {
   display: flex;
