@@ -30,7 +30,9 @@ watch(props, (newValue, oldValue) => {
     grid.load(grid.getGridItems())
   })
 })
-
+const edit = comp => {
+  editIndex.id = comp.id
+}
 onMounted(() => {
   grid = GridStack.init(
     {
@@ -41,13 +43,15 @@ onMounted(() => {
     },
     gridref.value,
   )
-  grid.on('dragstop', function (event, el) {
-    console.log('Ивент', event)
-    console.log('El', el.gridstackNode)
-    emit('changeOrder', el.gridstackNode.id, el.gridstackNode.y)
+  // grid.on('dragstop', function (event, el) {
+  //   console.log('Ивент', event)
+  //   console.log('El', el.gridstackNode)
+  //   emit('changeOrder', el.gridstackNode.id, el.gridstackNode.y)
+  // })
+  grid.on('dragstop', function (event, newGrid) {
+    console.log('GRID', grid.engine.nodes)
   })
 })
-
 </script>
 
 <template>
@@ -59,6 +63,7 @@ onMounted(() => {
       v-for="component in props.components.mandatory"
       :key="component.id"
       class="grid-stack-item"
+      :gs-name="component.name"
       :gs-id="component.id"
       :gs-x="0"
       :gs-y="component.code - 1"
@@ -89,7 +94,7 @@ onMounted(() => {
             icon="mdi-pencil"
             size="x-small"
             style="margin-right: 2%"
-            @click="edit(item)"
+            @click="edit(component)"
           />
           <VBtn
             icon="mdi-trash-can"

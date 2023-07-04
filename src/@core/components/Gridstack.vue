@@ -5,10 +5,6 @@ import 'gridstack/dist/gridstack-extra.min.css'
 import { defineExpose, ref } from 'vue'
 
 const props = defineProps({
-  gridItems: {
-    type: Object,
-    required: true,
-  },
   components: {
     type: Array,
     required: false,

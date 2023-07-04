@@ -265,7 +265,7 @@
           <VRow>
             <VCol cols="12">
               <VTextField
-                v-model="newComponent.name"
+                v-model.trim="newComponent.name"
                 label="Назва компонента"
                 required
                 :rules="rulesComp.nameComp"
