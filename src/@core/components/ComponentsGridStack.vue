@@ -30,8 +30,9 @@ watch(props, (newValue, oldValue) => {
   })
 })
 const edit = comp => {
+  console.log(comp)
   editIndex.id = comp.id
-  editIndex.value = comp
+  editIndex.value = Object.assign({}, comp)
 }
 function remove(comp) {
   emit('remove', comp)
@@ -39,6 +40,12 @@ function remove(comp) {
 const cancel = comp => {
   console.log(comp)
   editIndex.id = 0
+  editIndex.value = {}
+}
+const saveComponent = comp => {
+  console.log(comp)
+  editIndex.id = 0
+  editIndex.value = {}
 }
 onMounted(() => {
   grid = GridStack.init(
@@ -97,7 +104,7 @@ onMounted(() => {
           <span v-if="editIndex.id === component.id">
             <VTextField
               class="pa-0"
-              v-model="component.credits"
+              v-model="editIndex.value.credits"
               variant="underlined"
               type="number"
               min="1"
@@ -113,7 +120,7 @@ onMounted(() => {
           <span v-if="editIndex.id === component.id">
             <VSelect
               class="pa-0"
-              v-model="component.control_type"
+              v-model="editIndex.value.control_type"
               variant="underlined"
               :items="control_types"
               @keyup.enter="saveComponent(component)"
