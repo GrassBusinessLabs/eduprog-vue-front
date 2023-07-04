@@ -4,6 +4,9 @@ import { useEduProgsStore } from '@/stores/eduProgs.js'
 import { reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import Gridstack from '@core/components/Gridstack.vue'
+import GridstackForComponents from '@core/components/GridstackForComponents.vue'
+import { it } from 'vuetify/locale'
+
 
 const route = useRoute()
 const disciplines = ref([])
@@ -26,13 +29,30 @@ const changes = reactive({
 
 const enabled = ref(true)
 
-const items = ref({})
+let items = reactive([])
 
 const childComponentRef = ref(null)
+const childFreeCompRef = ref(null)
 
-function logger(evt) {
-  console.log(evt)
-}
+const freeCompSheme = ref()
+const FreeCompItems = ref([])
+
+
+
+const credits_semestr = ref({
+  discipline_id: '',
+  row: '',
+  semester_num: '',
+  eduprog_id: '',
+  eduprogcomp_id: '',
+  credits_per_semester: '',
+})
+
+
+
+const free_comp_id = ref()
+const del_index = ref()
+const last_ID = ref()
 
 onMounted(async () => {
   // Get disciplines
@@ -48,39 +68,205 @@ onMounted(async () => {
   await eduProgsStore.fetchScheme(eduprogId)
   scheme.value = eduProgsStore.scheme
 
-  // initGrid()
+  await eduProgsStore.fetchFreeCompSheme(eduprogId)
+  freeCompSheme.value = eduProgsStore.freeCompSheme
+
+  console.log('freeCompSheme',freeCompSheme.value)
+
+  initCopmGrid()
+
+  initGrid()
   console.log('sscheme: ', scheme.value)
+  console.log('components',eduProgsStore.components)
+  console.log('disciplines.value',disciplines.value)
 })
 
+function lastID (evt){
+  last_ID.value = evt.itemId
+  console.log(last_ID.value)
+  console.log(evt)
+
+}
+
+function logger(evt) {
+  console.log(evt)
+
+  if (evt[0].type === 'dropped') {
+    const result = FreeCompItems.value.find(item => item.id === evt[2].id)
+
+    if (result === undefined) {
+      const component = items[last_ID.value].find(item => item.id === evt[2].id)
+
+      credits_semestr.value.discipline_id = evt.itemId,
+      credits_semestr.value.row = evt[2].y + 1,
+      credits_semestr.value.semester_num = evt[2].x + 1,
+      credits_semestr.value.eduprog_id = Number(eduprogId),
+      credits_semestr.value.eduprogcomp_id = component.eduprogcomp_id,
+      credits_semestr.value.credits_per_semester = component.eduprogcomp.credits
+
+      console.log(credits_semestr.value)
+      console.log("NE DRISNA",result)
+
+      updateComponent()
+    } else if (result !== undefined){
+      credits_semestr.value.discipline_id = evt.itemId,
+      credits_semestr.value.row = evt[2].y + 1,
+      credits_semestr.value.semester_num = evt[2].x + 1,
+      credits_semestr.value.eduprog_id = Number(eduprogId),
+      credits_semestr.value.eduprogcomp_id = result.eduprogcomp_id,
+      credits_semestr.value.credits_per_semester = result.free_credit
+      free_comp_id.value = evt[2]
+      del_index.value = disciplines.value.findIndex(item => item.id === evt.itemId)
+      console.log("DRISNA", result)
+
+      createCompToSheme()
+    }
+  } else if (evt[0].type === 'dragstop') {
+    const component = items[last_ID.value].find(item => item.id === evt[1].gridstackNode.id)
+
+    credits_semestr.value.discipline_id = evt.itemId,
+    credits_semestr.value.row = evt[1].gridstackNode.y + 1,
+    credits_semestr.value.semester_num = evt[1].gridstackNode.x + 1,
+    credits_semestr.value.eduprog_id = Number(eduprogId),
+    credits_semestr.value.eduprogcomp_id = component.eduprogcomp_id,
+    credits_semestr.value.credits_per_semester = component.eduprogcomp.credits
+
+    console.log(credits_semestr.value)
+
+    updateComponent()
+  }
+
+}
+
+
+async function updateComponent(){
+  await eduProgsStore.UpdateComponentInScheme(eduprogId,credits_semestr.value)
+}
+
+async function updateContent(){
+  // Get eduprog components
+  await eduProgsStore.fetchComponents(eduprogId)
+  eduprogComponents.value = eduProgsStore.components
+
+  // Get components scheme
+  await eduProgsStore.fetchScheme(eduprogId)
+  scheme.value = eduProgsStore.scheme
+
+  initGrid()
+}
+
+function initCopmGrid() {
+  freeCompSheme.value.forEach((item, index) => {
+    const existingWidget = FreeCompItems.value.find(widget => widget.eduprogcomp_id === item.id)
+    if (existingWidget) {
+      // Обновление свойств существующего элемента
+      existingWidget.free_credit = item.free_credits
+      existingWidget.name = item.name
+    } else {
+      // Добавление нового элемента в массив
+      const widget = {
+        w: Math.round(Math.random()),
+        x: Math.round(Math.random()),
+        y: Math.round(Math.random()),
+        id: uuidv4(),
+        free_credit: item.free_credits,
+        eduprogcomp_id: item.id,
+        name: item.name,
+      }
+      FreeCompItems.value.push(widget)
+    }
+  })
+  console.log(FreeCompItems.value)
+  console.log(childFreeCompRef.value)
+  FreeCompItems.value.forEach((item,index)=>
+    childFreeCompRef.value.createFreeWidget())
+}
+
+
+// function initCopmGrid(){
+//   freeCompSheme.value.forEach((item, index )=> {
+//     const widget = {
+//       w: Math.round(Math.random()),
+//       x: Math.round(Math.random()),
+//       y: Math.round(Math.random()),
+//       id: uuidv4(),
+//       free_credit: item.free_credits,
+//       eduprogcomp_id: item.id,
+//       name: item.name,
+//     }
+//     FreeCompItems.value.push(widget)
+//   })
+//   console.log(FreeCompItems.value)
+// }
+
+
+// function initGrid() {
+//   console.log(items.value)
+//   scheme.value.forEach(item => {
+//     const widget = {
+//       w: Math.round(Math.random()),
+//       x: item.semester_num - 1 ,
+//       y: item.row - 1,
+//       id: uuidv4(),
+//       eduprogcomp: item.eduprogcomp,
+//       eduprogcomp_id: item.id,
+//       disc_id: item.discipline_id,
+//     }
+//     console.log(widget)
+//     items.value[item.discipline_id].unshift(widget)
+//   })
+//   disciplines.value.forEach((item,index)=>
+//     childComponentRef.value[index].createWidget())
+// }
+
+
 function initGrid() {
-  scheme.value.map(item => {
-    items.value[item.discipline_id].push({
-      w: 1,
-      x: item.semester_num,
-      id: uuidv4(),
-      eduprogcomp: item.eduprogcomp,
-    })
+  scheme.value.forEach(item => {
+    const widgetIndex = items[item.discipline_id].findIndex(w => w.eduprogcomp_id === item.id)
+    if (widgetIndex === -1) {
+      const widget = {
+        w: Math.round(Math.random()),
+        x: item.semester_num - 1 ,
+        y: item.row - 1,
+        id: uuidv4(),
+        eduprogcomp: item.eduprogcomp,
+        eduprogcomp_id: item.id,
+        disc_id: item.discipline_id,
+      }
+      console.log(items)
+      console.log(scheme.value)
+      items[item.discipline_id].unshift(widget)
+      disciplines.value.forEach((item,index)=>
+        childComponentRef.value[index].createWidget())
+    }
   })
 }
+
+
+
+
 function initGridItems() {
-  disciplines.value.map(item => {
-    Object.defineProperty(items.value, item.id, {
-      value: [{
-        w: Math.round(Math.random()),
-        id: uuidv4(),
-      }],
+  disciplines.value.map((item,index) => {
+    Object.defineProperty(items, item.id, {
+      value: [],
+      writable: true,
+    })
+    Object.defineProperty(items, item.index, {
+      value: index,
       writable: true,
     })
   })
+  console.log(disciplines.value)
 }
 
 function addEmptyWidget(discipline, index) {
   const node = {
     w: Math.round(Math.random()),
     id: uuidv4(),
+    disc_id:discipline.id,
   }
   if (childComponentRef.value[index].isAreaEmpty()) {
-    items.value[discipline.id].push(node)
+    items[discipline.id].push(node)
     childComponentRef.value[index].createWidget(node.id)
   }
 }
@@ -95,12 +281,55 @@ async function deleteDiscipline(id) {
   await eduProgsStore.deleteDiscipline(id)
   await eduProgsStore.fetchDisciplines(route.params.pages)
   disciplines.value = eduProgsStore.getDisciplines
+
 }
 
-async function deleteComponent(event, element) {
-  await eduProgsStore.deleteComponentFromSheme(element.id)
-  await eduProgsStore.fetchScheme(route.params.pages)
+async function deleteComponent(component) {
+
+  console.log(component)
+
+  if(component.eduprogcomp_id === undefined || null || 0){
+
+  } else {
+    await eduProgsStore.deleteComponentFromSheme(component.eduprogcomp_id)
+    await eduProgsStore.fetchScheme(route.params.pages)
+    await eduProgsStore.fetchFreeCompSheme(eduprogId)
+    freeCompSheme.value = eduProgsStore.freeCompSheme
+    scheme.value = eduProgsStore.scheme
+
+
+    console.log(component.eduprogcomp_id)
+    console.log(items[component.disc_id])
+    items[component.disc_id] = items[component.disc_id].filter(item => item.eduprogcomp_id !== component.eduprogcomp_id)
+    console.log('items[component.disc_id]',items[component.disc_id])
+    console.log('items',items)
+
+  }
+  initCopmGrid()
+  initGrid()
 }
+
+
+async function createCompToSheme(){
+
+  console.log('credits_semestr',credits_semestr.value)
+  console.log(free_comp_id.value)
+
+  console.log(credits_semestr.value)
+
+  await eduProgsStore.setComponentToScheme(credits_semestr.value)
+
+  await eduProgsStore.fetchFreeCompSheme(eduprogId)
+  freeCompSheme.value = eduProgsStore.freeCompSheme
+
+  await eduProgsStore.fetchScheme(eduprogId)
+  scheme.value = eduProgsStore.scheme
+  console.log('childComponentRef.value',childComponentRef.value)
+  childComponentRef.value[del_index.value].deleteGridComponent(free_comp_id.value)
+  initGrid()
+  initCopmGrid()
+}
+
 
 function edit(item) {
   editIndex.value = item.id
@@ -134,6 +363,7 @@ async function createNewDiscipline() {
   disciplines.value = eduProgsStore.getDisciplines
   dialogCreate.value = false
   initGridItems()
+  initGrid()
 }
 
 function cancelNewDiscipline() {
@@ -191,16 +421,34 @@ function deleteItem(event) {
     </VCard>
   </VDialog>
 
+
+
+
+
+
   <VRow>
     <VCol cols="12">
       <VCard
         title="Всі предмети"
         class="mb-5"
+        style="max-width: 200px"
       >
+        <VTable>
+          <thead>
+            <tr>
+              <th>Назвва компонента</th>
+              <th>Вільні кредити</th>
+            </tr>
+          </thead>
+        </VTable>
+        <GridstackForComponents
+          ref="childFreeCompRef"
+          :components="FreeCompItems"
+        />
         <VCardText cols="12" />
       </VCard>
     </VCol>
-    <VCol>
+    <VCol cols="10">
       <VTable>
         <thead>
           <tr>
@@ -288,7 +536,7 @@ function deleteItem(event) {
             </div>
             <div style="text-align: center; margin-top: 5%; margin-bottom: 5%">
               <span v-if="editIndex !== item.id">
-                <div>
+                <div style="margin-bottom: 2%">
                   <VBtn
                     icon="mdi-pencil"
                     size="x-small"
@@ -304,6 +552,7 @@ function deleteItem(event) {
                 <VBtn
                   icon="mdi-plus"
                   size="x-small"
+                  style="margin-right:2% "
                   @click="addEmptyWidget(item, index)"
                 />
               </span>
@@ -325,13 +574,19 @@ function deleteItem(event) {
           <div style="width: 100%">
             <Gridstack
               ref="childComponentRef"
+              gs-current-row="item.rows"
               :grid-items="items[item.id]"
               :components="eduprogComponents"
               @added="logger"
-              @dragstart="logger"
               @resizestop="logger"
+              @dropped=" event => logger({...event, itemId: item.id})"
+              @dragstart="event => lastID({...event, itemId: item.id})"
+              @dragstop=" event => logger({...event, itemId: item.id})"
               @delete="deleteItem"
+              @delComp="deleteComponent"
+              @createComp="createCompToSheme"
             />
+            <hr style="transform: scaleY(0.3)">
           </div>
         </div>
       </div>

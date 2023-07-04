@@ -21,6 +21,7 @@ export const useEduProgsStore = defineStore({
     specialities: [],
     components: [],
     VBblock: [],
+    freeCompSheme:[],
   }),
 
   getters: {
@@ -40,6 +41,7 @@ export const useEduProgsStore = defineStore({
     getSpecialities: state => state.specialities,
     getComponents: state => state.components,
     getVBblock: state => state.VBblock,
+    getfreeCompSheme: state => state.freeCompSheme,
   },
 
   actions: {
@@ -106,6 +108,9 @@ export const useEduProgsStore = defineStore({
     async setComponentToScheme(payload) {
       const response = await postData('/eduprogs/scheme/setCompToSemester', payload)
     },
+    async UpdateComponentInScheme(id, payload) {
+      const response = await editData('/eduprogs/scheme/' + id, payload)
+    },
     async createDiscipline(payload) {
       const response = await postData('/eduprogs/scheme/disciplines/create', payload)
     },
@@ -134,6 +139,11 @@ export const useEduProgsStore = defineStore({
       const response = await getData('/eduprogs/competencies/byEduprogId/' + eduId)
       this.competencies = response
     },
+    async fetchFreeCompSheme(eduId) {
+      const response = await getData('/eduprogs/scheme/freeComps/' + eduId)
+      this.freeCompSheme = response
+    },
+
 
     async createCompetencyRelation(eduprogId, componentId, competencyId) {
       const newRelation = {
@@ -267,6 +277,10 @@ export const useEduProgsStore = defineStore({
     async findCompById(compId) {
       const response = await getData('/eduprogs/comps/' + compId)
       return response
+    },
+    async replaceCompAfter(eduId, putAfterId) {
+      console.log("replace")
+      await editData(`/eduprogs/comps/replace?edcompId=${eduId}&putAfter=${putAfterId}`)
     },
   },
 })

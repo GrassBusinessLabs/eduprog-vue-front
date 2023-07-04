@@ -26,15 +26,20 @@ let grid
 const gridref = ref(null)
 const hoveredWidget = ref(null)
 
+
 onMounted(() => {
+
   grid = GridStack.init(
     {
-      float: true,
+      float: false,
       column: GRID_COLUMN,
       minRow: GRID_MIN_ROW,
       maxRow: GRID_MAX_ROW,
+      acceptWidgets: '.grid-stack-item',
+      dragIn: '.grid-stack',
     },
     gridref.value,
+    console.log(gridref.value),
   )
 
   grid.on('added', function(event, items) {
@@ -46,11 +51,14 @@ onMounted(() => {
   })
 
   grid.on('dragstop', (event, element) => {
-    console.log('move event!', event, element)
+    emit('dragstop', [event, element])
   })
 
   grid.on('resizestop', function(event, items) {
     emit('resizestop', [event, items])
+  })
+  grid.on('dropped', function (event, previousWidget, newWidget) {
+    emit('dropped', [event, previousWidget, newWidget])
   })
 })
 
@@ -61,21 +69,25 @@ function mouseleave() {
 function mouseover(idWidget) {
   hoveredWidget.value = idWidget
 }
-function deleteComponent(idWidget) {
-  const foundWidget = grid.getGridItems()
-    .find(item => item.gridstackNode.id.toString() === idWidget.toString())
+
+function deleteGridComponent(component) {
+  console.log(component)
+  const foundWidget = grid.getGridItems().find(item => item.gridstackNode.id.toString() === component.id.toString())
   if (foundWidget) {
     grid.removeWidget(foundWidget, true)
+    emit('delComp', component)
+
   }
 }
 
-const createWidget = idWidget => {
+const createWidget = () => {
   nextTick(() => {
     grid.load(grid.getGridItems())
   })
 }
 
 const isAreaEmpty = () => {
+  console.log(grid.getRow())
   let sumNodeWidth = 0
   grid.getGridItems().map(item => sumNodeWidth += item.gridstackNode.w)
 
@@ -86,7 +98,37 @@ const getGridNodes = () => {
   return grid.getGridItems()
 }
 
-defineExpose({ createWidget, isAreaEmpty, getGridNodes })
+function editWidget(component){
+  console.log(component.id)
+
+}
+
+function change(component){
+  console.log(component)
+  console.log(component.id)
+  const items = this.grid.getGridItems()
+  const item = items.find(item => item.gridstackNode.id === component.id)
+  console.log('Widget с мисива на прямую', items[0].gridstackNode)
+  console.log('Widget который нашел ', item)
+
+  const newComp = {
+    discipline_id: component.disc_id,
+    row: item.gridstackNode.y + 1,
+    semester_num: item.gridstackNode.x + 1,
+    eduprog_id: 0,
+    eduprogcomp_id: component.eduprogcomp,
+    credits_per_semester: 0,
+
+  }
+  emit('createComp', newComp)
+
+}
+
+
+
+
+
+defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent})
 </script>
 
 <template>
@@ -109,8 +151,12 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes })
         @mouseover="mouseover(component.id)"
         @mouseleave="mouseleave"
       >
-        <VMenu activator="parent" location="top" offset="0px">
-          <template v-slot:activator="{ props }">
+        <VMenu
+          activator="parent"
+          location="top"
+          offset="0px"
+        >
+          <template #activator="{ props }">
             <VBtn
               v-show="hoveredWidget === component.id"
               v-bind="props"
@@ -121,36 +167,27 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes })
           </template>
 
           <VList>
-            <VListItem>
-              <VListItemTitle>Remove</VListItemTitle>
+            <VListItem @click="deleteGridComponent(component)">
+              Remove
             </VListItem>
-            <VListItem>
-              <VListItemTitle>Edit</VListItemTitle>
+            <VListItem @click="editWidget(component)">
+              Edit
             </VListItem>
           </VList>
         </VMenu>
         <!--    :variant="hoveredWidget === component.id ? 'underlined' : 'plain'"    -->
-        <VSelect
-          class="grid-stack-item__select"
-          variant="underlined"
-          item-value="id"
-          item-title="name"
-          menu-icon=""
-          multiple
-          :items="props.components"
-        />
+        <div style="width: 65%; margin-left: 10%">
+          {{ component.eduprogcomp.name }}
+        </div>
+        <div style="width: 10%">
+          {{ component.eduprogcomp.credits}}
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <style>
-.grid-stack {
-
-}
-
-.grid-stack-item {
-}
 
 .grid-stack-item-content {
   display: flex;
