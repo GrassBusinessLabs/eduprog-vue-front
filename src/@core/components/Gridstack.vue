@@ -2,9 +2,13 @@
 import { GridStack } from 'gridstack'
 import 'gridstack/dist/gridstack.min.css'
 import 'gridstack/dist/gridstack-extra.min.css'
-import { defineExpose, ref } from 'vue'
+import { defineExpose, nextTick, ref, watch } from 'vue'
 
 const props = defineProps({
+  gridItems: {
+    type: Object,
+    required: true,
+  },
   components: {
     type: Array,
     required: false,
@@ -68,13 +72,9 @@ function mouseover(idWidget) {
 
 function deleteGridComponent(component) {
   console.log(component)
-  const foundWidget = grid.getGridItems().find(item => item.gridstackNode.id.toString() === component.id.toString())
-  if (foundWidget) {
-    console.log(foundWidget)
-    grid.removeWidget(foundWidget, true)
-    emit('delComp', component)
-
-  }
+  console.log(grid.getGridItems())
+  console.log(grid.getGridItems().toString())
+  emit('delComp', component)
 }
 
 const createWidget = () => {

@@ -7,7 +7,7 @@ import Gridstack from '@core/components/Gridstack.vue'
 import GridstackForComponents from '@core/components/GridstackForComponents.vue'
 import { it } from 'vuetify/locale'
 
-
+const searchTerm = ref('')
 const route = useRoute()
 const disciplines = ref([])
 const eduprogComponents = ref([])
@@ -137,7 +137,6 @@ function logger(evt) {
 
     updateComponent()
   }
-
 }
 
 
@@ -183,44 +182,6 @@ function initCopmGrid() {
   FreeCompItems.value.forEach((item,index)=>
     childFreeCompRef.value.createFreeWidget())
 }
-
-
-// function initCopmGrid(){
-//   freeCompSheme.value.forEach((item, index )=> {
-//     const widget = {
-//       w: Math.round(Math.random()),
-//       x: Math.round(Math.random()),
-//       y: Math.round(Math.random()),
-//       id: uuidv4(),
-//       free_credit: item.free_credits,
-//       eduprogcomp_id: item.id,
-//       name: item.name,
-//     }
-//     FreeCompItems.value.push(widget)
-//   })
-//   console.log(FreeCompItems.value)
-// }
-
-
-// function initGrid() {
-//   console.log(items.value)
-//   scheme.value.forEach(item => {
-//     const widget = {
-//       w: Math.round(Math.random()),
-//       x: item.semester_num - 1 ,
-//       y: item.row - 1,
-//       id: uuidv4(),
-//       eduprogcomp: item.eduprogcomp,
-//       eduprogcomp_id: item.id,
-//       disc_id: item.discipline_id,
-//     }
-//     console.log(widget)
-//     items.value[item.discipline_id].unshift(widget)
-//   })
-//   disciplines.value.forEach((item,index)=>
-//     childComponentRef.value[index].createWidget())
-// }
-
 
 function initGrid() {
   scheme.value.forEach(item => {
@@ -301,11 +262,14 @@ async function deleteComponent(component) {
     freeCompSheme.value = eduProgsStore.freeCompSheme
     scheme.value = eduProgsStore.scheme
 
+    removeObjectById(items[component.disc_id], component.id)
+
     console.log(FreeCompItems.value)
     console.log(component.eduprogcomp_id)
     console.log(items[component.disc_id])
     console.log('items[component.disc_id]',items[component.disc_id])
     console.log('items',items)
+    console.log(component)
 
     initCopmGrid()
     initGrid()
@@ -329,10 +293,22 @@ async function createCompToSheme(){
   scheme.value = eduProgsStore.scheme
   console.log('childComponentRef.value',childComponentRef.value)
   childComponentRef.value[del_index.value].deleteGridComponent(free_comp_id.value)
+  console.log( FreeCompItems.value)
+  
+  removeObjectById(FreeCompItems.value, free_comp_id.value.id)
+
+  console.log(FreeCompItems.value)
+
   initGrid()
   initCopmGrid()
 }
 
+function removeObjectById(arr, id) {
+  const index = arr.findIndex(obj => obj.id === id)
+  if (index > -1) {
+    arr.splice(index, 1)
+  }
+}
 
 function edit(item) {
   editIndex.value = item.id
@@ -377,6 +353,23 @@ function cancelNewDiscipline() {
 function deleteItem(event) {
   console.log(event)
 }
+
+const filteredData = computed(() => {
+  const found = FreeCompItems.value
+
+  if (!searchTerm.value) {
+    return found
+  }
+
+  return found.filter(item => {
+    // Применение фильтрации на основе поискового запроса
+    return Object.values(item).some(value =>
+      String(value).toLowerCase().includes(searchTerm.value.toLowerCase()),
+    )
+  })
+})
+
+console.log(filteredData)
 </script>
 
 <template>
@@ -436,6 +429,15 @@ function deleteItem(event) {
         class="mb-5"
         style="max-width: 200px"
       >
+        <VTextField
+          v-model="searchTerm"
+          style="margin: 5%; margin-top: -5%"
+          append-icon="mdi-magnify"
+          label="Пошук"
+          single-line
+          hide-details
+          variant="underlined"
+        />
         <VTable>
           <thead>
             <tr>
@@ -446,9 +448,8 @@ function deleteItem(event) {
         </VTable>
         <GridstackForComponents
           ref="childFreeCompRef"
-          :components="FreeCompItems"
+          :components="filteredData"
         />
-        <VCardText cols="12" />
       </VCard>
     </VCol>
     <VCol cols="10">
@@ -593,22 +594,6 @@ function deleteItem(event) {
           </div>
         </div>
       </div>
-    </VCol>
-    <VCol cols="12">
-      <VBtn
-        class="mr-2"
-        type="reset"
-        color="secondary"
-        variant="tonal"
-      >
-        Скинути
-      </VBtn>
-      <VBtn
-        dark
-        @click="saveChanges"
-      >
-        Зберегти зміни
-      </VBtn>
     </VCol>
   </VRow>
 </template>
