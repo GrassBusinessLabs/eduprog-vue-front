@@ -14,7 +14,7 @@ const props = defineProps({
 })
 const componentsRef = toRef(props, 'components')
 // const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete'])
-const emit = defineEmits(['remove', 'changeOrder'])
+const emit = defineEmits(['remove', 'changeOrder', 'saveComponent'])
 const editIndex = reactive({
   id: 0,
   value: {},
@@ -43,9 +43,7 @@ const cancel = comp => {
   editIndex.value = {}
 }
 const saveComponent = comp => {
-  console.log(comp)
-  editIndex.id = 0
-  editIndex.value = {}
+  emit('saveComponent', comp)
 }
 onMounted(() => {
   grid = GridStack.init(
@@ -57,8 +55,9 @@ onMounted(() => {
     },
     gridref.value,
   )
-  grid.on('dragstop', function (event, newGrid) {
-    console.log('GRID', grid.engine.nodes)
+  grid.on('dragstop', function (event, el) {
+    console.log('ЕЛЕМЕНТ', el.gridstackNode.id, el.gridstackNode.y)
+    emit('changeOrder', el.gridstackNode.id, el.gridstackNode.y)
   })
 })
 </script>
@@ -167,9 +166,6 @@ onMounted(() => {
 </template>
 
 <style scoped>
-.v-field__input {
-  padding: 0;
-}
 .grid-stack {
   display: flex;
   width: 100%;

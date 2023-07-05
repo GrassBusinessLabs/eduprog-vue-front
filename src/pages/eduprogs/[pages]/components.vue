@@ -41,6 +41,7 @@
     <tbody>
       <th colspan="5">
         <ComponentsGridStack
+          @saveComponent="saveComponent"
           @changeOrder="changeOrder"
           @remove="remove"
           :components="components"
@@ -535,6 +536,7 @@ async function updateCredits() {
   await eduProgsStore.fetchVBblock(route.params.pages)
   VBblock.value = eduProgsStore.getVBblock
 }
+const saveMandatoryComp = () => {}
 async function createComponent() {
   updateSelectedBlockNum()
   console.log(newComponent.block_name, newComponent.block_num)
@@ -748,6 +750,13 @@ const changeOrder = async (compId, position) => {
 </script>
 
 <style>
+.grid-stack-item .v-field__field .v-field__input {
+  padding: 0 !important;
+}
+
+.grid-stack-item .v-select__selection {
+  align-items: center;
+}
 .eduprog-item {
   cursor: pointer;
 }
