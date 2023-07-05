@@ -599,19 +599,19 @@ async function createComponent() {
   await updateCredits()
 }
 
-function edit(item, type = 'Component') {
-  console.log(item)
-  originValue = Object.assign({}, item)
-  if (type === 'Block') {
-    editIndex.value.id = item.block_num
-    editIndex.value.category = 'BLOCK'
-    window.addEventListener('click', closeEdit)
-  } else if (type === 'Component') {
-    editIndex.value.id = item.id
-    editIndex.value.category = item.category
-    window.addEventListener('click', closeEdit)
-  }
-}
+// function edit(item, type = 'Component') {
+//   console.log(item)
+//   originValue = Object.assign({}, item)
+//   if (type === 'Block') {
+//     editIndex.value.id = item.block_num
+//     editIndex.value.category = 'BLOCK'
+//     window.addEventListener('click', closeEdit)
+//   } else if (type === 'Component') {
+//     editIndex.value.id = item.id
+//     editIndex.value.category = item.category
+//     window.addEventListener('click', closeEdit)
+//   }
+// }
 function cancel(item) {
   editIndex.value.id = null
   for (let key in item) {
