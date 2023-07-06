@@ -536,7 +536,6 @@ async function updateCredits() {
   await eduProgsStore.fetchVBblock(route.params.pages)
   VBblock.value = eduProgsStore.getVBblock
 }
-const saveMandatoryComp = () => {}
 async function createComponent() {
   updateSelectedBlockNum()
   console.log(newComponent.block_name, newComponent.block_num)
@@ -713,7 +712,7 @@ async function saveComponent(component) {
   editVBcomp(component)
   try {
     console.log(component)
-    await eduProgsStore.editComponent(component.id, component)
+    await eduProgsStore.editComponent(component.id, component.value)
     updateCredits()
     editIndex.value.id = null
   } catch (error) {
