@@ -43,11 +43,7 @@ const cancel = comp => {
   editIndex.value = {}
 }
 const saveComponent = comp => {
-  emit('saveComponent', editIndex)
-  console.log(comp.value)
-  comp.value = editIndex.value
-  // editIndex.id = 0
-  // editIndex.value = {}
+  emit('saveComponent', comp)
 }
 onMounted(() => {
   grid = GridStack.init(
@@ -98,7 +94,7 @@ onMounted(() => {
               class="pa-0"
               v-model="editIndex.value.name"
               variant="underlined"
-              @keyup.enter="saveComponent(comp)"
+              @keyup.enter="saveComponent(component)"
             />
           </span>
         </div>
