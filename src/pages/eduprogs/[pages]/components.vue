@@ -41,7 +41,7 @@
     <tbody>
       <th colspan="5">
         <ComponentsGridStack
-          @saveComponent="saveComponent"
+          @saveComponent="saveMandatoryComponent"
           @changeOrder="changeOrder"
           @remove="remove"
           :components="components"
@@ -194,7 +194,6 @@
               :rules="rulesComp.credits"
               min="1"
               @keyup.enter="saveComponent(comp)"
-              @focus="resetError"
             />
           </span>
         </td>
@@ -273,7 +272,6 @@
                 :error="NameError"
                 :error-messages="errorName"
                 @input="check"
-                @focus="resetErrorN"
               />
             </VCol>
             <VCol cols="12">
@@ -285,7 +283,6 @@
                 :rules="rulesComp.credits"
                 :error="hasError"
                 :error-messages="errorMessage"
-                @focus="resetError"
                 @input="validateCredits"
               />
             </VCol>
@@ -336,7 +333,6 @@
                 :rules="rulesComp.nameComp"
                 :error="NameError"
                 :error-messages="errorName"
-                @focus="resetErrorN"
               />
             </VCol>
             <VCol cols="12">
@@ -348,7 +344,6 @@
                 :rules="rulesComp.credits"
                 :error="hasError"
                 :error-messages="errorMessage"
-                @focus="resetError"
               />
             </VCol>
             <VCol cols="12">
@@ -503,24 +498,12 @@ function updateSelectedBlockNum() {
   }
 }
 
-function resetError() {
-  hasError.value = false
-  errorMessage.value = ''
-}
-
-function resetErrorN() {
-  NameError.value = false
-  errorName.value = ''
-}
-
 function changeDialog(type) {
   if (type == 'ОК') {
     dialogCreate.value = !dialogCreate.value
   } else if (type == 'ВБ') {
     dialogCreateSelective.value = !dialogCreateSelective.value
   }
-  resetError()
-  resetErrorN()
   setTimeout(() => {
     newComponent.name = ''
     newComponent.credits = 0
@@ -536,7 +519,6 @@ async function updateCredits() {
   await eduProgsStore.fetchVBblock(route.params.pages)
   VBblock.value = eduProgsStore.getVBblock
 }
-const saveMandatoryComp = () => {}
 async function createComponent() {
   updateSelectedBlockNum()
   console.log(newComponent.block_name, newComponent.block_num)
@@ -696,21 +678,19 @@ function editVBcomp(component) {
   if (selectedBlock) {
     component.block_num = String(selectedBlock.block_num)
     const maxVBNum = Math.max(...selectedBlock.comps_in_block.map(block => block.block_num))
-    console.log(maxVBNum)
     component.code = String(maxVBNum + 1)
-    console.log(component.code)
-    console.log(component)
   } else {
     const maxBlockNum = Math.max(...VBblock.value.map(block => block.block_num))
     component.block_num = String(maxBlockNum + 1)
     component.code = String(1)
-    console.log(component)
-    console.log(component.code)
   }
+}
+const saveMandatoryComponent = (comp, editIndex) => {
+  console.log(components.value)
 }
 
 async function saveComponent(component) {
-  editVBcomp(component)
+  console.log(component)
   try {
     console.log(component)
     await eduProgsStore.editComponent(component.id, component)
@@ -728,8 +708,8 @@ async function saveComponent(component) {
 
     return
   }
+  editVBcomp(component)
   window.removeEventListener('click', closeEdit)
-  originValue = {}
 }
 const saveBlockName = async block => {
   if (block.block_name.length === 0) {

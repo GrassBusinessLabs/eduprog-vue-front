@@ -4,6 +4,8 @@ import 'gridstack/dist/gridstack.min.css'
 import 'gridstack/dist/gridstack-extra.min.css'
 import { ref, toRef, defineProps, watch, nextTick, reactive } from 'vue'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
+import { useRoute } from 'vue-router'
+const route = useRoute()
 const eduProgsStore = useEduProgsStore()
 const props = defineProps({
   components: {
@@ -13,7 +15,11 @@ const props = defineProps({
   },
 })
 const componentsRef = toRef(props, 'components')
-// const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete'])
+const compError = reactive({
+  status: false,
+  message: '',
+})
+const isLoading = ref(false)
 const emit = defineEmits(['remove', 'changeOrder', 'saveComponent'])
 const editIndex = reactive({
   id: 0,
@@ -24,13 +30,11 @@ const gridref = ref(null)
 const control_types = ref(['залік', 'іспит'])
 
 watch(props, (newValue, oldValue) => {
-  console.log(`Значение изменилось с ${oldValue} на ${newValue}`)
   nextTick(() => {
     grid.load(grid.getGridItems())
   })
 })
 const edit = comp => {
-  console.log(comp)
   editIndex.id = comp.id
   editIndex.value = Object.assign({}, comp)
 }
@@ -38,12 +42,40 @@ function remove(comp) {
   emit('remove', comp)
 }
 const cancel = comp => {
-  console.log(comp)
   editIndex.id = 0
   editIndex.value = {}
 }
-const saveComponent = comp => {
-  emit('saveComponent', comp)
+const saveComponent = async comp => {
+  if (!editIndex.value.name.length) {
+    compError.message = 'Назва компоненту не може бути порожньою'
+    compError.status = true
+    return
+  }
+  isLoading.value = true
+  try {
+    await eduProgsStore.editComponent(editIndex.id, editIndex.value)
+    await eduProgsStore.fetchCreditsInfo(route.params.pages)
+    await eduProgsStore.findEduProgById(route.params.pages)
+    comp = editIndex.value
+    editIndex.id = 0
+    editIndex.value = {}
+  } catch (error) {
+    console.log(error.response.data.error)
+    const errMessage = error.response.data.error
+    switch (errMessage) {
+      case 'eduprog component with this name already exists':
+        compError.message = 'Компонент з такою назвою вже існує'
+        break
+      case 'too much credits':
+        compError.message = 'Забагато кредитів'
+        break
+    }
+    if (!compError.message.length) {
+      compError.message = 'Щось пішло не так'
+    }
+    compError.status = true
+  }
+  isLoading.value = false
 }
 onMounted(() => {
   grid = GridStack.init(
@@ -56,13 +88,24 @@ onMounted(() => {
     gridref.value,
   )
   grid.on('dragstop', function (event, el) {
-    console.log('ЕЛЕМЕНТ', el.gridstackNode.id, el.gridstackNode.y)
     emit('changeOrder', el.gridstackNode.id, el.gridstackNode.y)
   })
 })
 </script>
 
 <template>
+  <v-snackbar v-model="compError.status">
+    {{ compError.message }}
+
+    <template v-slot:actions>
+      <v-btn
+        color="pink"
+        icon="mdi-close-thick"
+        @click="compError.status = false"
+      >
+      </v-btn>
+    </template>
+  </v-snackbar>
   <div
     ref="gridref"
     class="grid-stack"
@@ -108,7 +151,6 @@ onMounted(() => {
               type="number"
               min="1"
               @keyup.enter="saveComponent(component)"
-              @focus="resetError"
             />
           </span>
         </div>
@@ -151,6 +193,7 @@ onMounted(() => {
               icon="mdi-check-bold"
               size="x-small"
               style="margin-right: 2%"
+              :loading="isLoading"
               @click="saveComponent(component)"
             />
             <VBtn
