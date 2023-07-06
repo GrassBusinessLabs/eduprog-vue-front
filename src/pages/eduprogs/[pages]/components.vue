@@ -41,6 +41,7 @@
     <tbody>
       <th colspan="5">
         <ComponentsGridStack
+          @saveComponent="saveComponent"
           @changeOrder="changeOrder"
           @remove="remove"
           :components="components"
@@ -265,7 +266,7 @@
           <VRow>
             <VCol cols="12">
               <VTextField
-                v-model="newComponent.name"
+                v-model.trim="newComponent.name"
                 label="Назва компонента"
                 required
                 :rules="rulesComp.nameComp"
@@ -597,19 +598,19 @@ async function createComponent() {
   await updateCredits()
 }
 
-function edit(item, type = 'Component') {
-  console.log(item)
-  originValue = Object.assign({}, item)
-  if (type === 'Block') {
-    editIndex.value.id = item.block_num
-    editIndex.value.category = 'BLOCK'
-    window.addEventListener('click', closeEdit)
-  } else if (type === 'Component') {
-    editIndex.value.id = item.id
-    editIndex.value.category = item.category
-    window.addEventListener('click', closeEdit)
-  }
-}
+// function edit(item, type = 'Component') {
+//   console.log(item)
+//   originValue = Object.assign({}, item)
+//   if (type === 'Block') {
+//     editIndex.value.id = item.block_num
+//     editIndex.value.category = 'BLOCK'
+//     window.addEventListener('click', closeEdit)
+//   } else if (type === 'Component') {
+//     editIndex.value.id = item.id
+//     editIndex.value.category = item.category
+//     window.addEventListener('click', closeEdit)
+//   }
+// }
 function cancel(item) {
   editIndex.value.id = null
   for (let key in item) {
@@ -711,7 +712,7 @@ async function saveComponent(component) {
   editVBcomp(component)
   try {
     console.log(component)
-    await eduProgsStore.editComponent(component.id, component)
+    await eduProgsStore.editComponent(component.id, component.value)
     updateCredits()
     editIndex.value.id = null
   } catch (error) {
@@ -748,6 +749,13 @@ const changeOrder = async (compId, position) => {
 </script>
 
 <style>
+.grid-stack-item .v-field__field .v-field__input {
+  padding: 0 !important;
+}
+
+.grid-stack-item .v-select__selection {
+  align-items: center;
+}
 .eduprog-item {
   cursor: pointer;
 }

@@ -21,7 +21,7 @@ export const useEduProgsStore = defineStore({
     specialities: [],
     components: [],
     VBblock: [],
-    freeCompSheme:[],
+    freeCompSheme: [],
   }),
 
   getters: {
@@ -56,7 +56,7 @@ export const useEduProgsStore = defineStore({
     async createEduProg(payload) {
       const response = await postData('/eduprogs/create', payload)
       this.fetchEduProgs
-      router.replace('/eduprogs/' + response.id+'/characteristic')
+      router.replace('/eduprogs/' + response.id + '/characteristic')
     },
     async editNameEduProg(payload, id) {
       await editData('/eduprogs/' + id, payload)
@@ -144,7 +144,6 @@ export const useEduProgsStore = defineStore({
       this.freeCompSheme = response
     },
 
-
     async createCompetencyRelation(eduprogId, componentId, competencyId) {
       const newRelation = {
         eduprog_id: eduprogId,
@@ -216,8 +215,8 @@ export const useEduProgsStore = defineStore({
     },
     async copyEduprog(id, payload) {
       const response = await postData('/eduprogs/copy/' + id, payload)
-      
-      router.replace('/eduprogs/' + response.id+'/characteristic')
+
+      router.replace('/eduprogs/' + response.id + '/characteristic')
     },
     async editCustomCompetency(id, payload) {
       const newDefinition = {
@@ -245,7 +244,16 @@ export const useEduProgsStore = defineStore({
         link.click()
       })
     },
-
+    async exportToDocx(eduId) {
+      await getFile('/eduprogs/toWord/' + eduId).then(response => {
+        const url = window.URL.createObjectURL(new Blob([response.data]))
+        const link = document.createElement('a')
+        link.href = url
+        link.setAttribute('download', 'ОПП ' + eduId + '.docx')
+        document.body.appendChild(link)
+        link.click()
+      })
+    },
 
     async fetchRelations(eduId) {
       const response = await getData('/eduprogs/compRelations/' + eduId)
@@ -279,7 +287,7 @@ export const useEduProgsStore = defineStore({
       return response
     },
     async replaceCompAfter(eduId, putAfterId) {
-      console.log("replace")
+      console.log('replace')
       await editData(`/eduprogs/comps/replace?edcompId=${eduId}&putAfter=${putAfterId}`)
     },
   },

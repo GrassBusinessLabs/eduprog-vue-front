@@ -2,7 +2,7 @@
 import { GridStack } from 'gridstack'
 import 'gridstack/dist/gridstack.min.css'
 import 'gridstack/dist/gridstack-extra.min.css'
-import { defineExpose, ref } from 'vue'
+import { defineExpose, nextTick, ref, watch } from 'vue'
 
 const props = defineProps({
   gridItems: {
@@ -72,12 +72,9 @@ function mouseover(idWidget) {
 
 function deleteGridComponent(component) {
   console.log(component)
-  const foundWidget = grid.getGridItems().find(item => item.gridstackNode.id.toString() === component.id.toString())
-  if (foundWidget) {
-    grid.removeWidget(foundWidget, true)
-    emit('delComp', component)
-
-  }
+  console.log(grid.getGridItems())
+  console.log(grid.getGridItems().toString())
+  emit('delComp', component)
 }
 
 const createWidget = () => {
@@ -176,6 +173,7 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent})
           </VList>
         </VMenu>
         <!--    :variant="hoveredWidget === component.id ? 'underlined' : 'plain'"    -->
+
         <div style="width: 65%; margin-left: 10%">
           {{ component.eduprogcomp.name }}
         </div>

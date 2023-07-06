@@ -13,6 +13,9 @@ const eduProgsStore = useEduProgsStore()
 const exportToExcel = () => {
   eduProgsStore.exportToExcel(route.params.pages)
 }
+const exportToDocx = () => {
+  eduProgsStore.exportToDocx(route.params.pages)
+}
 const exportToPng = () => {
   eduProgsStore.exportToPng(route.params.pages)
 }
@@ -33,7 +36,10 @@ const exportToPng = () => {
       -->
 
       <VSpacer />
-      <VMenu class="mr-5" v-if="route.params.pages">
+      <VMenu
+        class="mr-5"
+        v-if="route.params.pages"
+      >
         <template #activator="{ props }">
           <VBtn
             color="primary"
@@ -43,12 +49,9 @@ const exportToPng = () => {
           </VBtn>
         </template>
         <VList>
-          <VListItem @click="exportToExcel">
-            ОПП
-          </VListItem>
-          <VListItem @click="exportToPng">
-            Малюнок
-          </VListItem>
+          <VListItem @click="exportToExcel"> ОПП (excel) </VListItem>
+          <VListItem @click="exportToDocx"> ОПП (docx) </VListItem>
+          <VListItem @click="exportToPng"> Малюнок </VListItem>
         </VList>
       </VMenu>
 

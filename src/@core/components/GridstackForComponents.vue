@@ -18,7 +18,6 @@ let grid
 const gridref = ref(null)
 
 watch(props.components, (newValue, oldValue) => {
-  console.log(`Значение изменилось с ${oldValue} на ${newValue}`)
   nextTick(()=>{
     grid.load(grid.getGridItems())
   })
