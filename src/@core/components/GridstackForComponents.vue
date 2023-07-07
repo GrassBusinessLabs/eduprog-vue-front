@@ -64,7 +64,9 @@ const createFreeWidget = () => {
 
 const updateGridComp = () => {
   nextTick(() => {
+    console.log('dfgdfgdfgdfgdfgdf')
     grid.load(grid.getGridItems())
+    grid.compact(grid.getGridItems())
   })
 }
 

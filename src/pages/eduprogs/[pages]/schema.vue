@@ -8,6 +8,7 @@ import GridstackForComponents from '@core/components/GridstackForComponents.vue'
 import { it } from 'vuetify/locale'
 
 const searchTerm = ref('')
+const sortType = ref('Az')
 const route = useRoute()
 const disciplines = ref([])
 const eduprogComponents = ref([])
@@ -121,24 +122,32 @@ function logger(evt) {
 
       createCompToSheme()
     }
-  } else if (evt[0].type === 'dragstop') {
-    const component = items[last_ID.value].find(item => item.id === evt[1].gridstackNode.id)
-
-    console.log(component.eduprogcomp_id)
-    edu_id.value = component.eduprogcomp_id
-    credits_semestr.value.discipline_id = evt.itemId,
-    credits_semestr.value.row = evt[1].gridstackNode.y + 1,
-    credits_semestr.value.semester_num = evt[1].gridstackNode.x + 1,
-    credits_semestr.value.eduprog_id = Number(eduprogId),
-    credits_semestr.value.eduprogcomp_id = component.eduprogcomp.id,
-    credits_semestr.value.credits_per_semester = component.eduprogcomp.credits
-
-    console.log(credits_semestr.value)
-
-    updateComponent()
   }
   else if (evt[0].type === 'change'){
 
+    const arr = evt[1]
+    console.log(arr.length)
+    console.log(arr)
+
+    arr.forEach(obj => {
+      console.log('OBJECT', obj.id)
+
+      const component = items[last_ID.value].find(item => item.id === obj.id)
+
+      console.log(component.eduprogcomp_id)
+      edu_id.value = component.eduprogcomp_id
+      credits_semestr.value.discipline_id = evt.itemId,
+      credits_semestr.value.row = obj.y + 1,
+      credits_semestr.value.semester_num = obj.x + 1,
+      credits_semestr.value.eduprog_id = Number(eduprogId),
+      credits_semestr.value.eduprogcomp_id = component.eduprogcomp.id,
+      credits_semestr.value.credits_per_semester = component.eduprogcomp.credits
+
+      console.log(credits_semestr.value)
+
+      updateComponent()
+
+    })
   }
 }
 
@@ -359,19 +368,51 @@ function deleteItem(event) {
 }
 
 const filteredData = computed(() => {
-  const found = FreeCompItems.value
 
+  console.log(FreeCompItems.value)
   if (!searchTerm.value) {
-    return found
+    return FreeCompItems.value
   }
 
-  return found.filter(item => {
-    // Применение фильтрации на основе поискового запроса
+  return FreeCompItems.value.filter(item => {
+    
     return Object.values(item).some(value =>
       String(value).toLowerCase().includes(searchTerm.value.toLowerCase()),
     )
   })
+})
 
+
+async function sort(){
+
+  if (sortType.value === 'Az') {
+
+    await eduProgsStore.fetchFreeCompShemeSort(eduprogId, sortType.value)
+    freeCompSheme.value = eduProgsStore.freeCompSheme
+
+    console.log(freeCompSheme.value)
+    sortType.value  = 'Za'
+
+  } else if (sortType.value === 'Za') {
+
+    await eduProgsStore.fetchFreeCompShemeSort(eduprogId, sortType.value)
+    freeCompSheme.value = eduProgsStore.freeCompSheme
+    console.log(freeCompSheme.value)
+    sortType.value  = 'default'
+
+  } else if (sortType.value === 'default') {
+
+    await eduProgsStore.fetchFreeCompSheme(eduprogId)
+    freeCompSheme.value = eduProgsStore.freeCompSheme
+    console.log(freeCompSheme.value)
+    sortType.value = 'Az'
+
+  }
+}
+
+
+watch(filteredData, () => {
+  childFreeCompRef.value.updateGridComp()
 })
 </script>
 
@@ -444,7 +485,7 @@ const filteredData = computed(() => {
         <VTable>
           <thead>
             <tr>
-              <th>Назвва компонента</th>
+              <th @click='sort' >Назвва компонента</th>
               <th>Вільні кредити</th>
             </tr>
           </thead>

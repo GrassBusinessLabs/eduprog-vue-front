@@ -141,6 +141,10 @@ export const useEduProgsStore = defineStore({
       const response = await getData('/eduprogs/scheme/freeComps/' + eduId)
       this.freeCompSheme = response
     },
+    async fetchFreeCompShemeSort(eduId, typeSort) {
+      const response = await getData('/eduprogs/scheme/freeComps/' + eduId + '?order=' +typeSort)
+      this.freeCompSheme = response
+    },
 
     async createCompetencyRelation(eduprogId, componentId, competencyId) {
       const newRelation = {

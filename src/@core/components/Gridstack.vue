@@ -27,7 +27,6 @@ const gridref = ref(null)
 const hoveredWidget = ref(null)
 
 watch(props, (newValue, oldValue) => {
-  console.log('Значение изменилось с ${oldValue} на ${newValue}')
   nextTick(() => {
     grid.load(grid.getGridItems())
   })
@@ -38,7 +37,7 @@ onMounted(() => {
 
   grid = GridStack.init(
     {
-      float: true,
+      float: false,
       column: GRID_COLUMN,
       minRow: GRID_MIN_ROW,
       maxRow: GRID_MAX_ROW,
