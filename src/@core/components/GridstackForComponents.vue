@@ -27,7 +27,7 @@ watch(props.components, (newValue, oldValue) => {
 onMounted(() => {
   grid = GridStack.init(
     {
-      float: false,
+      float: true,
       column: 1,
       cellHeight: '65px',
       disableResize: true,
@@ -62,7 +62,13 @@ const createFreeWidget = () => {
   })
 }
 
-defineExpose({ createFreeWidget })
+const updateGridComp = () => {
+  nextTick(() => {
+    grid.load(grid.getGridItems())
+  })
+}
+
+defineExpose({ createFreeWidget, updateGridComp })
 </script>
 
 <template>

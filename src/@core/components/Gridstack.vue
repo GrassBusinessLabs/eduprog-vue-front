@@ -16,22 +16,29 @@ const props = defineProps({
   },
 })
 
-const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete'])
+const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete','change'])
 
 const GRID_COLUMN = 8
 const GRID_MIN_ROW = 1
-const GRID_MAX_ROW = 1
+const GRID_MAX_ROW = 5
 
 let grid
 const gridref = ref(null)
 const hoveredWidget = ref(null)
+
+watch(props, (newValue, oldValue) => {
+  console.log('Значение изменилось с ${oldValue} на ${newValue}')
+  nextTick(() => {
+    grid.load(grid.getGridItems())
+  })
+})
 
 
 onMounted(() => {
 
   grid = GridStack.init(
     {
-      float: false,
+      float: true,
       column: GRID_COLUMN,
       minRow: GRID_MIN_ROW,
       maxRow: GRID_MAX_ROW,
@@ -54,12 +61,17 @@ onMounted(() => {
     emit('dragstop', [event, element])
   })
 
+  grid.on('change', function(event, items) {
+    emit('change', [event, items])
+  })
+
   grid.on('resizestop', function(event, items) {
     emit('resizestop', [event, items])
   })
   grid.on('dropped', function (event, previousWidget, newWidget) {
     emit('dropped', [event, previousWidget, newWidget])
   })
+
 })
 
 function mouseleave() {
@@ -71,10 +83,10 @@ function mouseover(idWidget) {
 }
 
 function deleteGridComponent(component) {
-  console.log(component)
-  console.log(grid.getGridItems())
-  console.log(grid.getGridItems().toString())
   emit('delComp', component)
+  nextTick(() => {
+    grid.load(grid.getGridItems())
+  })
 }
 
 const createWidget = () => {

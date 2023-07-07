@@ -137,6 +137,9 @@ function logger(evt) {
 
     updateComponent()
   }
+  else if (evt[0].type === 'change'){
+
+  }
 }
 
 
@@ -273,6 +276,7 @@ async function deleteComponent(component) {
 
     initCopmGrid()
     initGrid()
+
   }
 }
 
@@ -367,9 +371,8 @@ const filteredData = computed(() => {
       String(value).toLowerCase().includes(searchTerm.value.toLowerCase()),
     )
   })
-})
 
-console.log(filteredData)
+})
 </script>
 
 <template>
@@ -553,12 +556,6 @@ console.log(filteredData)
                     @click="deleteDiscipline(item.id)"
                   />
                 </div>
-                <VBtn
-                  icon="mdi-plus"
-                  size="x-small"
-                  style="margin-right:2% "
-                  @click="addEmptyWidget(item, index)"
-                />
               </span>
               <span v-else>
                 <VBtn
@@ -586,6 +583,7 @@ console.log(filteredData)
               @dropped=" event => logger({...event, itemId: item.id})"
               @dragstart="event => lastID({...event, itemId: item.id})"
               @dragstop=" event => logger({...event, itemId: item.id})"
+              @change=" event => logger({...event, itemId: item.id})"
               @delete="deleteItem"
               @delComp="deleteComponent"
               @createComp="createCompToSheme"
