@@ -42,7 +42,6 @@ onMounted(() => {
       minRow: GRID_MIN_ROW,
       maxRow: GRID_MAX_ROW,
       acceptWidgets: '.grid-stack-item',
-      dragIn: '.grid-stack',
     },
     gridref.value,
     console.log(gridref.value),

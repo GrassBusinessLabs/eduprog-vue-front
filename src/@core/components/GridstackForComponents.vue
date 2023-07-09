@@ -27,12 +27,11 @@ watch(props.components, (newValue, oldValue) => {
 onMounted(() => {
   grid = GridStack.init(
     {
-      float: true,
+      float: false,
       column: 1,
       cellHeight: '65px',
       disableResize: true,
       acceptWidgets: '.grid-stack-item',
-      dragIn: '.grid-stack',
     },
     gridref.value,
     console.log(gridref.value),
@@ -64,11 +63,13 @@ const createFreeWidget = () => {
 
 const updateGridComp = () => {
   nextTick(() => {
-    console.log('dfgdfgdfgdfgdfgdf')
     grid.load(grid.getGridItems())
     grid.compact(grid.getGridItems())
+    console.log(props.components)
   })
 }
+
+
 
 defineExpose({ createFreeWidget, updateGridComp })
 </script>
@@ -96,9 +97,8 @@ defineExpose({ createFreeWidget, updateGridComp })
           {{ component.name }}
         </div>
         <div style="width: 10%">
-          {{ component.free_credit}}
+          {{ component.free_credit }}
         </div>
-
       </div>
     </div>
   </div>
