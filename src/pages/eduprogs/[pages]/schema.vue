@@ -1,5 +1,5 @@
 <script setup>
-import { v4 as uuidv4 } from "uuid"
+import { v4 as uuidv4 } from 'uuid'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 import { reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
@@ -48,8 +48,6 @@ const credits_semestr = ref({
   credits_per_semester: '',
 })
 
-
-
 const free_comp_id = ref()
 const del_index = ref()
 const last_ID = ref()
@@ -71,91 +69,66 @@ onMounted(async () => {
   await eduProgsStore.fetchFreeCompSheme(eduprogId)
   freeCompSheme.value = eduProgsStore.freeCompSheme
 
-  console.log('freeCompSheme',freeCompSheme.value)
-
   initCopmGrid()
 
   initGrid()
-  console.log('sscheme: ', scheme.value)
-  console.log('components',eduProgsStore.components)
-  console.log('disciplines.value',disciplines.value)
 })
 
-function lastID (evt){
+function lastID(evt) {
   last_ID.value = evt.itemId
-  console.log(last_ID.value)
-  console.log(evt)
-
 }
 
 function logger(evt) {
-  console.log(evt)
-
   if (evt[0].type === 'dropped') {
     const result = FreeCompItems.value.find(item => item.id === evt[2].id)
 
     if (result === undefined) {
       const component = items[last_ID.value].find(item => item.id === evt[2].id)
 
-      credits_semestr.value.discipline_id = evt.itemId,
-      credits_semestr.value.row = evt[2].y + 1,
-      credits_semestr.value.semester_num = evt[2].x + 1,
-      credits_semestr.value.eduprog_id = Number(eduprogId),
-      credits_semestr.value.eduprogcomp_id = component.eduprogcomp_id,
-      credits_semestr.value.credits_per_semester = component.eduprogcomp.credits
-
-      console.log("NE DRISNA",result)
+      ;(credits_semestr.value.discipline_id = evt.itemId),
+        (credits_semestr.value.row = evt[2].y + 1),
+        (credits_semestr.value.semester_num = evt[2].x + 1),
+        (credits_semestr.value.eduprog_id = Number(eduprogId)),
+        (credits_semestr.value.eduprogcomp_id = component.eduprogcomp_id),
+        (credits_semestr.value.credits_per_semester = component.eduprogcomp.credits)
 
       updateComponent()
-    } else if (result !== undefined){
-      credits_semestr.value.discipline_id = evt.itemId,
-      credits_semestr.value.row = evt[2].y + 1,
-      credits_semestr.value.semester_num = evt[2].x + 1,
-      credits_semestr.value.eduprog_id = Number(eduprogId),
-      credits_semestr.value.eduprogcomp_id = result.eduprogcomp_id,
-      credits_semestr.value.credits_per_semester = result.free_credit
+    } else if (result !== undefined) {
+      ;(credits_semestr.value.discipline_id = evt.itemId),
+        (credits_semestr.value.row = evt[2].y + 1),
+        (credits_semestr.value.semester_num = evt[2].x + 1),
+        (credits_semestr.value.eduprog_id = Number(eduprogId)),
+        (credits_semestr.value.eduprogcomp_id = result.eduprogcomp_id),
+        (credits_semestr.value.credits_per_semester = result.free_credit)
       free_comp_id.value = evt[2]
       del_index.value = disciplines.value.findIndex(item => item.id === evt.itemId)
-      console.log("DRISNA", result)
-      console.log(credits_semestr.value)
 
       createCompToSheme()
     }
-  }
-  else if (evt[0].type === 'change'){
-
+  } else if (evt[0].type === 'change') {
     const arr = evt[1]
-    console.log(arr.length)
-    console.log(arr)
 
     arr.forEach(obj => {
-      console.log('OBJECT', obj.id)
-
       const component = items[last_ID.value].find(item => item.id === obj.id)
 
-      console.log(component.eduprogcomp_id)
       edu_id.value = component.eduprogcomp_id
-      credits_semestr.value.discipline_id = evt.itemId,
-      credits_semestr.value.row = obj.y + 1,
-      credits_semestr.value.semester_num = obj.x + 1,
-      credits_semestr.value.eduprog_id = Number(eduprogId),
-      credits_semestr.value.eduprogcomp_id = component.eduprogcomp.id,
-      credits_semestr.value.credits_per_semester = component.eduprogcomp.credits
-
-      console.log(credits_semestr.value)
+      ;(credits_semestr.value.discipline_id = evt.itemId),
+        (credits_semestr.value.row = obj.y + 1),
+        (credits_semestr.value.semester_num = obj.x + 1),
+        (credits_semestr.value.eduprog_id = Number(eduprogId)),
+        (credits_semestr.value.eduprogcomp_id = component.eduprogcomp.id),
+        (credits_semestr.value.credits_per_semester = component.eduprogcomp.credits)
 
       updateComponent()
-
     })
   }
 }
 
-
-async function updateComponent(){
-  await eduProgsStore.UpdateComponentInScheme(edu_id.value,credits_semestr.value)
+async function updateComponent() {
+  await eduProgsStore.UpdateComponentInScheme(edu_id.value, credits_semestr.value)
 }
 
-async function updateContent(){
+async function updateContent() {
   // Get eduprog components
   await eduProgsStore.fetchComponents(eduprogId)
   eduprogComponents.value = eduProgsStore.components
@@ -190,8 +163,7 @@ function initCopmGrid() {
   })
   console.log(FreeCompItems.value)
   console.log(childFreeCompRef.value)
-  FreeCompItems.value.forEach((item,index)=>
-    childFreeCompRef.value.createFreeWidget())
+  FreeCompItems.value.forEach((item, index) => childFreeCompRef.value.createFreeWidget())
 }
 
 function initGrid() {
@@ -200,7 +172,7 @@ function initGrid() {
     if (widgetIndex === -1) {
       const widget = {
         w: Math.round(Math.random()),
-        x: item.semester_num - 1 ,
+        x: item.semester_num - 1,
         y: item.row - 1,
         h: 1,
         id: uuidv4(),
@@ -211,17 +183,13 @@ function initGrid() {
       console.log(items)
       console.log(scheme.value)
       items[item.discipline_id].unshift(widget)
-      disciplines.value.forEach((item,index)=>
-        childComponentRef.value[index].createWidget())
+      disciplines.value.forEach((item, index) => childComponentRef.value[index].createWidget())
     }
   })
 }
 
-
-
-
 function initGridItems() {
-  disciplines.value.map((item,index) => {
+  disciplines.value.map((item, index) => {
     Object.defineProperty(items, item.id, {
       value: [],
       writable: true,
@@ -238,7 +206,7 @@ function addEmptyWidget(discipline, index) {
   const node = {
     w: Math.round(Math.random()),
     id: uuidv4(),
-    disc_id:discipline.id,
+    disc_id: discipline.id,
   }
   if (childComponentRef.value[index].isAreaEmpty()) {
     items[discipline.id].push(node)
@@ -252,20 +220,15 @@ function saveChanges() {
   })
 }
 async function deleteDiscipline(id) {
-
-
   await eduProgsStore.deleteDiscipline(id)
   await eduProgsStore.fetchDisciplines(route.params.pages)
   disciplines.value = eduProgsStore.getDisciplines
-
 }
 
 async function deleteComponent(component) {
-
   console.log(component)
 
-  if(component.eduprogcomp_id === undefined || null || 0){
-
+  if (component.eduprogcomp_id === undefined || null || 0) {
   } else {
     await eduProgsStore.deleteComponentFromSheme(component.eduprogcomp_id)
     await eduProgsStore.fetchScheme(route.params.pages)
@@ -278,20 +241,17 @@ async function deleteComponent(component) {
     console.log(FreeCompItems.value)
     console.log(component.eduprogcomp_id)
     console.log(items[component.disc_id])
-    console.log('items[component.disc_id]',items[component.disc_id])
-    console.log('items',items)
+    console.log('items[component.disc_id]', items[component.disc_id])
+    console.log('items', items)
     console.log(component)
 
     initCopmGrid()
     initGrid()
-
   }
 }
 
-
-async function createCompToSheme(){
-
-  console.log('credits_semestr',credits_semestr.value)
+async function createCompToSheme() {
+  console.log('credits_semestr', credits_semestr.value)
   console.log(free_comp_id.value)
 
   console.log(credits_semestr.value)
@@ -303,10 +263,10 @@ async function createCompToSheme(){
 
   await eduProgsStore.fetchScheme(eduprogId)
   scheme.value = eduProgsStore.scheme
-  console.log('childComponentRef.value',childComponentRef.value)
+  console.log('childComponentRef.value', childComponentRef.value)
   childComponentRef.value[del_index.value].deleteGridComponent(free_comp_id.value)
-  console.log( FreeCompItems.value)
-  
+  console.log(FreeCompItems.value)
+
   removeObjectById(FreeCompItems.value, free_comp_id.value.id)
 
   console.log(FreeCompItems.value)
@@ -366,25 +326,24 @@ function deleteItem(event) {
   console.log(event)
 }
 
-const filteredData = computed(() => {
+// const filteredData = computed(() => {
 
-  console.log(FreeCompItems.value)
-  if (!searchTerm.value) {
-    return FreeCompItems.value
-  }
+//   console.log(FreeCompItems.value)
+//   if (!searchTerm.value) {
+//     return FreeCompItems.value
+//   }
 
-  return FreeCompItems.value.filter(item => {
-    
-    return Object.values(item).some(value =>
-      String(value).toLowerCase().includes(searchTerm.value.toLowerCase()),
-    )
-  })
-})
+//   return FreeCompItems.value.filter(item => {
 
+//     return Object.values(item).some(value =>
+//       String(value).toLowerCase().includes(searchTerm.value.toLowerCase()),
+//     )
+//   })
+// })
 
-watch(filteredData, () => {
-  childFreeCompRef.value.updateGridComp()
-})
+// watch(filteredData, () => {
+//   childFreeCompRef.value.updateGridComp()
+// })
 </script>
 
 <template>
@@ -400,9 +359,7 @@ watch(filteredData, () => {
       <VCardText>
         <VContainer>
           <VRow>
-            <VCol
-              cols="12"
-            >
+            <VCol cols="12">
               <VTextField
                 v-model="newDiscipline.name"
                 label="Назва дисципліни "
@@ -432,11 +389,6 @@ watch(filteredData, () => {
     </VCard>
   </VDialog>
 
-
-
-
-
-
   <VRow>
     <VCol cols="2">
       <VCard
@@ -453,17 +405,11 @@ watch(filteredData, () => {
           hide-details
           variant="underlined"
         />
-        <VTable>
-          <thead>
-            <tr>
-              <th>Назвва компонента</th>
-              <th>Вільні кредити</th>
-            </tr>
-          </thead>
-        </VTable>
+
         <GridstackForComponents
           ref="childFreeCompRef"
-          :components="filteredData"
+          :searchTerm="searchTerm"
+          :components="FreeCompItems"
         />
       </VCard>
     </VCol>
@@ -509,37 +455,21 @@ watch(filteredData, () => {
           </tr>
 
           <tr>
-            <th class="text-center">
-              1 семестр
-            </th>
-            <th class="text-center">
-              2 семестр
-            </th>
-            <th class="text-center">
-              3 семестр
-            </th>
-            <th class="text-center">
-              4 семестр
-            </th>
-            <th class="text-center">
-              5 семестр
-            </th>
-            <th class="text-center">
-              6 семестр
-            </th>
-            <th class="text-center">
-              7 семестр
-            </th>
-            <th class="text-center">
-              8 семестр
-            </th>
+            <th class="text-center">1 семестр</th>
+            <th class="text-center">2 семестр</th>
+            <th class="text-center">3 семестр</th>
+            <th class="text-center">4 семестр</th>
+            <th class="text-center">5 семестр</th>
+            <th class="text-center">6 семестр</th>
+            <th class="text-center">7 семестр</th>
+            <th class="text-center">8 семестр</th>
           </tr>
         </thead>
       </VTable>
 
       <div style="width: 100%">
         <div
-          v-for="(item, index) in disciplines"
+          v-for="item in disciplines"
           :key="item.id"
           class="discipline-block"
         >
@@ -559,7 +489,7 @@ watch(filteredData, () => {
                   <VBtn
                     icon="mdi-pencil"
                     size="x-small"
-                    style="margin-right:2% "
+                    style="margin-right: 2%"
                     @click="edit(item)"
                   />
                   <VBtn
@@ -573,7 +503,7 @@ watch(filteredData, () => {
                 <VBtn
                   icon="mdi-check-bold"
                   size="x-small"
-                  style="margin-right:2% "
+                  style="margin-right: 2%"
                   @click="save(item)"
                 />
                 <VBtn
@@ -592,22 +522,21 @@ watch(filteredData, () => {
               :components="eduprogComponents"
               @added="logger"
               @resizestop="logger"
-              @dropped=" event => logger({...event, itemId: item.id})"
-              @dragstart="event => lastID({...event, itemId: item.id})"
-              @dragstop=" event => logger({...event, itemId: item.id})"
-              @change=" event => logger({...event, itemId: item.id})"
+              @dropped="event => logger({ ...event, itemId: item.id })"
+              @dragstart="event => lastID({ ...event, itemId: item.id })"
+              @dragstop="event => logger({ ...event, itemId: item.id })"
+              @change="event => logger({ ...event, itemId: item.id })"
               @delete="deleteItem"
               @delComp="deleteComponent"
               @createComp="createCompToSheme"
             />
-            <hr style="transform: scaleY(0.3)">
+            <hr style="transform: scaleY(0.3)" />
           </div>
         </div>
       </div>
     </VCol>
   </VRow>
 </template>
-
 
 <style scoped>
 .discipline-block {
@@ -617,7 +546,7 @@ watch(filteredData, () => {
 }
 </style>
 
-<route lang='yaml'>
+<route lang="yaml">
 name: schema
 meta:
 navActiveLink: pages-account-settings-tab

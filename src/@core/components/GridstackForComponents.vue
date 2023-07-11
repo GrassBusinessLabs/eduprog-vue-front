@@ -2,27 +2,44 @@
 import { GridStack } from 'gridstack'
 import 'gridstack/dist/gridstack.min.css'
 import 'gridstack/dist/gridstack-extra.min.css'
-import { defineExpose, ref, toRef, defineProps, watch, nextTick} from 'vue'
+import { defineExpose, ref, toRef, defineProps, watch, nextTick } from 'vue'
 
-const props =defineProps({
+const props = defineProps({
   components: {
     type: Object,
     required: true,
     default: () => [],
   },
+  searchTerm: {
+    type: String,
+    required: true,
+  },
 })
-
-const emit = defineEmits(['added', 'dragstart', 'delete','dropped'])
+const sortByName = ref(false)
+const filteredData = computed(() => {
+  const searchedComps = props.components.filter(comp => {
+    return comp.name.toLowerCase().includes(props.searchTerm.toLowerCase())
+  })
+  if (sortByName) {
+    console.log(searchedComps.sort())
+    return searchedComps.sort()
+  }
+  return searchedComps
+})
+watch(filteredData, () => {
+  updateGridComp()
+})
+console.log('ФИЛЬТРОВАНАЯ ДАТА', filteredData)
+const emit = defineEmits(['added', 'dragstart', 'delete', 'dropped'])
 
 let grid
 const gridref = ref(null)
 
 watch(props.components, (newValue, oldValue) => {
-  nextTick(()=>{
+  nextTick(() => {
     grid.load(grid.getGridItems())
   })
 })
-
 
 onMounted(() => {
   grid = GridStack.init(
@@ -34,13 +51,12 @@ onMounted(() => {
       acceptWidgets: '.grid-stack-item',
     },
     gridref.value,
-    console.log(gridref.value),
   )
-  grid.on('added', function(event, items) {
+  grid.on('added', function (event, items) {
     emit('added', [event, items])
   })
 
-  grid.on('dragstart', function(event, items) {
+  grid.on('dragstart', function (event, items) {
     emit('dragstart', [event, items])
   })
 
@@ -53,7 +69,6 @@ onMounted(() => {
   })
   console.log(props.components)
 })
-
 
 const createFreeWidget = () => {
   nextTick(() => {
@@ -69,18 +84,24 @@ const updateGridComp = () => {
   })
 }
 
-
-
 defineExpose({ createFreeWidget, updateGridComp })
 </script>
 
 <template>
+  <VTable>
+    <thead>
+      <tr>
+        <th @click="sortByName = !sortByName">Назва компонента</th>
+        <th>Вільні кредити</th>
+      </tr>
+    </thead>
+  </VTable>
   <div
     ref="gridref"
     class="grid-stack"
   >
     <div
-      v-for="component in props.components"
+      v-for="component in filteredData"
       :key="component.id"
       class="grid-stack-item"
       :gs-id="component.id"
@@ -103,5 +124,3 @@ defineExpose({ createFreeWidget, updateGridComp })
     </div>
   </div>
 </template>
-
-
