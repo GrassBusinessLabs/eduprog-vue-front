@@ -8,7 +8,6 @@ import GridstackForComponents from '@core/components/GridstackForComponents.vue'
 import { it } from 'vuetify/locale'
 
 const searchTerm = ref('')
-const sortType = ref('Az')
 const route = useRoute()
 const disciplines = ref([])
 const eduprogComponents = ref([])
@@ -178,9 +177,9 @@ function initCopmGrid() {
     } else {
       // Добавление нового элемента в массив
       const widget = {
-        w: Math.round(Math.random()),
-        x: Math.round(Math.random()),
-        y: Math.round(Math.random()),
+        w: 0,
+        x: 0,
+        y: 0,
         id: uuidv4(),
         free_credit: item.free_credits,
         eduprogcomp_id: item.id,
@@ -383,34 +382,6 @@ const filteredData = computed(() => {
 })
 
 
-async function sort(){
-
-  if (sortType.value === 'Az') {
-
-    await eduProgsStore.fetchFreeCompShemeSort(eduprogId, sortType.value)
-    freeCompSheme.value = eduProgsStore.freeCompSheme
-
-    console.log(freeCompSheme.value)
-    sortType.value  = 'Za'
-
-  } else if (sortType.value === 'Za') {
-
-    await eduProgsStore.fetchFreeCompShemeSort(eduprogId, sortType.value)
-    freeCompSheme.value = eduProgsStore.freeCompSheme
-    console.log(freeCompSheme.value)
-    sortType.value  = 'default'
-
-  } else if (sortType.value === 'default') {
-
-    await eduProgsStore.fetchFreeCompSheme(eduprogId)
-    freeCompSheme.value = eduProgsStore.freeCompSheme
-    console.log(freeCompSheme.value)
-    sortType.value = 'Az'
-
-  }
-}
-
-
 watch(filteredData, () => {
   childFreeCompRef.value.updateGridComp()
 })
@@ -485,7 +456,7 @@ watch(filteredData, () => {
         <VTable>
           <thead>
             <tr>
-              <th @click='sort' >Назвва компонента</th>
+              <th>Назвва компонента</th>
               <th>Вільні кредити</th>
             </tr>
           </thead>
