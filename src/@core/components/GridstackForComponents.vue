@@ -15,23 +15,56 @@ const props = defineProps({
     required: true,
   },
 })
-const sortByName = ref(false)
+const emit = defineEmits(['added', 'dragstart', 'delete', 'dropped'])
+const sortByName = ref('norm')
+
 const filteredData = computed(() => {
   const searchedComps = props.components.filter(comp => {
     return comp.name.toLowerCase().includes(props.searchTerm.toLowerCase())
   })
-  if (sortByName) {
-    console.log(searchedComps.sort())
-    return searchedComps.sort()
+  if (sortByName.value === 'Az') {
+
+    const filter = searchedComps.map(obj => toRaw(obj))
+    console.log(filter.sort(compareByName))
+    console.log(searchedComps.sort(compareByName))
+
+    return searchedComps.sort(compareByName)
+
+  } else if (sortByName.value === 'Za'){
+    console.log(searchedComps.reverse())
+
+    return searchedComps.reverse()
+  }else {
+
   }
+
   return searchedComps
 })
+
+const compareByName = (a, b) => {
+  const nameA = a.name.toLowerCase()
+  const nameB = b.name.toLowerCase()
+  
+  return nameA < nameB ? -1 : nameA > nameB ? 1 : 0
+}
+
+
+function sort (){
+  if (sortByName.value === 'norm'){
+    sortByName.value = 'Az'
+  } else if (sortByName.value === 'Az'){
+    sortByName.value = 'Za'
+  } else {
+    sortByName.value = 'norm'
+  }
+}
+
+
 watch(filteredData, () => {
+  console.log('searchedComps', filteredData.value)
   updateGridComp()
 })
 console.log('ФИЛЬТРОВАНАЯ ДАТА', filteredData)
-const emit = defineEmits(['added', 'dragstart', 'delete', 'dropped'])
-
 let grid
 const gridref = ref(null)
 
@@ -80,7 +113,6 @@ const updateGridComp = () => {
   nextTick(() => {
     grid.load(grid.getGridItems())
     grid.compact(grid.getGridItems())
-    console.log(props.components)
   })
 }
 
@@ -91,7 +123,9 @@ defineExpose({ createFreeWidget, updateGridComp })
   <VTable>
     <thead>
       <tr>
-        <th @click="sortByName = !sortByName">Назва компонента</th>
+        <th @click="sort">
+          Назва компонента
+        </th>
         <th>Вільні кредити</th>
       </tr>
     </thead>
@@ -101,8 +135,8 @@ defineExpose({ createFreeWidget, updateGridComp })
     class="grid-stack"
   >
     <div
-      v-for="component in filteredData"
-      :key="component.id"
+      v-for="(component, index) in filteredData"
+      :key="index"
       class="grid-stack-item"
       :gs-id="component.id"
       :gs-x="component.x"

@@ -5,7 +5,6 @@ import { reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import Gridstack from '@core/components/Gridstack.vue'
 import GridstackForComponents from '@core/components/GridstackForComponents.vue'
-import { it } from 'vuetify/locale'
 
 const searchTerm = ref('')
 const route = useRoute()
@@ -85,21 +84,21 @@ function logger(evt) {
     if (result === undefined) {
       const component = items[last_ID.value].find(item => item.id === evt[2].id)
 
-      ;(credits_semestr.value.discipline_id = evt.itemId),
-        (credits_semestr.value.row = evt[2].y + 1),
-        (credits_semestr.value.semester_num = evt[2].x + 1),
-        (credits_semestr.value.eduprog_id = Number(eduprogId)),
-        (credits_semestr.value.eduprogcomp_id = component.eduprogcomp_id),
-        (credits_semestr.value.credits_per_semester = component.eduprogcomp.credits)
+      credits_semestr.value.discipline_id = evt.itemId,
+      credits_semestr.value.row = evt[2].y + 1,
+      credits_semestr.value.semester_num = evt[2].x + 1,
+      credits_semestr.value.eduprog_id = Number(eduprogId),
+      credits_semestr.value.eduprogcomp_id = component.eduprogcomp_id,
+      credits_semestr.value.credits_per_semester = component.eduprogcomp.credits
 
       updateComponent()
     } else if (result !== undefined) {
-      ;(credits_semestr.value.discipline_id = evt.itemId),
-        (credits_semestr.value.row = evt[2].y + 1),
-        (credits_semestr.value.semester_num = evt[2].x + 1),
-        (credits_semestr.value.eduprog_id = Number(eduprogId)),
-        (credits_semestr.value.eduprogcomp_id = result.eduprogcomp_id),
-        (credits_semestr.value.credits_per_semester = result.free_credit)
+      credits_semestr.value.discipline_id = evt.itemId,
+      credits_semestr.value.row = evt[2].y + 1,
+      credits_semestr.value.semester_num = evt[2].x + 1,
+      credits_semestr.value.eduprog_id = Number(eduprogId),
+      credits_semestr.value.eduprogcomp_id = result.eduprogcomp_id,
+      credits_semestr.value.credits_per_semester = result.free_credit
       free_comp_id.value = evt[2]
       del_index.value = disciplines.value.findIndex(item => item.id === evt.itemId)
 
@@ -112,12 +111,12 @@ function logger(evt) {
       const component = items[last_ID.value].find(item => item.id === obj.id)
 
       edu_id.value = component.eduprogcomp_id
-      ;(credits_semestr.value.discipline_id = evt.itemId),
-        (credits_semestr.value.row = obj.y + 1),
-        (credits_semestr.value.semester_num = obj.x + 1),
-        (credits_semestr.value.eduprog_id = Number(eduprogId)),
-        (credits_semestr.value.eduprogcomp_id = component.eduprogcomp.id),
-        (credits_semestr.value.credits_per_semester = component.eduprogcomp.credits)
+      credits_semestr.value.discipline_id = evt.itemId,
+      credits_semestr.value.row = obj.y + 1,
+      credits_semestr.value.semester_num = obj.x + 1,
+      credits_semestr.value.eduprog_id = Number(eduprogId),
+      credits_semestr.value.eduprogcomp_id = component.eduprogcomp.id,
+      credits_semestr.value.credits_per_semester = component.eduprogcomp.credits
 
       updateComponent()
     })
@@ -408,7 +407,7 @@ function deleteItem(event) {
 
         <GridstackForComponents
           ref="childFreeCompRef"
-          :searchTerm="searchTerm"
+          :search-term="searchTerm"
           :components="FreeCompItems"
         />
       </VCard>
@@ -455,14 +454,30 @@ function deleteItem(event) {
           </tr>
 
           <tr>
-            <th class="text-center">1 семестр</th>
-            <th class="text-center">2 семестр</th>
-            <th class="text-center">3 семестр</th>
-            <th class="text-center">4 семестр</th>
-            <th class="text-center">5 семестр</th>
-            <th class="text-center">6 семестр</th>
-            <th class="text-center">7 семестр</th>
-            <th class="text-center">8 семестр</th>
+            <th class="text-center">
+              1 семестр
+            </th>
+            <th class="text-center">
+              2 семестр
+            </th>
+            <th class="text-center">
+              3 семестр
+            </th>
+            <th class="text-center">
+              4 семестр
+            </th>
+            <th class="text-center">
+              5 семестр
+            </th>
+            <th class="text-center">
+              6 семестр
+            </th>
+            <th class="text-center">
+              7 семестр
+            </th>
+            <th class="text-center">
+              8 семестр
+            </th>
           </tr>
         </thead>
       </VTable>
@@ -530,7 +545,7 @@ function deleteItem(event) {
               @delComp="deleteComponent"
               @createComp="createCompToSheme"
             />
-            <hr style="transform: scaleY(0.3)" />
+            <hr style="transform: scaleY(0.3)">
           </div>
         </div>
       </div>
