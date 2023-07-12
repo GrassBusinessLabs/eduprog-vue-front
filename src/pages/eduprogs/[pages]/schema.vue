@@ -78,6 +78,7 @@ function lastID(evt) {
 }
 
 function logger(evt) {
+  console.log(evt)
   if (evt[0].type === 'dropped') {
     const result = FreeCompItems.value.find(item => item.id === evt[2].id)
 
@@ -106,9 +107,13 @@ function logger(evt) {
     }
   } else if (evt[0].type === 'change') {
     const arr = evt[1]
+    console.log(arr)
+    console.log(evt.itemId)
+    console.log(last_ID.value)
 
     arr.forEach(obj => {
-      const component = items[last_ID.value].find(item => item.id === obj.id)
+      const component = items[evt.itemId].find(item => item.id === obj.id)
+      console.log(component)
 
       edu_id.value = component.eduprogcomp_id
       credits_semestr.value.discipline_id = evt.itemId,
@@ -125,6 +130,8 @@ function logger(evt) {
 
 async function updateComponent() {
   await eduProgsStore.UpdateComponentInScheme(edu_id.value, credits_semestr.value)
+
+  childFreeCompRef.value.updateGridComp()
 }
 
 async function updateContent() {
@@ -269,7 +276,7 @@ async function createCompToSheme() {
   removeObjectById(FreeCompItems.value, free_comp_id.value.id)
 
   console.log(FreeCompItems.value)
-
+  childFreeCompRef.value.updateGridComp()
   initGrid()
   initCopmGrid()
 }
