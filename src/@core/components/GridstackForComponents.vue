@@ -132,7 +132,7 @@ defineExpose({ createFreeWidget, updateGridComp })
   </VTable>
   <div
     ref="gridref"
-    class="grid-stack"
+    class="grid-stack grid-schema"
   >
     <div
       v-for="(component, index) in filteredData"
