@@ -125,7 +125,11 @@ function change(component) {
   emit('createComp', newComp)
 }
 
-defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent })
+function init(){
+  grid.initAll()
+}
+
+defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent, init })
 </script>
 
 <template>

@@ -25,15 +25,15 @@ const filteredData = computed(() => {
   if (sortByName.value === 'Az') {
 
     const filter = searchedComps.map(obj => toRaw(obj))
-    console.log(filter.sort(compareByName))
-    console.log(searchedComps.sort(compareByName))
+    console.log(filter.sort(compareByNameAz))
+    console.log(searchedComps.sort(compareByNameAz))
 
-    return searchedComps.sort(compareByName)
+    return searchedComps.sort(compareByNameAz).reverse()
 
   } else if (sortByName.value === 'Za'){
     console.log(searchedComps.reverse())
 
-    return searchedComps.reverse()
+    return searchedComps.sort(compareByNameZa).reverse()
   }else {
 
   }
@@ -41,11 +41,18 @@ const filteredData = computed(() => {
   return searchedComps
 })
 
-const compareByName = (a, b) => {
+const compareByNameAz = (a, b) => {
   const nameA = a.name.toLowerCase()
   const nameB = b.name.toLowerCase()
   
   return nameA < nameB ? -1 : nameA > nameB ? 1 : 0
+}
+
+const compareByNameZa = (a, b) => {
+  const nameA = a.name.toLowerCase()
+  const nameB = b.name.toLowerCase()
+
+  return nameA > nameB ? -1 : nameA < nameB ? 1 : 0
 }
 
 
@@ -55,7 +62,7 @@ function sort (){
   } else if (sortByName.value === 'Az'){
     sortByName.value = 'Za'
   } else {
-    sortByName.value = 'norm'
+    sortByName.value = 'Az'
   }
 }
 
@@ -115,6 +122,7 @@ const updateGridComp = () => {
     grid.compact(grid.getGridItems())
   })
 }
+
 
 defineExpose({ createFreeWidget, updateGridComp })
 </script>

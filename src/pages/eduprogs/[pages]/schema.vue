@@ -106,6 +106,9 @@ function logger(evt) {
       createCompToSheme()
     }
   } else if (evt[0].type === 'change') {
+    console.log(items)
+    console.log(FreeCompItems.value)
+
     const arr = evt[1]
     console.log(arr)
     console.log(evt.itemId)
@@ -114,6 +117,7 @@ function logger(evt) {
     arr.forEach(obj => {
       const component = items[evt.itemId].find(item => item.id === obj.id)
       console.log(component)
+      console.log(obj)
 
       edu_id.value = component.eduprogcomp_id
       credits_semestr.value.discipline_id = evt.itemId,
@@ -173,6 +177,7 @@ function initCopmGrid() {
 }
 
 function initGrid() {
+  console.log(items)
   scheme.value.forEach(item => {
     const widgetIndex = items[item.discipline_id].findIndex(w => w.eduprogcomp_id === item.id)
     if (widgetIndex === -1) {
@@ -189,7 +194,7 @@ function initGrid() {
       console.log(items)
       console.log(scheme.value)
       items[item.discipline_id].unshift(widget)
-      disciplines.value.forEach((item, index) => childComponentRef.value[index].createWidget())
+      disciplines.value.forEach((item, index) => childComponentRef.value[index].createWidget)
     }
   })
 }
@@ -228,7 +233,19 @@ function saveChanges() {
 async function deleteDiscipline(id) {
   await eduProgsStore.deleteDiscipline(id)
   await eduProgsStore.fetchDisciplines(route.params.pages)
+
+  await eduProgsStore.fetchScheme(eduprogId)
+  scheme.value = eduProgsStore.scheme
+
+  await eduProgsStore.fetchFreeCompSheme(eduprogId)
+  freeCompSheme.value = eduProgsStore.freeCompSheme
+
   disciplines.value = eduProgsStore.getDisciplines
+
+  // items.splice(id, 1)
+
+  initGrid()
+  initCopmGrid()
 }
 
 async function deleteComponent(component) {
@@ -319,8 +336,8 @@ async function createNewDiscipline() {
   newDiscipline.name = ''
   disciplines.value = eduProgsStore.getDisciplines
   dialogCreate.value = false
-  initGridItems()
-  initGrid()
+
+  disciplines.value.forEach((item,index) => items[item.id] = items[item.id] || [])
 }
 
 function cancelNewDiscipline() {
@@ -388,6 +405,7 @@ function deleteItem(event) {
           text
           :disabled="!newDiscipline.name"
           @click="createNewDiscipline"
+          @keyup.enter="createNewDiscipline"
         >
           Створити
         </VBtn>
