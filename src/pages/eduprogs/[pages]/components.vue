@@ -38,7 +38,7 @@
         </th>
       </tr>
     </thead>
-    <tbody>
+    <tbody :key="componentKey">
       <th colspan="5">
         <ComponentsGridStack
           @saveComponent="saveMandatoryComponent"
@@ -435,7 +435,7 @@ onMounted(async () => {
 })
 const route = useRoute()
 const eduProgsStore = useEduProgsStore()
-
+const componentKey = ref(0)
 const { components, creditsInfo } = storeToRefs(eduProgsStore)
 const VBblock = ref()
 const dialogDelete = ref(false)
@@ -477,6 +477,10 @@ const rulesComp = ref({
       return 'Введіть форму підсумку контролю'
     },
   ],
+})
+window.addEventListener('resize', function () {
+  componentKey.value += 1
+  console.log(componentKey.value)
 })
 const rulesVB = ref({
   maxLength: [v => v.length <= 99 || 'Максимум 100 символів', v => v.length >= 1 || 'Мінімум 1 символ'],
