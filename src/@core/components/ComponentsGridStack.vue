@@ -2,9 +2,11 @@
 import { GridStack } from 'gridstack'
 import 'gridstack/dist/gridstack.min.css'
 import 'gridstack/dist/gridstack-extra.min.css'
-import { ref, defineProps, watch, nextTick, reactive, defineExpose } from 'vue'
+import { ref, toRef, defineProps, watch, nextTick, reactive } from 'vue'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 import { useRoute } from 'vue-router'
+const route = useRoute()
+const eduProgsStore = useEduProgsStore()
 const props = defineProps({
   components: {
     type: Object,
@@ -12,14 +14,13 @@ const props = defineProps({
     default: () => [],
   },
 })
-const emit = defineEmits(['remove', 'changeOrder', 'saveComponent'])
-const route = useRoute()
-const eduProgsStore = useEduProgsStore()
+const componentsRef = toRef(props, 'components')
 const compError = reactive({
   status: false,
   message: '',
 })
 const isLoading = ref(false)
+const emit = defineEmits(['remove', 'changeOrder', 'saveComponent'])
 const editIndex = reactive({
   id: 0,
   value: {},
@@ -33,7 +34,6 @@ watch(props, (newValue, oldValue) => {
     grid.load(grid.getGridItems())
   })
 })
-
 const edit = comp => {
   editIndex.id = comp.id
   editIndex.value = Object.assign({}, comp)
@@ -49,7 +49,6 @@ const saveComponent = async comp => {
   if (!editIndex.value.name.length) {
     compError.message = 'Назва компоненту не може бути порожньою'
     compError.status = true
-    
     return
   }
   isLoading.value = true
@@ -64,12 +63,12 @@ const saveComponent = async comp => {
     console.log(error.response.data.error)
     const errMessage = error.response.data.error
     switch (errMessage) {
-    case 'eduprog component with this name already exists':
-      compError.message = 'Компонент з такою назвою вже існує'
-      break
-    case 'too much credits':
-      compError.message = 'Забагато кредитів'
-      break
+      case 'eduprog component with this name already exists':
+        compError.message = 'Компонент з такою назвою вже існує'
+        break
+      case 'too much credits':
+        compError.message = 'Забагато кредитів'
+        break
     }
     if (!compError.message.length) {
       compError.message = 'Щось пішло не так'
@@ -92,50 +91,42 @@ onMounted(() => {
     emit('changeOrder', el.gridstackNode.id, el.gridstackNode.y)
   })
 })
-
-const createFreeWidget = () => {
-  nextTick(() => {
-    grid.load(grid.getGridItems())
-    grid.compact(grid.getGridItems())
-  })
-}
-
-defineExpose({ createFreeWidget })
 </script>
 
 <template>
-  <VSnackbar v-model="compError.status">
+  <v-snackbar v-model="compError.status">
     {{ compError.message }}
 
-    <template #actions>
-      <VBtn
+    <template v-slot:actions>
+      <v-btn
         color="pink"
         icon="mdi-close-thick"
         @click="compError.status = false"
-      />
+      >
+      </v-btn>
     </template>
-  </VSnackbar>
+  </v-snackbar>
   <div
     ref="gridref"
     class="grid-stack"
   >
     <div
-      v-for="component in props.components"
+      v-for="component in props.components.mandatory"
       :key="component.id"
       class="grid-stack-item"
       :gs-name="component.name"
-      :gs-x="component.x"
-      :gs-y="component.y"
-      :gs-h="component.h"
-      :gs-w="component.w"
       :gs-id="component.id"
+      :gs-x="0"
+      :gs-y="component.code - 1"
+      :gs-h="1"
+      :gs-w="1"
     >
       <div
         class="grid-stack-item-content"
         style="overflow: hidden"
       >
         <div style="width: 5%; white-space: nowrap">
-          {{ 'OK ' + (component.code) }}
+          {{ 'OK ' + component.code }}
         </div>
         <div style="width: 65%">
           <span v-if="editIndex.id !== component.id">
@@ -143,8 +134,8 @@ defineExpose({ createFreeWidget })
           </span>
           <span v-if="editIndex.id === component.id">
             <VTextField
-              v-model="editIndex.value.name"
               class="pa-0"
+              v-model="editIndex.value.name"
               variant="underlined"
               @keyup.enter="saveComponent(component)"
             />
@@ -154,8 +145,8 @@ defineExpose({ createFreeWidget })
           <span v-if="editIndex.id !== component.id"> {{ component.credits }}</span>
           <span v-if="editIndex.id === component.id">
             <VTextField
-              v-model="editIndex.value.credits"
               class="pa-0"
+              v-model="editIndex.value.credits"
               variant="underlined"
               type="number"
               min="1"
@@ -169,8 +160,8 @@ defineExpose({ createFreeWidget })
           </span>
           <span v-if="editIndex.id === component.id">
             <VSelect
-              v-model="editIndex.value.control_type"
               class="pa-0"
+              v-model="editIndex.value.control_type"
               variant="underlined"
               :items="control_types"
               @keyup.enter="saveComponent(component)"
