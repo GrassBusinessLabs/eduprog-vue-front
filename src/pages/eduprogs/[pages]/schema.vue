@@ -106,6 +106,8 @@ function logger(evt) {
       createCompToSheme()
     }
   } else if (evt[0].type === 'change') {
+    console.log('Безобразие',evt)
+
     console.log(items)
     console.log(FreeCompItems.value)
 
@@ -130,6 +132,7 @@ function logger(evt) {
       updateComponent()
     })
   }
+  childFreeCompRef.value.updateGridComp()
 }
 
 async function updateComponent() {
@@ -211,24 +214,6 @@ function initGridItems() {
     })
   })
   console.log(disciplines.value)
-}
-
-function addEmptyWidget(discipline, index) {
-  const node = {
-    w: Math.round(Math.random()),
-    id: uuidv4(),
-    disc_id: discipline.id,
-  }
-  if (childComponentRef.value[index].isAreaEmpty()) {
-    items[discipline.id].push(node)
-    childComponentRef.value[index].createWidget(node.id)
-  }
-}
-
-function saveChanges() {
-  childComponentRef.value.map(item => {
-    console.log(item.getGridNodes())
-  })
 }
 async function deleteDiscipline(id) {
   await eduProgsStore.deleteDiscipline(id)
@@ -349,24 +334,6 @@ function deleteItem(event) {
   console.log(event)
 }
 
-// const filteredData = computed(() => {
-
-//   console.log(FreeCompItems.value)
-//   if (!searchTerm.value) {
-//     return FreeCompItems.value
-//   }
-
-//   return FreeCompItems.value.filter(item => {
-
-//     return Object.values(item).some(value =>
-//       String(value).toLowerCase().includes(searchTerm.value.toLowerCase()),
-//     )
-//   })
-// })
-
-// watch(filteredData, () => {
-//   childFreeCompRef.value.updateGridComp()
-// })
 </script>
 
 <template>

@@ -14,19 +14,19 @@
     <thead class="thead-light">
       <tr>
         <th style="width: 5%">
-          Код <br />
+          Код <br>
           н/д
         </th>
         <th>
-          Компонент освітньої <br />
+          Компонент освітньої <br>
           програми
         </th>
         <th style="width: 10%">
-          Кількість <br />
+          Кількість <br>
           кредитів
         </th>
         <th style="width: 10%">
-          Форма підсумку <br />
+          Форма підсумку <br>
           контролю
         </th>
         <th style="width: 10%">
@@ -38,14 +38,15 @@
         </th>
       </tr>
     </thead>
-    <tbody>
+    <tbody :key="componentKey">
       <th colspan="5">
         <ComponentsGridStack
+          ref="childCompRef"
+          :components="compItems"
           @saveComponent="saveMandatoryComponent"
           @changeOrder="changeOrder"
           @remove="remove"
-          :components="components"
-        ></ComponentsGridStack>
+        />
       </th>
     </tbody>
     <thead>
@@ -73,19 +74,19 @@
     <thead class="thead-light">
       <tr>
         <th style="width: 5%">
-          Код <br />
+          Код <br>
           н/д
         </th>
         <th>
-          Компонент освітньої <br />
+          Компонент освітньої <br>
           програми
         </th>
         <th style="width: 10%">
-          Кількість <br />
+          Кількість <br>
           кредитів
         </th>
         <th style="width: 10%">
-          Форма підсумку <br />
+          Форма підсумку <br>
           контролю
         </th>
         <th style="width: 10%">
@@ -240,7 +241,7 @@
           </span>
         </td>
       </tr>
-      <hr style="border: 0px" />
+      <hr style="border: 0px">
     </tbody>
   </VTable>
   <VTable>
@@ -271,7 +272,6 @@
                 :rules="rulesComp.nameComp"
                 :error="NameError"
                 :error-messages="errorName"
-                @input="check"
               />
             </VCol>
             <VCol cols="12">
@@ -283,7 +283,6 @@
                 :rules="rulesComp.credits"
                 :error="hasError"
                 :error-messages="errorMessage"
-                @input="validateCredits"
               />
             </VCol>
             <VCol cols="12">
@@ -422,19 +421,25 @@
 </template>
 
 <script setup>
-import { computed, onMounted, reactive } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 import { editData } from '@/api/http/apiService'
 import { storeToRefs } from 'pinia'
 import ComponentsGridStack from '@core/components/ComponentsGridStack.vue'
+import { v4 as uuidv4 } from 'uuid'
 onMounted(async () => {
   await eduProgsStore.findEduProgById(route.params.pages)
   await eduProgsStore.fetchVBblock(route.params.pages)
   VBblock.value = eduProgsStore.getVBblock
+  console.log(components.value.mandatory)
+  initCopmGrid()
 })
+const childCompRef = ref(null)
 const route = useRoute()
 const eduProgsStore = useEduProgsStore()
+
+const componentKey = ref(0)
 
 const { components, creditsInfo } = storeToRefs(eduProgsStore)
 const VBblock = ref()
@@ -443,6 +448,7 @@ const editIndex = ref({})
 let originValue = {}
 const dialogCreate = ref(false)
 const dialogCreateSelective = ref(false)
+const compItems = ref([])
 const newComponent = reactive({
   name: '',
   credits: 0,
@@ -492,6 +498,35 @@ const reset = () => {
   newComponent.block_name = ''
   newComponent.block_num = ''
 }
+
+function initCopmGrid() {
+  components.value.mandatory.forEach((item, index) => {
+    const existingWidget = compItems.value.find(widget => widget.id === item.id)
+    if (existingWidget) {
+      // Обновление свойств существующего элемента
+      existingWidget.credits = item.credits
+      existingWidget.name = item.name
+      existingWidget.control_type = item.control_type
+      existingWidget.code = item.code
+    } else {
+      // Добавление нового элемента в массив
+      const widget = {
+        y: item.code - 1,
+        code: item.code,
+        id_uuidv4: uuidv4(),
+        credits: item.credits,
+        id: item.id,
+        name: item.name,
+        control_type: item.control_type,
+      }
+      compItems.value.push(widget)
+      console.log(widget)
+      compItems.value.forEach((item, index) => childCompRef.value.createFreeWidget())
+    }
+  })
+  console.log(compItems.value)
+}
+
 function updateSelectedBlockNum() {
   const selectedBlock = VBblock.value.find(block => block.block_name === newComponent.block_name)
   if (selectedBlock) {
@@ -503,6 +538,11 @@ function updateSelectedBlockNum() {
     newComponent.block_num = String(maxBlockNum + 1)
   }
 }
+
+window.addEventListener('resize', function() {
+  componentKey.value +=1
+  console.log(componentKey.value)
+})
 
 function changeDialog(type) {
   if (type == 'ОК') {
@@ -572,6 +612,7 @@ async function createComponent() {
     reset()
   }, 500)
   await updateCredits()
+  initCopmGrid()
 }
 
 function edit(item, type = 'Component') {
@@ -612,12 +653,12 @@ async function closeEdit(e) {
     const originData = await eduProgsStore.findCompById(editIndex.value.id)
     let foundComponent = {}
     switch (editIndex.value.category) {
-      case 'MANDATORY':
-        foundComponent = components.value.mandatory.find(item => item.id === editIndex.value.id)
-        break
-      case 'BLOC':
-        foundComponent = findObjectById(editIndex.value.id, VBblock.value)
-        break
+    case 'MANDATORY':
+      foundComponent = components.value.mandatory.find(item => item.id === editIndex.value.id)
+      break
+    case 'BLOC':
+
+      break
     }
     for (let key in foundComponent) {
       foundComponent[key] = originData[key]
@@ -653,7 +694,18 @@ const confirmRemove = async () => {
   components.value[type] = components.value[type].filter(obj => obj.id !== originValue.id)
   updateCredits()
   await eduProgsStore.findEduProgById(route.params.pages)
+  console.log(originValue.id)
+  console.log(components.value.mandatory)
+  removeObjectById(compItems.value, originValue.id)
+  childCompRef.value.createFreeWidget()
   originValue = {}
+}
+
+function removeObjectById(arr, id) {
+  const index = arr.findIndex(obj => obj.id === id)
+  if (index > -1) {
+    arr.splice(index, 1)
+  }
 }
 
 function editVBcomp(component) {
@@ -703,6 +755,7 @@ const saveBlockName = async block => {
 const changeOrder = async (compId, position) => {
   await eduProgsStore.replaceCompAfter(compId, position)
   await eduProgsStore.findEduProgById(route.params.pages)
+  initCopmGrid()
 }
 </script>
 
