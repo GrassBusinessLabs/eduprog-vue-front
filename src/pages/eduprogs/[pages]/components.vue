@@ -38,10 +38,10 @@
         </th>
       </tr>
     </thead>
-    <tbody>
+    <tbody :key="componentKey">
       <th colspan="5">
         <ComponentsGridStack
-          @saveComponent="saveComponent"
+          @saveComponent="saveMandatoryComponent"
           @changeOrder="changeOrder"
           @remove="remove"
           :components="components"
@@ -194,7 +194,6 @@
               :rules="rulesComp.credits"
               min="1"
               @keyup.enter="saveComponent(comp)"
-              @focus="resetError"
             />
           </span>
         </td>
@@ -273,7 +272,6 @@
                 :error="NameError"
                 :error-messages="errorName"
                 @input="check"
-                @focus="resetErrorN"
               />
             </VCol>
             <VCol cols="12">
@@ -285,7 +283,6 @@
                 :rules="rulesComp.credits"
                 :error="hasError"
                 :error-messages="errorMessage"
-                @focus="resetError"
                 @input="validateCredits"
               />
             </VCol>
@@ -336,7 +333,6 @@
                 :rules="rulesComp.nameComp"
                 :error="NameError"
                 :error-messages="errorName"
-                @focus="resetErrorN"
               />
             </VCol>
             <VCol cols="12">
@@ -348,7 +344,6 @@
                 :rules="rulesComp.credits"
                 :error="hasError"
                 :error-messages="errorMessage"
-                @focus="resetError"
               />
             </VCol>
             <VCol cols="12">
@@ -440,7 +435,7 @@ onMounted(async () => {
 })
 const route = useRoute()
 const eduProgsStore = useEduProgsStore()
-
+const componentKey = ref(0)
 const { components, creditsInfo } = storeToRefs(eduProgsStore)
 const VBblock = ref()
 const dialogDelete = ref(false)
@@ -483,6 +478,10 @@ const rulesComp = ref({
     },
   ],
 })
+window.addEventListener('resize', function () {
+  componentKey.value += 1
+  console.log(componentKey.value)
+})
 const rulesVB = ref({
   maxLength: [v => v.length <= 99 || 'Максимум 100 символів', v => v.length >= 1 || 'Мінімум 1 символ'],
 })
@@ -490,7 +489,13 @@ const hasError = ref(false)
 const errorMessage = ref('')
 const NameError = ref(false)
 const errorName = ref('')
-
+const reset = () => {
+  newComponent.name = ''
+  newComponent.credits = 0
+  newComponent.control_type = ''
+  newComponent.block_name = ''
+  newComponent.block_num = ''
+}
 function updateSelectedBlockNum() {
   const selectedBlock = VBblock.value.find(block => block.block_name === newComponent.block_name)
   if (selectedBlock) {
@@ -503,30 +508,14 @@ function updateSelectedBlockNum() {
   }
 }
 
-function resetError() {
-  hasError.value = false
-  errorMessage.value = ''
-}
-
-function resetErrorN() {
-  NameError.value = false
-  errorName.value = ''
-}
-
 function changeDialog(type) {
   if (type == 'ОК') {
     dialogCreate.value = !dialogCreate.value
   } else if (type == 'ВБ') {
     dialogCreateSelective.value = !dialogCreateSelective.value
   }
-  resetError()
-  resetErrorN()
   setTimeout(() => {
-    newComponent.name = ''
-    newComponent.credits = 0
-    newComponent.control_type = ''
-    newComponent.block_name = ''
-    newComponent.block_num = ''
+    reset()
   }, 500)
 }
 
@@ -536,19 +525,15 @@ async function updateCredits() {
   await eduProgsStore.fetchVBblock(route.params.pages)
   VBblock.value = eduProgsStore.getVBblock
 }
-const saveMandatoryComp = () => {}
 async function createComponent() {
   updateSelectedBlockNum()
-  console.log(newComponent.block_name, newComponent.block_num)
   const createdComponent = Object.assign({}, newComponent)
   if (dialogCreate.value) {
     createdComponent.type = 'ОК'
     try {
-      console.log(createdComponent)
       const response = await eduProgsStore.createComponent(createdComponent)
       createdComponent.id = response.id
       createdComponent.code = response.code
-      console.log('Компонент', createdComponent)
       components.value.mandatory.push(createdComponent)
       dialogCreate.value = false
     } catch (error) {
@@ -564,7 +549,6 @@ async function createComponent() {
       return
     }
   } else if (dialogCreateSelective.value) {
-    console.log(createdComponent)
     createdComponent.type = 'ВБ'
     if (components.value.selective.length) {
       createdComponent.code = String(+components.value.selective[components.value.selective.length - 1].code + 1)
@@ -572,7 +556,6 @@ async function createComponent() {
       createdComponent.code = '1'
     }
     try {
-      console.log(createdComponent)
       createdComponent.id = await eduProgsStore.createComponent(createdComponent)
       components.value.selective.push(createdComponent)
       dialogCreateSelective.value = false
@@ -590,28 +573,23 @@ async function createComponent() {
     }
   }
   setTimeout(() => {
-    newComponent.name = ''
-    newComponent.credits = 0
-    newComponent.control_type = ''
-    newComponent.block_name = ''
-    newComponent.block_num = ''
+    reset()
   }, 500)
   await updateCredits()
 }
 
-// function edit(item, type = 'Component') {
-//   console.log(item)
-//   originValue = Object.assign({}, item)
-//   if (type === 'Block') {
-//     editIndex.value.id = item.block_num
-//     editIndex.value.category = 'BLOCK'
-//     window.addEventListener('click', closeEdit)
-//   } else if (type === 'Component') {
-//     editIndex.value.id = item.id
-//     editIndex.value.category = item.category
-//     window.addEventListener('click', closeEdit)
-//   }
-// }
+function edit(item, type = 'Component') {
+  originValue = Object.assign({}, item)
+  if (type === 'Block') {
+    editIndex.value.id = item.block_num
+    editIndex.value.category = 'BLOCK'
+    window.addEventListener('click', closeEdit)
+  } else if (type === 'Component') {
+    editIndex.value.id = item.id
+    editIndex.value.category = item.category
+    window.addEventListener('click', closeEdit)
+  }
+}
 function cancel(item) {
   editIndex.value.id = null
   for (let key in item) {
@@ -621,7 +599,6 @@ function cancel(item) {
   window.removeEventListener('click', closeEdit)
 }
 async function closeEdit(e) {
-  console.log('клик')
   if (
     (e && e.target.closest('.active-comp-block')) ||
     e.target.closest('.active-component') ||
@@ -631,13 +608,11 @@ async function closeEdit(e) {
     return
   }
   if (editIndex.value.category === 'BLOCK') {
-    console.log('dfgdfgdf')
     await eduProgsStore.fetchVBblock(route.params.pages)
     VBblock.value = eduProgsStore.getVBblock
     editIndex.value.id = null
     window.removeEventListener('click', closeEdit)
   } else {
-    console.log('че то делаем')
     const originData = await eduProgsStore.findCompById(editIndex.value.id)
     let foundComponent = {}
     switch (editIndex.value.category) {
@@ -646,14 +621,11 @@ async function closeEdit(e) {
         break
       case 'BLOC':
         foundComponent = findObjectById(editIndex.value.id, VBblock.value)
-        console.log(foundComponent)
         break
     }
-    console.log('ФАУГНД', foundComponent)
     for (let key in foundComponent) {
       foundComponent[key] = originData[key]
     }
-    console.log(originData)
     editIndex.value.id = null
     window.removeEventListener('click', closeEdit)
   }
@@ -674,10 +646,8 @@ function findObjectById(id, arrayOfObjects) {
 function remove(comp) {
   dialogDelete.value = true
   originValue = Object.assign({}, comp)
-  console.log('ОРИДЖИ?', originValue.id)
 }
 const confirmRemove = async () => {
-  console.log(originValue)
   dialogDelete.value = false
   await eduProgsStore.deleteComponent(originValue)
   let type = 'mandatory'
@@ -692,27 +662,20 @@ const confirmRemove = async () => {
 
 function editVBcomp(component) {
   const selectedBlock = VBblock.value.find(block => block.block_name === component.block_name)
-  console.log(selectedBlock)
   if (selectedBlock) {
     component.block_num = String(selectedBlock.block_num)
     const maxVBNum = Math.max(...selectedBlock.comps_in_block.map(block => block.block_num))
-    console.log(maxVBNum)
     component.code = String(maxVBNum + 1)
-    console.log(component.code)
-    console.log(component)
   } else {
     const maxBlockNum = Math.max(...VBblock.value.map(block => block.block_num))
     component.block_num = String(maxBlockNum + 1)
     component.code = String(1)
-    console.log(component)
-    console.log(component.code)
   }
 }
+const saveMandatoryComponent = (comp, editIndex) => {}
 
 async function saveComponent(component) {
-  editVBcomp(component)
   try {
-    console.log(component)
     await eduProgsStore.editComponent(component.id, component)
     updateCredits()
     editIndex.value.id = null
@@ -728,22 +691,20 @@ async function saveComponent(component) {
 
     return
   }
+  editVBcomp(component)
   window.removeEventListener('click', closeEdit)
-  originValue = {}
 }
 const saveBlockName = async block => {
   if (block.block_name.length === 0) {
     return
   }
   editIndex.value.id = null
-  console.log('Блок', block)
   await eduProgsStore.updateVbBlockName(route.params.pages, block.block_num, block.block_name)
   await eduProgsStore.fetchVBblock(route.params.pages)
   VBblock.value = eduProgsStore.getVBblock
   originValue = {}
 }
 const changeOrder = async (compId, position) => {
-  console.log(compId, position)
   await eduProgsStore.replaceCompAfter(compId, position)
   await eduProgsStore.findEduProgById(route.params.pages)
 }

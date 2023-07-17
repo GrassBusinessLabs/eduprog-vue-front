@@ -2,27 +2,84 @@
 import { GridStack } from 'gridstack'
 import 'gridstack/dist/gridstack.min.css'
 import 'gridstack/dist/gridstack-extra.min.css'
-import { defineExpose, ref, toRef, defineProps, watch, nextTick} from 'vue'
+import { defineExpose, ref, toRef, defineProps, watch, nextTick } from 'vue'
 
-const props =defineProps({
+const props = defineProps({
   components: {
     type: Object,
     required: true,
     default: () => [],
   },
+  searchTerm: {
+    type: String,
+    required: true,
+  },
+})
+const emit = defineEmits(['added', 'dragstart', 'delete', 'dropped'])
+const sortByName = ref('norm')
+
+const filteredData = computed(() => {
+  const searchedComps = props.components.filter(comp => {
+    return comp.name.toLowerCase().includes(props.searchTerm.toLowerCase())
+  })
+  if (sortByName.value === 'Az') {
+
+    const filter = searchedComps.map(obj => toRaw(obj))
+    console.log(filter.sort(compareByNameAz))
+    console.log(searchedComps.sort(compareByNameAz))
+
+    return searchedComps.sort(compareByNameAz).reverse()
+
+  } else if (sortByName.value === 'Za'){
+    console.log(searchedComps.reverse())
+
+    return searchedComps.sort(compareByNameZa).reverse()
+  }else {
+
+  }
+
+  return searchedComps
 })
 
-const emit = defineEmits(['added', 'dragstart', 'delete','dropped'])
+const compareByNameAz = (a, b) => {
+  const nameA = a.name.toLowerCase()
+  const nameB = b.name.toLowerCase()
+  
+  return nameA < nameB ? -1 : nameA > nameB ? 1 : 0
+}
 
+const compareByNameZa = (a, b) => {
+  const nameA = a.name.toLowerCase()
+  const nameB = b.name.toLowerCase()
+
+  return nameA > nameB ? -1 : nameA < nameB ? 1 : 0
+}
+
+
+function sort (){
+  if (sortByName.value === 'norm'){
+    sortByName.value = 'Az'
+  } else if (sortByName.value === 'Az'){
+    sortByName.value = 'Za'
+  } else {
+    sortByName.value = 'Az'
+  }
+}
+
+
+watch(filteredData, () => {
+  console.log('searchedComps', filteredData.value)
+  updateGridComp()
+})
+console.log('ФИЛЬТРОВАНАЯ ДАТА', filteredData)
 let grid
 const gridref = ref(null)
 
 watch(props.components, (newValue, oldValue) => {
-  nextTick(()=>{
+  nextTick(() => {
     grid.load(grid.getGridItems())
   })
 })
-
 
 onMounted(() => {
   grid = GridStack.init(
@@ -32,16 +89,14 @@ onMounted(() => {
       cellHeight: '65px',
       disableResize: true,
       acceptWidgets: '.grid-stack-item',
-      dragIn: '.grid-stack',
     },
     gridref.value,
-    console.log(gridref.value),
   )
-  grid.on('added', function(event, items) {
+  grid.on('added', function (event, items) {
     emit('added', [event, items])
   })
 
-  grid.on('dragstart', function(event, items) {
+  grid.on('dragstart', function (event, items) {
     emit('dragstart', [event, items])
   })
 
@@ -55,24 +110,41 @@ onMounted(() => {
   console.log(props.components)
 })
 
-
 const createFreeWidget = () => {
   nextTick(() => {
     grid.load(grid.getGridItems())
   })
 }
 
-defineExpose({ createFreeWidget })
+const updateGridComp = () => {
+  nextTick(() => {
+    grid.load(grid.getGridItems())
+    grid.compact(grid.getGridItems())
+  })
+}
+
+
+defineExpose({ createFreeWidget, updateGridComp })
 </script>
 
 <template>
+  <VTable>
+    <thead>
+      <tr>
+        <th @click="sort">
+          Назва компонента
+        </th>
+        <th>Вільні кредити</th>
+      </tr>
+    </thead>
+  </VTable>
   <div
     ref="gridref"
-    class="grid-stack"
+    class="grid-stack grid-schema"
   >
     <div
-      v-for="component in props.components"
-      :key="component.id"
+      v-for="(component, index) in filteredData"
+      :key="index"
       class="grid-stack-item"
       :gs-id="component.id"
       :gs-x="component.x"
@@ -88,12 +160,9 @@ defineExpose({ createFreeWidget })
           {{ component.name }}
         </div>
         <div style="width: 10%">
-          {{ component.free_credit}}
+          {{ component.free_credit }}
         </div>
-
       </div>
     </div>
   </div>
 </template>
-
-

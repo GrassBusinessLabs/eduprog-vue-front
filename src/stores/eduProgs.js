@@ -99,8 +99,6 @@ export const useEduProgsStore = defineStore({
     },
     async editComponent(id, payload) {
       await editData('eduprogs/comps/' + id, payload)
-      const response = await getData('eduprogs/credits/' + payload.eduprog_id)
-      this.creditsInfo = response
     },
     async deleteComponent(payload) {
       await deleteData('eduprogs/comps/' + payload.id)
@@ -141,6 +139,10 @@ export const useEduProgsStore = defineStore({
     },
     async fetchFreeCompSheme(eduId) {
       const response = await getData('/eduprogs/scheme/freeComps/' + eduId)
+      this.freeCompSheme = response
+    },
+    async fetchFreeCompShemeSort(eduId, typeSort) {
+      const response = await getData('/eduprogs/scheme/freeComps/' + eduId + '?order=' +typeSort)
       this.freeCompSheme = response
     },
 
@@ -245,7 +247,7 @@ export const useEduProgsStore = defineStore({
       })
     },
     async exportToDocx(eduId) {
-      await getFile('/eduprogs/toWord/' + eduId).then(response => {
+      await getFile('/eduprogs/expToWord/edId/' + eduId).then(response => {
         const url = window.URL.createObjectURL(new Blob([response.data]))
         const link = document.createElement('a')
         link.href = url
