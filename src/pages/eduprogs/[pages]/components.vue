@@ -484,6 +484,10 @@ const rulesComp = ref({
     },
   ],
 })
+window.addEventListener('resize', function () {
+  componentKey.value += 1
+  console.log(componentKey.value)
+})
 const rulesVB = ref({
   maxLength: [v => v.length <= 99 || 'Максимум 100 символів', v => v.length >= 1 || 'Мінімум 1 символ'],
 })
