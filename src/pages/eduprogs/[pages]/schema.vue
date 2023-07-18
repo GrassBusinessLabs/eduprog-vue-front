@@ -68,6 +68,8 @@ onMounted(async () => {
   await eduProgsStore.fetchFreeCompSheme(eduprogId)
   freeCompSheme.value = eduProgsStore.freeCompSheme
 
+  console.log(scheme.value)
+
   initCopmGrid()
 
   initGrid()
@@ -77,7 +79,7 @@ function lastID(evt) {
   last_ID.value = evt.itemId
 }
 
-function logger(evt) {
+async function logger(evt) {
   console.log(evt)
   if (evt[0].type === 'dropped') {
     const result = FreeCompItems.value.find(item => item.id === evt[2].id)
@@ -103,7 +105,7 @@ function logger(evt) {
       free_comp_id.value = evt[2]
       del_index.value = disciplines.value.findIndex(item => item.id === evt.itemId)
 
-      createCompToSheme()
+      await createCompToSheme()
     }
   } else if (evt[0].type === 'change') {
     console.log('Безобразие',evt)
@@ -131,26 +133,31 @@ function logger(evt) {
 
       updateComponent()
     })
+  }else if (evt[0].type === 'resizestop') {
+    console.log('NO Безобразие',evt)
+    console.log(evt.itemId)
+    console.log(evt[1].gridstackNode.id)
+    const component = items[evt.itemId].find(item => item.id === evt[1].gridstackNode.id)
+    console.log(component)
+    console.log(evt[1].gridstackNode.w > 1)
+    if (evt[1].gridstackNode.w > 1 ){
+
+      await eduProgsStore.expandSchemecomp(component.eduprogcomp_id)
+
+    }
+
   }
   childFreeCompRef.value.updateGridComp()
 }
+
+
+
+
 
 async function updateComponent() {
   await eduProgsStore.UpdateComponentInScheme(edu_id.value, credits_semestr.value)
 
   childFreeCompRef.value.updateGridComp()
-}
-
-async function updateContent() {
-  // Get eduprog components
-  await eduProgsStore.fetchComponents(eduprogId)
-  eduprogComponents.value = eduProgsStore.components
-
-  // Get components scheme
-  await eduProgsStore.fetchScheme(eduprogId)
-  scheme.value = eduProgsStore.scheme
-
-  initGrid()
 }
 
 function initCopmGrid() {
@@ -190,6 +197,7 @@ function initGrid() {
         y: item.row - 1,
         h: 1,
         id: uuidv4(),
+        credits: item.credits_per_semester,
         eduprogcomp: item.eduprogcomp,
         eduprogcomp_id: item.id,
         disc_id: item.discipline_id,
@@ -200,6 +208,7 @@ function initGrid() {
       disciplines.value.forEach((item, index) => childComponentRef.value[index].createWidget)
     }
   })
+  console.log(items)
 }
 
 function initGridItems() {
@@ -333,7 +342,6 @@ function cancelNewDiscipline() {
 function deleteItem(event) {
   console.log(event)
 }
-
 </script>
 
 <template>
@@ -528,7 +536,7 @@ function deleteItem(event) {
               :grid-items="items[item.id]"
               :components="eduprogComponents"
               @added="logger"
-              @resizestop="logger"
+              @resizestop="event => logger({ ...event, itemId: item.id })"
               @dropped="event => logger({ ...event, itemId: item.id })"
               @dragstart="event => lastID({ ...event, itemId: item.id })"
               @dragstop="event => logger({ ...event, itemId: item.id })"

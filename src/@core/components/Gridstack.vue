@@ -29,6 +29,7 @@ const hoveredWidget = ref(null)
 watch(props, (newValue, oldValue) => {
   nextTick(() => {
     grid.load(grid.getGridItems())
+    console.log(props.gridItems)
   })
 })
 
@@ -178,7 +179,7 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent, ini
           {{ component.eduprogcomp.name }}
         </div>
         <div style="width: 10%">
-          {{ component.eduprogcomp.credits }}
+          {{ component.credits}}
         </div>
       </div>
     </div>
