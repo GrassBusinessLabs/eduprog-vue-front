@@ -23,19 +23,16 @@ const filteredData = computed(() => {
     return comp.name.toLowerCase().includes(props.searchTerm.toLowerCase())
   })
   if (sortByName.value === 'Az') {
-
     const filter = searchedComps.map(obj => toRaw(obj))
     console.log(filter.sort(compareByNameAz))
     console.log(searchedComps.sort(compareByNameAz))
 
     return searchedComps.sort(compareByNameAz).reverse()
-
-  } else if (sortByName.value === 'Za'){
+  } else if (sortByName.value === 'Za') {
     console.log(searchedComps.reverse())
 
     return searchedComps.sort(compareByNameZa).reverse()
-  }else {
-
+  } else {
   }
 
   return searchedComps
@@ -44,7 +41,7 @@ const filteredData = computed(() => {
 const compareByNameAz = (a, b) => {
   const nameA = a.name.toLowerCase()
   const nameB = b.name.toLowerCase()
-  
+
   return nameA < nameB ? -1 : nameA > nameB ? 1 : 0
 }
 
@@ -55,17 +52,15 @@ const compareByNameZa = (a, b) => {
   return nameA > nameB ? -1 : nameA < nameB ? 1 : 0
 }
 
-
-function sort (){
-  if (sortByName.value === 'norm'){
+function sort() {
+  if (sortByName.value === 'norm') {
     sortByName.value = 'Az'
-  } else if (sortByName.value === 'Az'){
+  } else if (sortByName.value === 'Az') {
     sortByName.value = 'Za'
   } else {
     sortByName.value = 'Az'
   }
 }
-
 
 watch(filteredData, () => {
   console.log('searchedComps', filteredData.value)
@@ -123,7 +118,6 @@ const updateGridComp = () => {
   })
 }
 
-
 defineExpose({ createFreeWidget, updateGridComp })
 </script>
 
@@ -131,9 +125,7 @@ defineExpose({ createFreeWidget, updateGridComp })
   <VTable>
     <thead>
       <tr>
-        <th @click="sort">
-          Назва компонента
-        </th>
+        <th @click="sort">Назва компонента</th>
         <th>Вільні кредити</th>
       </tr>
     </thead>
@@ -153,16 +145,23 @@ defineExpose({ createFreeWidget, updateGridComp })
       :gs-w="component.w"
     >
       <div
-        class="grid-stack-item-content"
+        class="grid-stack-item-content rounded-lg d-flex pa-4 align-center"
         style="overflow: hidden"
       >
-        <div style="width: 65%; margin-left: 10%">
+        <div>
           {{ component.name }}
         </div>
-        <div style="width: 10%">
+        <v-spacer></v-spacer>
+        <div>
           {{ component.free_credit }}
         </div>
       </div>
     </div>
   </div>
 </template>
+<style scoped>
+.grid-schema .grid-stack-item-content {
+  height: 80%;
+  border: 1px solid rgb(202, 202, 202);
+}
+</style>
