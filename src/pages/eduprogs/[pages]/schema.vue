@@ -189,13 +189,8 @@ const newScheme = ref()
 
 function initGrid() {
   newScheme.value = groupByEduprogcompId()
-  console.log(newScheme.value)
-  console.log(items)
   newScheme.value.forEach(item => {
-    console.log(item)
-
-    const widgetIndex = items[item.items[0].discipline_id].findIndex(w => w.eduprogcomp_id === item.eduprogcomp_id)
-
+    const widgetIndex = items[item.items[0].discipline_id].findIndex(w =>  w.eduprogcomp.id === item.eduprogcomp_id)
     if (widgetIndex === -1) {
       const widget = {
         w: item.items.length,
@@ -207,14 +202,10 @@ function initGrid() {
         disc_id: item.items[0].discipline_id,
       }
       addExtractedFieldsToObject(item.items, fields, widget)
-      console.log('WIDGET',widget)
-      console.log('items in grid',items)
-      console.log(scheme.value)
       items[item.items[0].discipline_id].unshift(widget)
       disciplines.value.forEach((item, index) => childComponentRef.value[index].createWidget)
     }
   })
-  console.log(items)
 }
 
 const fields = ["credits_per_semester", "id"]
@@ -286,9 +277,9 @@ async function deleteDiscipline(id) {
 async function deleteComponent(component) {
   console.log(component)
 
-  if (component.eduprogcomp_id === undefined || null || 0) {
+  if (component.id1 === undefined || null || 0) {
   } else {
-    await eduProgsStore.deleteComponentFromSheme(component.eduprogcomp_id)
+    await eduProgsStore.deleteComponentFromSheme(component.id1)
     await eduProgsStore.fetchScheme(route.params.pages)
     await eduProgsStore.fetchFreeCompSheme(eduprogId)
     freeCompSheme.value = eduProgsStore.freeCompSheme

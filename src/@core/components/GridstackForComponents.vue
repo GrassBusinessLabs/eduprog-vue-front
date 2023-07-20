@@ -81,7 +81,7 @@ onMounted(() => {
     {
       float: true,
       column: 1,
-      cellHeight: '65px',
+      cellHeight: '70px',
       disableResize: true,
       acceptWidgets: '.grid-stack-item',
     },
@@ -125,7 +125,9 @@ defineExpose({ createFreeWidget, updateGridComp })
   <VTable>
     <thead>
       <tr>
-        <th @click="sort">Назва компонента</th>
+        <th @click="sort">
+          Назва компонента
+        </th>
         <th>Вільні кредити</th>
       </tr>
     </thead>
@@ -149,9 +151,9 @@ defineExpose({ createFreeWidget, updateGridComp })
         style="overflow: hidden"
       >
         <div>
-          {{ component.name }}
+          {{ component.name}}
         </div>
-        <v-spacer></v-spacer>
+        <VSpacer />
         <div>
           {{ component.free_credit }}
         </div>
@@ -159,9 +161,10 @@ defineExpose({ createFreeWidget, updateGridComp })
     </div>
   </div>
 </template>
+
 <style scoped>
 .grid-schema .grid-stack-item-content {
-  height: 80%;
+  height: 70%;
   border: 1px solid rgb(202, 202, 202);
 }
 </style>
