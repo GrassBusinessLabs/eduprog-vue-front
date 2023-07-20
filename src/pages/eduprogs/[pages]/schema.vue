@@ -68,7 +68,7 @@ onMounted(async () => {
   await eduProgsStore.fetchFreeCompSheme(eduprogId)
   freeCompSheme.value = eduProgsStore.freeCompSheme
 
-  console.log(scheme.value)
+  console.log('SHEMA',scheme.value)
 
   initCopmGrid()
 
@@ -142,7 +142,7 @@ async function logger(evt) {
     console.log(evt[1].gridstackNode.w > 1)
     if (evt[1].gridstackNode.w > 1 ){
 
-      await eduProgsStore.expandSchemecomp(component.eduprogcomp_id)
+      await eduProgsStore.expandSchemecomp(component.id1)
 
     }
 
@@ -185,31 +185,72 @@ function initCopmGrid() {
   console.log(childFreeCompRef.value)
   FreeCompItems.value.forEach((item, index) => childFreeCompRef.value.createFreeWidget())
 }
+const newScheme = ref()
 
 function initGrid() {
+  newScheme.value = groupByEduprogcompId()
+  console.log(newScheme.value)
   console.log(items)
-  scheme.value.forEach(item => {
-    const widgetIndex = items[item.discipline_id].findIndex(w => w.eduprogcomp_id === item.id)
+  newScheme.value.forEach(item => {
+    console.log(item)
+
+    const widgetIndex = items[item.items[0].discipline_id].findIndex(w => w.eduprogcomp_id === item.eduprogcomp_id)
+
     if (widgetIndex === -1) {
       const widget = {
-        w: Math.round(Math.random()),
-        x: item.semester_num - 1,
-        y: item.row - 1,
+        w: item.items.length,
+        x: item.items[item.items.length -1].semester_num - 1,
+        y: item.items[item.items.length -1].row - 1,
         h: 1,
         id: uuidv4(),
-        credits: item.credits_per_semester,
-        eduprogcomp: item.eduprogcomp,
-        eduprogcomp_id: item.id,
-        disc_id: item.discipline_id,
+        eduprogcomp: item.items[0].eduprogcomp,
+        disc_id: item.items[0].discipline_id,
       }
-      console.log(items)
+      addExtractedFieldsToObject(item.items, fields, widget)
+      console.log('WIDGET',widget)
+      console.log('items in grid',items)
       console.log(scheme.value)
-      items[item.discipline_id].unshift(widget)
+      items[item.items[0].discipline_id].unshift(widget)
       disciplines.value.forEach((item, index) => childComponentRef.value[index].createWidget)
     }
   })
   console.log(items)
 }
+
+const fields = ["credits_per_semester", "id"]
+
+function addExtractedFieldsToObject(array, fields, targetObject) {
+  array.forEach((obj, index) => {
+    const extractedFields = {}
+    fields.forEach(field => {
+      extractedFields[`${field}${index + 1}`] = obj[field]
+    })
+    Object.assign(targetObject, extractedFields)
+  })
+  
+  return targetObject
+}
+
+function groupByEduprogcompId() {
+  const groupedObjects = {}
+
+  for (const obj of scheme.value) {
+    const { eduprogcomp_id, ...rest } = obj
+
+    if (!groupedObjects[eduprogcomp_id]) {
+      groupedObjects[eduprogcomp_id] = {
+        eduprogcomp_id,
+        items: [rest],
+      }
+    } else {
+      groupedObjects[eduprogcomp_id].items.push(rest)
+    }
+  }
+
+  return Object.values(groupedObjects)
+}
+
+
 
 function initGridItems() {
   disciplines.value.map((item, index) => {
@@ -352,7 +393,7 @@ function deleteItem(event) {
   >
     <VCard>
       <VCardTitle>
-        <span class="text-h5">Створення нової Дисципліни</span>
+        <span class="text-h5">Створення нової Категорії</span>
       </VCardTitle>
       <VCardText>
         <VContainer>
@@ -360,7 +401,7 @@ function deleteItem(event) {
             <VCol cols="12">
               <VTextField
                 v-model="newDiscipline.name"
-                label="Назва дисципліни "
+                label="Назва категорії "
                 required
               />
             </VCol>
@@ -420,7 +461,7 @@ function deleteItem(event) {
               rowspan="2"
               class="text-center"
             >
-              <p>Дисципліни</p>
+              <p>Категорії</p>
               <VBtn
                 icon="mdi-plus"
                 size="x-small"
