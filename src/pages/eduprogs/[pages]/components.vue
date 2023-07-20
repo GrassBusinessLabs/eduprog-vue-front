@@ -69,7 +69,10 @@
       </tr>
     </thead>
   </VTable>
-  <VTable class="table-vb-blocks">
+  <VTable
+    :key="componentKey"
+    class="table-vb-blocks"
+  >
     <thead class="thead-light">
       <tr>
         <th style="width: 5%">
@@ -97,7 +100,15 @@
         </th>
       </tr>
     </thead>
-    <tbody
+
+    <VBComponentsGridStack
+      v-for="(block, index) in VBblock"
+      :key="'block-' + index"
+      :block="block"
+      @saveBlockName="saveBlockName"
+    ></VBComponentsGridStack>
+
+    <!-- <tbody
       v-for="(block, index) in VBblock"
       :key="'block-' + index"
     >
@@ -241,7 +252,7 @@
         </td>
       </tr>
       <hr style="border: 0px" />
-    </tbody>
+    </tbody> -->
   </VTable>
   <VTable>
     <thead>
@@ -428,6 +439,7 @@ import { useEduProgsStore } from '@/stores/eduProgs.js'
 import { editData } from '@/api/http/apiService'
 import { storeToRefs } from 'pinia'
 import ComponentsGridStack from '@core/components/ComponentsGridStack.vue'
+import VBComponentsGridStack from '@core/components/VBComponentsGridStack.vue'
 onMounted(async () => {
   await eduProgsStore.findEduProgById(route.params.pages)
   await eduProgsStore.fetchVBblock(route.params.pages)
@@ -695,14 +707,9 @@ async function saveComponent(component) {
   window.removeEventListener('click', closeEdit)
 }
 const saveBlockName = async block => {
-  if (block.block_name.length === 0) {
-    return
-  }
-  editIndex.value.id = null
   await eduProgsStore.updateVbBlockName(route.params.pages, block.block_num, block.block_name)
   await eduProgsStore.fetchVBblock(route.params.pages)
   VBblock.value = eduProgsStore.getVBblock
-  originValue = {}
 }
 const changeOrder = async (compId, position) => {
   await eduProgsStore.replaceCompAfter(compId, position)
