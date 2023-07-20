@@ -84,7 +84,7 @@ watch(props.components, (newValue, oldValue) => {
 onMounted(() => {
   grid = GridStack.init(
     {
-      float: false,
+      float: true,
       column: 1,
       cellHeight: '65px',
       disableResize: true,
