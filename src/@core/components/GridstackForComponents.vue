@@ -71,7 +71,7 @@ watch(filteredData, () => {
   console.log('searchedComps', filteredData.value)
   updateGridComp()
 })
-console.log('ФИЛЬТРОВАНАЯ ДАТА', filteredData)
+
 let grid
 const gridref = ref(null)
 

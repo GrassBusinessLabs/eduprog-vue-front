@@ -148,8 +148,10 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent, ini
       :gs-h="component.h"
       :gs-w="component.w"
     >
-      <div
-        class="grid-stack-item-content"
+      <VSheet
+        class="grid-stack-item-content d-flex align-center justify-center text-center "
+        rounded
+        width="90%"
         @mouseover="mouseover(component.id)"
         @mouseleave="mouseleave"
       >
@@ -169,19 +171,52 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent, ini
           </template>
 
           <VList>
-            <VListItem @click="deleteGridComponent(component)"> Remove </VListItem>
-            <VListItem @click="editWidget(component)"> Edit </VListItem>
+            <VListItem @click="deleteGridComponent(component)">
+              Remove
+            </VListItem>
+            <VListItem @click="editWidget(component)">
+              Edit
+            </VListItem>
           </VList>
         </VMenu>
         <!--    :variant="hoveredWidget === component.id ? 'underlined' : 'plain'"    -->
 
-        <div style="width: 65%; margin-left: 10%">
-          {{ component.eduprogcomp.name }}
+        <div>
+          <div class="text-body-2 mb-1">
+            {{ component.eduprogcomp.name }}
+          </div>
+          <div class="text-body-2">
+            <VTable>
+              <tbody>
+                <td >
+                  {{ component.credits_per_semester1 }}
+                </td>
+                <td>
+                  {{ component.credits_per_semester2 }}
+                </td>
+                <td>
+                  {{ component.credits_per_semester3 }}
+                </td>
+                <td>
+                  {{ component.credits_per_semester4 }}
+                </td>
+                <td>
+                  {{ component.credits_per_semester5 }}
+                </td>
+                <td>
+                  {{ component.credits_per_semester6 }}
+                </td>
+                <td>
+                  {{ component.credits_per_semester7 }}
+                </td>
+                <td>
+                  {{ component.credits_per_semester8 }}
+                </td>
+              </tbody>
+            </VTable>
+          </div>
         </div>
-        <div style="width: 10%">
-          {{ component.credits}}
-        </div>
-      </div>
+      </VSheet>
     </div>
   </div>
 </template>
@@ -213,4 +248,5 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent, ini
   right: 3px;
   z-index: 10000;
 }
+
 </style>
