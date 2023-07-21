@@ -106,9 +106,6 @@ export const useEduProgsStore = defineStore({
     async setComponentToScheme(payload) {
       const response = await postData('/eduprogs/scheme/setCompToSemester', payload)
     },
-    async UpdateComponentInScheme(id, payload) {
-      const response = await editData('/eduprogs/scheme/' + id, payload)
-    },
     async createDiscipline(payload) {
       const response = await postData('/eduprogs/scheme/disciplines/create', payload)
     },
@@ -127,7 +124,7 @@ export const useEduProgsStore = defineStore({
       await editData('/eduprogs/scheme/disciplines/' + discipline.id, editedDiscipline)
     },
     async deleteComponentFromSheme(id) {
-      const response = await deleteData('/eduprogs/scheme/' + id)
+      const response = await deleteData('/eduprogs/scheme/delFull/' + id)
     },
     async fetchPossibleRelations(eduId, compId) {
       const response = await getData('/eduprogs/compRelations/posRel/' + eduId + '/' + compId)
@@ -145,6 +142,17 @@ export const useEduProgsStore = defineStore({
     async expandSchemecomp(payload) {
       const respone = await postData('/eduprogs/scheme/expand/'+payload+'?expandTo=RIGHT')
       return respone
+    },
+
+    async shrinkSchemecomp(payload) {
+      const respone = await  deleteData('/eduprogs/scheme/shrink/'+payload+'?shrinkTo=LEFT')
+      return respone
+    },
+    async updateComponentInScheme(id, payload) {
+      const response = await editData('/eduprogs/scheme/' + id, payload)
+    },
+    async moveComponentInScheme(id, payload) {
+      const response = await editData('/eduprogs/scheme/move/' + id, payload)
     },
 
     async createCompetencyRelation(eduprogId, componentId, competencyId) {

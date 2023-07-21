@@ -36,7 +36,6 @@ const childFreeCompRef = ref(null)
 const freeCompSheme = ref()
 const FreeCompItems = ref([])
 
-const edu_id = ref()
 
 const credits_semestr = ref({
   discipline_id: '',
@@ -107,7 +106,8 @@ async function logger(evt) {
 
       await createCompToSheme()
     }
-  } else if (evt[0].type === 'change') {
+  }
+  else if (evt[0].type === 'change') {
     console.log('Безобразие',evt)
 
     console.log(items)
@@ -118,35 +118,49 @@ async function logger(evt) {
     console.log(evt.itemId)
     console.log(last_ID.value)
 
+
     arr.forEach(obj => {
       const component = items[evt.itemId].find(item => item.id === obj.id)
       console.log(component)
       console.log(obj)
 
-      edu_id.value = component.eduprogcomp_id
-      credits_semestr.value.discipline_id = evt.itemId,
-      credits_semestr.value.row = obj.y + 1,
-      credits_semestr.value.semester_num = obj.x + 1,
-      credits_semestr.value.eduprog_id = Number(eduprogId),
-      credits_semestr.value.eduprogcomp_id = component.eduprogcomp.id,
-      credits_semestr.value.credits_per_semester = component.eduprogcomp.credits
+      // console.log(component['id'+component.w])
+      console.log(component.id1)
 
-      updateComponent()
+      const moveComp = {
+        discipline_id: evt.itemId,
+        semester_num: obj.x + 1,
+        row: obj.y + 1,
+      }
+
+      updateComponent(component.id1, moveComp)
     })
-  }else if (evt[0].type === 'resizestop') {
+  }
+  else if (evt[0].type === 'resizestop') {
     console.log('NO Безобразие',evt)
     console.log(evt.itemId)
-    console.log(evt[1].gridstackNode.id)
+    console.log(evt[1].gridstackNode)
     const component = items[evt.itemId].find(item => item.id === evt[1].gridstackNode.id)
     console.log(component)
     console.log(evt[1].gridstackNode.w > 1)
-    if (evt[1].gridstackNode.w > 1 ){
+    console.log(evt[1].gridstackNode.w < component.w)
+    if (evt[1].gridstackNode.w > component.w ){
 
       await eduProgsStore.expandSchemecomp(component.id1)
+      removeObjectById(items[component.disc_id], component.id)
+
+    } else if (evt[1].gridstackNode.w < component.w){
+
+      console.log(component.id1)
+      await eduProgsStore.shrinkSchemecomp(component.id1)
+
+      removeObjectById(items[component.disc_id], component.id)
 
     }
-
   }
+  await eduProgsStore.fetchScheme(route.params.pages)
+  scheme.value = eduProgsStore.scheme
+  initGrid()
   childFreeCompRef.value.updateGridComp()
 }
 
@@ -154,8 +168,11 @@ async function logger(evt) {
 
 
 
-async function updateComponent() {
-  await eduProgsStore.UpdateComponentInScheme(edu_id.value, credits_semestr.value)
+async function updateComponent(id, moveComp) {
+  console.log(moveComp)
+  console.log(id)
+
+  await eduProgsStore.moveComponentInScheme(id, moveComp)
 
   childFreeCompRef.value.updateGridComp()
 }
@@ -192,15 +209,17 @@ function initGrid() {
   newScheme.value.forEach(item => {
     const widgetIndex = items[item.items[0].discipline_id].findIndex(w =>  w.eduprogcomp.id === item.eduprogcomp_id)
     if (widgetIndex === -1) {
+      console.log(item)
       const widget = {
         w: item.items.length,
-        x: item.items[item.items.length -1].semester_num - 1,
-        y: item.items[item.items.length -1].row - 1,
+        x: item.items[0].semester_num - 1,
+        y: item.items[0].row - 1,
         h: 1,
         id: uuidv4(),
         eduprogcomp: item.items[0].eduprogcomp,
         disc_id: item.items[0].discipline_id,
       }
+      console.log(widget)
       addExtractedFieldsToObject(item.items, fields, widget)
       items[item.items[0].discipline_id].unshift(widget)
       disciplines.value.forEach((item, index) => childComponentRef.value[index].createWidget)

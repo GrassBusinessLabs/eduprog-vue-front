@@ -36,7 +36,7 @@ watch(props, (newValue, oldValue) => {
 onMounted(() => {
   grid = GridStack.init(
     {
-      cellHeight: '80px',
+      cellHeight: '90px',
       float: false,
       column: GRID_COLUMN,
       minRow: GRID_MIN_ROW,
