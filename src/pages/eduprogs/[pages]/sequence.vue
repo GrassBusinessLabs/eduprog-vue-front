@@ -107,9 +107,9 @@ const closeCombobox = async () => {
       >
         <td>{{ 'ОК ' + component.code }}</td>
         <td>
-          <span>{{ component.name }}</span>
+          {{ component.name }}
         </td>
-        <td rowspan="1">
+        <td style='width: 40%' >
           <VCombobox
             v-if="possibleComponents[component.id]?.length"
             v-model="selectedComponents[component.id]"

@@ -146,13 +146,20 @@ async function logger(evt) {
     console.log(evt[1].gridstackNode.w < component.w)
     if (evt[1].gridstackNode.w > component.w ){
 
-      await eduProgsStore.expandSchemecomp(component.id1)
+      const n = evt[1].gridstackNode.w - component.w
+
+      for (let i = 0; i < n; i++){
+        await eduProgsStore.expandSchemecomp(component.id1)
+      }
       removeObjectById(items[component.disc_id], component.id)
 
     } else if (evt[1].gridstackNode.w < component.w){
 
-      console.log(component.id1)
-      await eduProgsStore.shrinkSchemecomp(component.id1)
+      const n = component.w -evt[1].gridstackNode.w
+
+      for (let i = 0; i < n; i++){
+        await eduProgsStore.shrinkSchemecomp(component.id1)
+      }
 
       removeObjectById(items[component.disc_id], component.id)
 
