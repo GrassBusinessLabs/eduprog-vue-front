@@ -36,7 +36,6 @@ const childFreeCompRef = ref(null)
 const freeCompSheme = ref()
 const FreeCompItems = ref([])
 
-const edu_id = ref()
 
 const credits_semestr = ref({
   discipline_id: '',
@@ -68,6 +67,8 @@ onMounted(async () => {
   await eduProgsStore.fetchFreeCompSheme(eduprogId)
   freeCompSheme.value = eduProgsStore.freeCompSheme
 
+  console.log('SHEMA',scheme.value)
+
   initCopmGrid()
 
   initGrid()
@@ -77,7 +78,7 @@ function lastID(evt) {
   last_ID.value = evt.itemId
 }
 
-function logger(evt) {
+async function logger(evt) {
   console.log(evt)
   if (evt[0].type === 'dropped') {
     const result = FreeCompItems.value.find(item => item.id === evt[2].id)
@@ -103,9 +104,10 @@ function logger(evt) {
       free_comp_id.value = evt[2]
       del_index.value = disciplines.value.findIndex(item => item.id === evt.itemId)
 
-      createCompToSheme()
+      await createCompToSheme()
     }
-  } else if (evt[0].type === 'change') {
+  }
+  else if (evt[0].type === 'change') {
     console.log('Безобразие',evt)
 
     console.log(items)
@@ -116,41 +118,70 @@ function logger(evt) {
     console.log(evt.itemId)
     console.log(last_ID.value)
 
+
     arr.forEach(obj => {
       const component = items[evt.itemId].find(item => item.id === obj.id)
       console.log(component)
       console.log(obj)
 
-      edu_id.value = component.eduprogcomp_id
-      credits_semestr.value.discipline_id = evt.itemId,
-      credits_semestr.value.row = obj.y + 1,
-      credits_semestr.value.semester_num = obj.x + 1,
-      credits_semestr.value.eduprog_id = Number(eduprogId),
-      credits_semestr.value.eduprogcomp_id = component.eduprogcomp.id,
-      credits_semestr.value.credits_per_semester = component.eduprogcomp.credits
+      // console.log(component['id'+component.w])
+      console.log(component.id1)
 
-      updateComponent()
+      const moveComp = {
+        discipline_id: evt.itemId,
+        semester_num: obj.x + 1,
+        row: obj.y + 1,
+      }
+
+      updateComponent(component.id1, moveComp)
     })
   }
-  childFreeCompRef.value.updateGridComp()
-}
+  else if (evt[0].type === 'resizestop') {
+    console.log('NO Безобразие',evt)
+    console.log(evt.itemId)
+    console.log(evt[1].gridstackNode)
+    const component = items[evt.itemId].find(item => item.id === evt[1].gridstackNode.id)
+    console.log(component)
+    console.log(evt[1].gridstackNode.w > 1)
+    console.log(evt[1].gridstackNode.w < component.w)
+    if (evt[1].gridstackNode.w > component.w ){
 
-async function updateComponent() {
-  await eduProgsStore.UpdateComponentInScheme(edu_id.value, credits_semestr.value)
+      const n = evt[1].gridstackNode.w - component.w
 
-  childFreeCompRef.value.updateGridComp()
-}
+      for (let i = 0; i < n; i++){
+        await eduProgsStore.expandSchemecomp(component.id1)
+      }
+      removeObjectById(items[component.disc_id], component.id)
 
-async function updateContent() {
-  // Get eduprog components
-  await eduProgsStore.fetchComponents(eduprogId)
-  eduprogComponents.value = eduProgsStore.components
+    } else if (evt[1].gridstackNode.w < component.w){
 
-  // Get components scheme
-  await eduProgsStore.fetchScheme(eduprogId)
+      const n = component.w -evt[1].gridstackNode.w
+
+      for (let i = 0; i < n; i++){
+        await eduProgsStore.shrinkSchemecomp(component.id1)
+      }
+
+      removeObjectById(items[component.disc_id], component.id)
+
+    }
+  }
+  await eduProgsStore.fetchScheme(route.params.pages)
   scheme.value = eduProgsStore.scheme
-
   initGrid()
+  childFreeCompRef.value.updateGridComp()
+}
+
+
+
+
+
+async function updateComponent(id, moveComp) {
+  console.log(moveComp)
+  console.log(id)
+
+  await eduProgsStore.moveComponentInScheme(id, moveComp)
+
+  childFreeCompRef.value.updateGridComp()
 }
 
 function initCopmGrid() {
@@ -178,29 +209,65 @@ function initCopmGrid() {
   console.log(childFreeCompRef.value)
   FreeCompItems.value.forEach((item, index) => childFreeCompRef.value.createFreeWidget())
 }
+const newScheme = ref()
 
 function initGrid() {
-  console.log(items)
-  scheme.value.forEach(item => {
-    const widgetIndex = items[item.discipline_id].findIndex(w => w.eduprogcomp_id === item.id)
+  newScheme.value = groupByEduprogcompId()
+  newScheme.value.forEach(item => {
+    const widgetIndex = items[item.items[0].discipline_id].findIndex(w =>  w.eduprogcomp.id === item.eduprogcomp_id)
     if (widgetIndex === -1) {
+      console.log(item)
       const widget = {
-        w: Math.round(Math.random()),
-        x: item.semester_num - 1,
-        y: item.row - 1,
+        w: item.items.length,
+        x: item.items[0].semester_num - 1,
+        y: item.items[0].row - 1,
         h: 1,
         id: uuidv4(),
-        eduprogcomp: item.eduprogcomp,
-        eduprogcomp_id: item.id,
-        disc_id: item.discipline_id,
+        eduprogcomp: item.items[0].eduprogcomp,
+        disc_id: item.items[0].discipline_id,
       }
-      console.log(items)
-      console.log(scheme.value)
-      items[item.discipline_id].unshift(widget)
+      console.log(widget)
+      addExtractedFieldsToObject(item.items, fields, widget)
+      items[item.items[0].discipline_id].unshift(widget)
       disciplines.value.forEach((item, index) => childComponentRef.value[index].createWidget)
     }
   })
 }
+
+const fields = ["credits_per_semester", "id"]
+
+function addExtractedFieldsToObject(array, fields, targetObject) {
+  array.forEach((obj, index) => {
+    const extractedFields = {}
+    fields.forEach(field => {
+      extractedFields[`${field}${index + 1}`] = obj[field]
+    })
+    Object.assign(targetObject, extractedFields)
+  })
+  
+  return targetObject
+}
+
+function groupByEduprogcompId() {
+  const groupedObjects = {}
+
+  for (const obj of scheme.value) {
+    const { eduprogcomp_id, ...rest } = obj
+
+    if (!groupedObjects[eduprogcomp_id]) {
+      groupedObjects[eduprogcomp_id] = {
+        eduprogcomp_id,
+        items: [rest],
+      }
+    } else {
+      groupedObjects[eduprogcomp_id].items.push(rest)
+    }
+  }
+
+  return Object.values(groupedObjects)
+}
+
+
 
 function initGridItems() {
   disciplines.value.map((item, index) => {
@@ -236,9 +303,9 @@ async function deleteDiscipline(id) {
 async function deleteComponent(component) {
   console.log(component)
 
-  if (component.eduprogcomp_id === undefined || null || 0) {
+  if (component.id1 === undefined || null || 0) {
   } else {
-    await eduProgsStore.deleteComponentFromSheme(component.eduprogcomp_id)
+    await eduProgsStore.deleteComponentFromSheme(component.id1)
     await eduProgsStore.fetchScheme(route.params.pages)
     await eduProgsStore.fetchFreeCompSheme(eduprogId)
     freeCompSheme.value = eduProgsStore.freeCompSheme
@@ -333,7 +400,6 @@ function cancelNewDiscipline() {
 function deleteItem(event) {
   console.log(event)
 }
-
 </script>
 
 <template>
@@ -344,7 +410,7 @@ function deleteItem(event) {
   >
     <VCard>
       <VCardTitle>
-        <span class="text-h5">Створення нової Дисципліни</span>
+        <span class="text-h5">Створення нової Категорії</span>
       </VCardTitle>
       <VCardText>
         <VContainer>
@@ -352,7 +418,7 @@ function deleteItem(event) {
             <VCol cols="12">
               <VTextField
                 v-model="newDiscipline.name"
-                label="Назва дисципліни "
+                label="Назва категорії "
                 required
               />
             </VCol>
@@ -412,7 +478,7 @@ function deleteItem(event) {
               rowspan="2"
               class="text-center"
             >
-              <p>Дисципліни</p>
+              <p>Категорії</p>
               <VBtn
                 icon="mdi-plus"
                 size="x-small"
@@ -528,7 +594,7 @@ function deleteItem(event) {
               :grid-items="items[item.id]"
               :components="eduprogComponents"
               @added="logger"
-              @resizestop="logger"
+              @resizestop="event => logger({ ...event, itemId: item.id })"
               @dropped="event => logger({ ...event, itemId: item.id })"
               @dragstart="event => lastID({ ...event, itemId: item.id })"
               @dragstop="event => logger({ ...event, itemId: item.id })"

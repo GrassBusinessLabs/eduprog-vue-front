@@ -14,10 +14,11 @@ const props = defineProps({
     default: () => [],
   },
 })
-const componentsRef = toRef(props, 'components')
 const compError = reactive({
   status: false,
   message: '',
+  credits: false,
+  name: false,
 })
 const isLoading = ref(false)
 const emit = defineEmits(['remove', 'changeOrder', 'saveComponent'])
@@ -49,6 +50,7 @@ const saveComponent = async comp => {
   if (!editIndex.value.name.length) {
     compError.message = 'Назва компоненту не може бути порожньою'
     compError.status = true
+    compError.name = true
     return
   }
   isLoading.value = true
@@ -59,15 +61,19 @@ const saveComponent = async comp => {
     comp = editIndex.value
     editIndex.id = 0
     editIndex.value = {}
+    compError.name = false
+    compError.credits = false
   } catch (error) {
     console.log(error.response.data.error)
     const errMessage = error.response.data.error
     switch (errMessage) {
       case 'eduprog component with this name already exists':
         compError.message = 'Компонент з такою назвою вже існує'
+        compError.name = true
         break
       case 'too much credits':
         compError.message = 'Забагато кредитів'
+        compError.credits = true
         break
     }
     if (!compError.message.length) {
@@ -75,6 +81,7 @@ const saveComponent = async comp => {
     }
     compError.status = true
   }
+
   isLoading.value = false
 }
 onMounted(() => {
@@ -134,6 +141,7 @@ onMounted(() => {
           </span>
           <span v-if="editIndex.id === component.id">
             <VTextField
+              :error="compError.name"
               class="pa-0"
               v-model="editIndex.value.name"
               variant="underlined"
@@ -145,6 +153,7 @@ onMounted(() => {
           <span v-if="editIndex.id !== component.id"> {{ component.credits }}</span>
           <span v-if="editIndex.id === component.id">
             <VTextField
+              :error="compError.credits"
               class="pa-0"
               v-model="editIndex.value.credits"
               variant="underlined"

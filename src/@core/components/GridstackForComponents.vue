@@ -2,7 +2,7 @@
 import { GridStack } from 'gridstack'
 import 'gridstack/dist/gridstack.min.css'
 import 'gridstack/dist/gridstack-extra.min.css'
-import { defineExpose, ref, toRef, defineProps, watch, nextTick } from 'vue'
+import { defineExpose, ref, defineProps, watch, nextTick } from 'vue'
 
 const props = defineProps({
   components: {
@@ -23,19 +23,16 @@ const filteredData = computed(() => {
     return comp.name.toLowerCase().includes(props.searchTerm.toLowerCase())
   })
   if (sortByName.value === 'Az') {
-
     const filter = searchedComps.map(obj => toRaw(obj))
     console.log(filter.sort(compareByNameAz))
     console.log(searchedComps.sort(compareByNameAz))
 
     return searchedComps.sort(compareByNameAz).reverse()
-
-  } else if (sortByName.value === 'Za'){
+  } else if (sortByName.value === 'Za') {
     console.log(searchedComps.reverse())
 
     return searchedComps.sort(compareByNameZa).reverse()
-  }else {
-
+  } else {
   }
 
   return searchedComps
@@ -44,7 +41,7 @@ const filteredData = computed(() => {
 const compareByNameAz = (a, b) => {
   const nameA = a.name.toLowerCase()
   const nameB = b.name.toLowerCase()
-  
+
   return nameA < nameB ? -1 : nameA > nameB ? 1 : 0
 }
 
@@ -55,38 +52,37 @@ const compareByNameZa = (a, b) => {
   return nameA > nameB ? -1 : nameA < nameB ? 1 : 0
 }
 
-
-function sort (){
-  if (sortByName.value === 'norm'){
+function sort() {
+  if (sortByName.value === 'norm') {
     sortByName.value = 'Az'
-  } else if (sortByName.value === 'Az'){
+  } else if (sortByName.value === 'Az') {
     sortByName.value = 'Za'
   } else {
     sortByName.value = 'Az'
   }
 }
 
-
 watch(filteredData, () => {
   console.log('searchedComps', filteredData.value)
   updateGridComp()
 })
-console.log('ФИЛЬТРОВАНАЯ ДАТА', filteredData)
+
 let grid
 const gridref = ref(null)
 
-watch(props.components, (newValue, oldValue) => {
+watch(props, (newValue, oldValue) => {
   nextTick(() => {
     grid.load(grid.getGridItems())
   })
+  console.log(props.components)
 })
 
 onMounted(() => {
   grid = GridStack.init(
     {
-      float: false,
+      float: true,
       column: 1,
-      cellHeight: '65px',
+      cellHeight: '70px',
       disableResize: true,
       acceptWidgets: '.grid-stack-item',
     },
@@ -123,8 +119,13 @@ const updateGridComp = () => {
   })
 }
 
+function gridItem (){
+  return grid.getGridItems()
+}
 
-defineExpose({ createFreeWidget, updateGridComp })
+
+
+defineExpose({ createFreeWidget, updateGridComp, gridItem })
 </script>
 
 <template>
@@ -153,16 +154,24 @@ defineExpose({ createFreeWidget, updateGridComp })
       :gs-w="component.w"
     >
       <div
-        class="grid-stack-item-content"
+        class="grid-stack-item-content rounded-lg d-flex pa-4 align-center"
         style="overflow: hidden"
       >
-        <div style="width: 65%; margin-left: 10%">
+        <div>
           {{ component.name }}
         </div>
-        <div style="width: 10%">
-          {{ component.free_credit }}
+        <VSpacer />
+        <div>
+          {{ component.free_credits}}
         </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+.grid-schema .grid-stack-item-content {
+  height: 70%;
+  border: 1px solid rgb(202, 202, 202);
+}
+</style>
