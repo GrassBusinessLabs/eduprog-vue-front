@@ -2,7 +2,7 @@
 import { GridStack } from 'gridstack'
 import 'gridstack/dist/gridstack.min.css'
 import 'gridstack/dist/gridstack-extra.min.css'
-import { defineExpose, ref, toRef, defineProps, watch, nextTick } from 'vue'
+import { defineExpose, ref, defineProps, watch, nextTick } from 'vue'
 
 const props = defineProps({
   components: {
@@ -70,10 +70,11 @@ watch(filteredData, () => {
 let grid
 const gridref = ref(null)
 
-watch(props.components, (newValue, oldValue) => {
+watch(props, (newValue, oldValue) => {
   nextTick(() => {
     grid.load(grid.getGridItems())
   })
+  console.log(props.components)
 })
 
 onMounted(() => {
@@ -118,7 +119,13 @@ const updateGridComp = () => {
   })
 }
 
-defineExpose({ createFreeWidget, updateGridComp })
+function gridItem (){
+  return grid.getGridItems()
+}
+
+
+
+defineExpose({ createFreeWidget, updateGridComp, gridItem })
 </script>
 
 <template>
@@ -151,11 +158,11 @@ defineExpose({ createFreeWidget, updateGridComp })
         style="overflow: hidden"
       >
         <div>
-          {{ component.name}}
+          {{ component.name }}
         </div>
         <VSpacer />
         <div>
-          {{ component.free_credit }}
+          {{ component.free_credits}}
         </div>
       </div>
     </div>

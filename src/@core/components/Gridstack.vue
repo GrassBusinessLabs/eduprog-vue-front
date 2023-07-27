@@ -29,7 +29,6 @@ const hoveredWidget = ref(null)
 watch(props, (newValue, oldValue) => {
   nextTick(() => {
     grid.load(grid.getGridItems())
-    console.log(props.gridItems)
   })
 })
 
@@ -44,11 +43,18 @@ onMounted(() => {
       acceptWidgets: '.grid-stack-item',
     },
     gridref.value,
-    console.log(gridref.value),
   )
 
   grid.on('added', function (event, items) {
     emit('added', [event, items])
+
+    const extraArray = grid.getGridItems().filter(object => !props.gridItems.find(firstObject => firstObject.id === object.gridstackNode.id))
+
+    console.log(extraArray)
+    extraArray.forEach(object => {
+      grid.removeWidget(object, true)
+    })
+
   })
 
   grid.on('dragstart', function (event, items) {
@@ -90,6 +96,7 @@ const createWidget = () => {
   nextTick(() => {
     grid.load(grid.getGridItems())
   })
+  console.log(grid.getGridItems())
 }
 
 const isAreaEmpty = () => {
@@ -106,6 +113,7 @@ const getGridNodes = () => {
 
 function editWidget(component) {
   console.log(component.id)
+  console.log(grid.getGridItems())
 }
 
 function change(component) {
@@ -167,8 +175,12 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent, ini
         </template>
 
         <VList>
-          <VListItem @click="deleteGridComponent(component)"> Remove </VListItem>
-          <VListItem @click="editWidget(component)"> Edit </VListItem>
+          <VListItem @click="deleteGridComponent(component)">
+            Remove
+          </VListItem>
+          <VListItem @click="editWidget(component)">
+            Edit
+          </VListItem>
         </VList>
       </VMenu>
       <!--    :variant="hoveredWidget === component.id ? 'underlined' : 'plain'"    -->
