@@ -1,7 +1,8 @@
 <template>
-  <thead>
+  <thead class="VB-thead">
     <tr :class="[editIndexName.block_num === props.block.block_num ? 'active-comp-block' : '']">
       <th
+        style="border-left: 2px solid rgba(41, 37, 45, 0.1); border-top: 2px solid rgba(41, 37, 45, 0.1)"
         colspan="4"
         class="text-center"
       >
@@ -20,7 +21,10 @@
         </span>
       </th>
 
-      <th>
+      <th
+        style="border-top: 2px solid rgba(41, 37, 45, 0.1); border-right:2px solid rgba(41, 37, 45, 0.1);
+}"
+      >
         <span v-if="editIndexName.block_num !== props.block.block_num">
           <VBtn
             icon="mdi-pencil"
@@ -220,9 +224,11 @@ const saveBlockName = async block => {
 </script>
 
 <style scoped>
-.table-vb-blocks table tbody {
-  border-top: 1px solid rgb(58, 53, 65, 0.12);
+.ui-droppable {
+  border-right: 2px solid rgba(41, 37, 45, 0.1);
+  border-left: 2px solid rgba(41, 37, 45, 0.1);
 }
+
 .grid-stack {
   display: flex;
   width: 100%;

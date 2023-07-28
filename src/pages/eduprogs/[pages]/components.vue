@@ -59,7 +59,7 @@
     </thead>
   </VTable>
   <!-- Вибіркові компоненти -->
-  <VTable>
+  <VTable class="mt-2">
     <thead class="thead-light">
       <tr>
         <th class="text-center">
