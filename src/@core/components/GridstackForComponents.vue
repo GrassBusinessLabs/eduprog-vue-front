@@ -116,6 +116,7 @@ const updateGridComp = () => {
   nextTick(() => {
     grid.load(grid.getGridItems())
     grid.compact(grid.getGridItems())
+    console.log(grid.getGridItems())
   })
 }
 
@@ -162,7 +163,7 @@ defineExpose({ createFreeWidget, updateGridComp, gridItem })
         </div>
         <VSpacer />
         <div>
-          {{ component.free_credits}}
+          {{ component.free_credit}}
         </div>
       </div>
     </div>

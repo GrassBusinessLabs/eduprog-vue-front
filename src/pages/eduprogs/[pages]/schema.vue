@@ -27,7 +27,7 @@ const changes = reactive({
 })
 
 const enabled = ref(true)
-
+const componentKey = ref(0)
 let items = reactive([])
 
 const childComponentRef = ref(null)
@@ -167,6 +167,7 @@ async function logger(evt) {
   }
   await eduProgsStore.fetchScheme(route.params.pages)
   scheme.value = eduProgsStore.scheme
+  componentKey.value += 1
   initGrid()
   childFreeCompRef.value.updateGridComp()
 }
@@ -449,6 +450,7 @@ function deleteItem(event) {
   <VRow>
     <VCol cols="2">
       <VCard
+        :key="componentKey"
         title="Всі предмети"
         class="mb-5"
         style="max-width: 200px"
