@@ -63,7 +63,6 @@ function sort() {
 }
 
 watch(filteredData, () => {
-  console.log('searchedComps', filteredData.value)
   updateGridComp()
 })
 
@@ -74,13 +73,13 @@ watch(props, (newValue, oldValue) => {
   nextTick(() => {
     grid.load(grid.getGridItems())
   })
-  console.log(props.components)
 })
 
 onMounted(() => {
   grid = GridStack.init(
     {
       float: true,
+      minRow: 1,
       column: 1,
       cellHeight: '70px',
       disableResize: true,
@@ -103,7 +102,6 @@ onMounted(() => {
   grid.on('dropped', function (event, previousWidget, newWidget) {
     emit('dropped', [event, previousWidget, newWidget])
   })
-  console.log(props.components)
 })
 
 const createFreeWidget = () => {
@@ -116,8 +114,8 @@ const updateGridComp = () => {
   nextTick(() => {
     grid.load(grid.getGridItems())
     grid.compact(grid.getGridItems())
-    console.log(grid.getGridItems())
   })
+  console.log(grid.getGridItems())
 }
 
 function gridItem (){
@@ -145,6 +143,7 @@ defineExpose({ createFreeWidget, updateGridComp, gridItem })
     class="grid-stack grid-schema"
   >
     <div
+      v-if='filteredData.length >= 1'
       v-for="(component, index) in filteredData"
       :key="index"
       class="grid-stack-item"
@@ -166,6 +165,12 @@ defineExpose({ createFreeWidget, updateGridComp, gridItem })
           {{ component.free_credit}}
         </div>
       </div>
+    </div>
+    <div
+    v-else
+    class='d-flex pa-5 justify-center'
+    >
+      Вільні компоненти відсутні
     </div>
   </div>
 </template>

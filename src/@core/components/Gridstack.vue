@@ -41,6 +41,8 @@ onMounted(() => {
       minRow: GRID_MIN_ROW,
       maxRow: GRID_MAX_ROW,
       acceptWidgets: '.grid-stack-item',
+      resizable: {
+        handles: 'e,w' },
     },
     gridref.value,
   )
@@ -50,7 +52,6 @@ onMounted(() => {
 
     const extraArray = grid.getGridItems().filter(object => !props.gridItems.find(firstObject => firstObject.id === object.gridstackNode.id))
 
-    console.log(extraArray)
     extraArray.forEach(object => {
       grid.removeWidget(object, true)
     })
@@ -116,30 +117,8 @@ function editWidget(component) {
   console.log(grid.getGridItems())
 }
 
-function change(component) {
-  console.log(component)
-  console.log(component.id)
-  const items = this.grid.getGridItems()
-  const item = items.find(item => item.gridstackNode.id === component.id)
-  console.log('Widget с мисива на прямую', items[0].gridstackNode)
-  console.log('Widget который нашел ', item)
 
-  const newComp = {
-    discipline_id: component.disc_id,
-    row: item.gridstackNode.y + 1,
-    semester_num: item.gridstackNode.x + 1,
-    eduprog_id: 0,
-    eduprogcomp_id: component.eduprogcomp,
-    credits_per_semester: 0,
-  }
-  emit('createComp', newComp)
-}
-
-function init() {
-  grid.initAll()
-}
-
-defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent, init })
+defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent })
 </script>
 
 <template>
@@ -148,7 +127,7 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent, ini
     class="grid-stack grid-schema"
   >
     <div
-      v-for="(component, key, index) in props.gridItems"
+      v-for="(component, index) in props.gridItems"
       :key="'component' + index"
       class="grid-stack-item rounded-lg"
       :gs-id="component.id"
@@ -162,7 +141,6 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent, ini
       <VMenu
         activator="parent"
         location="top"
-        offset="0px"
       >
         <template #activator="{ props }">
           <VBtn
@@ -183,7 +161,7 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent, ini
           </VListItem>
         </VList>
       </VMenu>
-      <!--    :variant="hoveredWidget === component.id ? 'underlined' : 'plain'"    -->
+
 
       <div class="justify-center rounded-lg grid-stack-item-content text-center d-flex flex-column">
         <span class="text-body-2 mb-1">

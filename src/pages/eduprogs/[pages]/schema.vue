@@ -83,6 +83,8 @@ async function logger(evt) {
   if (evt[0].type === 'dropped') {
     const result = FreeCompItems.value.find(item => item.id === evt[2].id)
 
+    console.log(FreeCompItems.value)
+
     if (result === undefined) {
       const component = items[last_ID.value].find(item => item.id === evt[2].id)
 
@@ -172,8 +174,30 @@ async function logger(evt) {
   childFreeCompRef.value.updateGridComp()
 }
 
+function freCompLogger(evt){
+  console.log(evt)
+  if (evt[0].type === 'dropped'){
 
+    const result = findObjectById(evt[2].id)
+    deleteComponent(result)
 
+  }
+  else {}
+}
+
+function findObjectById(id) {
+  for (const subArray of items) {
+    if (Array.isArray(subArray)) {
+      const foundObject = subArray.find(obj => obj && obj.id === id)
+      if (foundObject) {
+        
+        return foundObject
+      }
+    }
+  }
+  
+  return null
+}
 
 
 async function updateComponent(id, moveComp) {
@@ -281,7 +305,6 @@ function initGridItems() {
       writable: true,
     })
   })
-  console.log(disciplines.value)
 }
 async function deleteDiscipline(id) {
   await eduProgsStore.deleteDiscipline(id)
@@ -302,7 +325,6 @@ async function deleteDiscipline(id) {
 }
 
 async function deleteComponent(component) {
-  console.log(component)
 
   if (component.id1 === undefined || null || 0) {
   } else {
@@ -313,13 +335,6 @@ async function deleteComponent(component) {
     scheme.value = eduProgsStore.scheme
 
     removeObjectById(items[component.disc_id], component.id)
-
-    console.log(FreeCompItems.value)
-    console.log(component.eduprogcomp_id)
-    console.log(items[component.disc_id])
-    console.log('items[component.disc_id]', items[component.disc_id])
-    console.log('items', items)
-    console.log(component)
 
     initCopmGrid()
     initGrid()
@@ -451,7 +466,7 @@ function deleteItem(event) {
     <VCol cols="2">
       <VCard
         :key="componentKey"
-        title="Всі предмети"
+        title="Усі компоненти"
         class="mb-5"
         style="max-width: 200px"
       >
@@ -469,6 +484,12 @@ function deleteItem(event) {
           ref="childFreeCompRef"
           :search-term="searchTerm"
           :components="FreeCompItems"
+          @added="event => freCompLogger({ ...event})"
+          @resizestop="event => freCompLogger({ ...event})"
+          @dropped="event => freCompLogger({ ...event})"
+          @dragstart="event => freCompLogger({ ...event})"
+          @dragstop="event => freCompLogger({ ...event})"
+          @change="event => freCompLogger({ ...event})"
         />
       </VCard>
     </VCol>
@@ -545,8 +566,8 @@ function deleteItem(event) {
       <div style="width: 100%">
         <div
           v-for="item in disciplines"
-          :key="item.id"
           class="discipline-block"
+          :key="item.id"
         >
           <div style="width: 12%">
             <div style="text-align: center">
@@ -595,7 +616,7 @@ function deleteItem(event) {
               gs-current-row="item.rows"
               :grid-items="items[item.id]"
               :components="eduprogComponents"
-              @added="logger"
+              @added="event => logger({ ...event, itemId: item.id })"
               @resizestop="event => logger({ ...event, itemId: item.id })"
               @dropped="event => logger({ ...event, itemId: item.id })"
               @dragstart="event => lastID({ ...event, itemId: item.id })"
