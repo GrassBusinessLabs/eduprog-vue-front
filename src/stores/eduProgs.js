@@ -139,14 +139,12 @@ export const useEduProgsStore = defineStore({
       this.freeCompSheme = response
     },
 
-    async expandSchemecomp(payload) {
-      const respone = await postData('/eduprogs/scheme/expand/'+payload+'?expandTo=RIGHT')
-      return respone
+    async expandSchemecomp(payload,side) {
+      return await postData('/eduprogs/scheme/expand/'+payload+'?expandTo='+side)
     },
 
-    async shrinkSchemecomp(payload) {
-      const respone = await  deleteData('/eduprogs/scheme/shrink/'+payload+'?shrinkTo=LEFT')
-      return respone
+    async shrinkSchemecomp(payload,side) {
+      return await  deleteData('/eduprogs/scheme/shrink/'+payload+'?shrinkTo='+side)
     },
     async updateComponentInScheme(id, payload) {
       const response = await editData('/eduprogs/scheme/' + id, payload)

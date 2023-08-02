@@ -17,6 +17,11 @@ const scheme = ref([])
 
 const eduprogId = route.params.pages
 
+const mistake = ref({
+  type: false,
+  massege: "",
+})
+
 const editIndex = ref(null)
 const originalData = ref(null)
 
@@ -88,14 +93,21 @@ async function logger(evt) {
     if (result === undefined) {
       const component = items[last_ID.value].find(item => item.id === evt[2].id)
 
-      credits_semestr.value.discipline_id = evt.itemId,
-      credits_semestr.value.row = evt[2].y + 1,
-      credits_semestr.value.semester_num = evt[2].x + 1,
-      credits_semestr.value.eduprog_id = Number(eduprogId),
-      credits_semestr.value.eduprogcomp_id = component.eduprogcomp_id,
-      credits_semestr.value.credits_per_semester = component.eduprogcomp.credits
+      // credits_semestr.value.discipline_id = evt.itemId,
+      // credits_semestr.value.row = evt[2].y + 1,
+      // credits_semestr.value.semester_num = evt[2].x + 1,
+      // credits_semestr.value.eduprog_id = Number(eduprogId),
+      // credits_semestr.value.eduprogcomp_id = component.eduprogcomp_id,
+      // credits_semestr.value.credits_per_semester = component.eduprogcomp.credits
 
-      updateComponent()
+      const moveComp = {
+        discipline_id: evt.itemId,
+        semester_num: evt[2].x + 1,
+        row: evt[2].y + 1,
+      }
+
+      await updateComponent(component.id1, moveComp)
+
     } else if (result !== undefined) {
       credits_semestr.value.discipline_id = evt.itemId,
       credits_semestr.value.row = evt[2].y + 1,
@@ -134,8 +146,11 @@ async function logger(evt) {
         semester_num: obj.x + 1,
         row: obj.y + 1,
       }
+      if (component.x == obj.x && component.y == obj.y && component.disc_id == evt.itemId){
 
-      updateComponent(component.id1, moveComp)
+      }else {
+        updateComponent(component.id1, moveComp)
+      }
     })
   }
   else if (evt[0].type === 'resizestop') {
@@ -146,12 +161,28 @@ async function logger(evt) {
     console.log(component)
     console.log(evt[1].gridstackNode.w > 1)
     console.log(evt[1].gridstackNode.w < component.w)
+
+    let side = null
+
+    if (evt[1].gridstackNode.x == component.x){
+      side = 'RIGHT'
+    }else {
+      side = 'LEFT'
+    }
+
     if (evt[1].gridstackNode.w > component.w ){
 
       const n = evt[1].gridstackNode.w - component.w
 
       for (let i = 0; i < n; i++){
-        await eduProgsStore.expandSchemecomp(component.id1)
+        console.log('asdfsadfsadfsadfasdfsdfsd')
+        try {
+          await eduProgsStore.expandSchemecomp(component.id1,side)
+        } catch (error){
+          mistake.value.type = true
+          mistake.value.massege = error.response.data.error
+          console.log(error.response.data.error)
+        }
       }
       removeObjectById(items[component.disc_id], component.id)
 
@@ -160,7 +191,15 @@ async function logger(evt) {
       const n = component.w -evt[1].gridstackNode.w
 
       for (let i = 0; i < n; i++){
-        await eduProgsStore.shrinkSchemecomp(component.id1)
+
+        if (side === 'LEFT'){
+          side = 'RIGHT'
+        }else{
+          side = 'LEFT'
+        }
+        console.log(side)
+
+        await eduProgsStore.shrinkSchemecomp(component.id1,side)
       }
 
       removeObjectById(items[component.disc_id], component.id)
@@ -419,6 +458,29 @@ function deleteItem(event) {
 </script>
 
 <template>
+  <div class="text-center">
+    <VSnackbar
+      v-model="mistake.type"
+      multi-line
+      location="top"
+      :timeout="3000"
+      color="error"
+    >
+      {{ mistake.massege }}
+
+      <template #actions>
+        <VBtn
+          color="red"
+          variant="text"
+          @click="mistake.type = false"
+        >
+          Close
+        </VBtn>
+      </template>
+    </VSnackbar>
+  </div>
+
+
   <VDialog
     v-model="dialogCreate"
     persistent
@@ -566,8 +628,8 @@ function deleteItem(event) {
       <div style="width: 100%">
         <div
           v-for="item in disciplines"
-          class="discipline-block"
           :key="item.id"
+          class="discipline-block"
         >
           <div style="width: 12%">
             <div style="text-align: center">

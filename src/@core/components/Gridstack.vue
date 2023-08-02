@@ -97,11 +97,9 @@ const createWidget = () => {
   nextTick(() => {
     grid.load(grid.getGridItems())
   })
-  console.log(grid.getGridItems())
 }
 
 const isAreaEmpty = () => {
-  console.log(grid.getRow())
   let sumNodeWidth = 0
   grid.getGridItems().map(item => (sumNodeWidth += item.gridstackNode.w))
 
@@ -113,7 +111,6 @@ const getGridNodes = () => {
 }
 
 function editWidget(component) {
-  console.log(component.id)
   console.log(grid.getGridItems())
 }
 

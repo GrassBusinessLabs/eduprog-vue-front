@@ -23,14 +23,8 @@ const filteredData = computed(() => {
     return comp.name.toLowerCase().includes(props.searchTerm.toLowerCase())
   })
   if (sortByName.value === 'Az') {
-    const filter = searchedComps.map(obj => toRaw(obj))
-    console.log(filter.sort(compareByNameAz))
-    console.log(searchedComps.sort(compareByNameAz))
-
     return searchedComps.sort(compareByNameAz).reverse()
   } else if (sortByName.value === 'Za') {
-    console.log(searchedComps.reverse())
-
     return searchedComps.sort(compareByNameZa).reverse()
   } else {
   }
@@ -96,7 +90,6 @@ onMounted(() => {
   })
 
   grid.on('dragstop', (event, element) => {
-    console.log('move event!', event, element)
   })
 
   grid.on('dropped', function (event, previousWidget, newWidget) {
@@ -115,7 +108,6 @@ const updateGridComp = () => {
     grid.load(grid.getGridItems())
     grid.compact(grid.getGridItems())
   })
-  console.log(grid.getGridItems())
 }
 
 function gridItem (){
