@@ -149,7 +149,7 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent })
           />
         </template>
 
-        <VList>
+        <VList style='width: 40%' >
           <VListItem @click="deleteGridComponent(component)">
             Remove
           </VListItem>

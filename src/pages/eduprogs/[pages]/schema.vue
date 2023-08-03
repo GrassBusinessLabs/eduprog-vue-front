@@ -54,6 +54,7 @@ const credits_semestr = ref({
 const free_comp_id = ref()
 const del_index = ref()
 const last_ID = ref()
+const keyGrid = ref(0)
 
 onMounted(async () => {
   // Get disciplines
@@ -86,6 +87,7 @@ function lastID(evt) {
 async function logger(evt) {
   console.log(evt)
   if (evt[0].type === 'dropped') {
+    keyGrid.value += 1
     const result = FreeCompItems.value.find(item => item.id === evt[2].id)
 
     console.log(FreeCompItems.value)
@@ -122,32 +124,18 @@ async function logger(evt) {
     }
   }
   else if (evt[0].type === 'change') {
-    console.log('Безобразие',evt)
-
-    console.log(items)
-    console.log(FreeCompItems.value)
-
     const arr = evt[1]
-    console.log(arr)
-    console.log(evt.itemId)
-    console.log(last_ID.value)
-
 
     arr.forEach(obj => {
       const component = items[evt.itemId].find(item => item.id === obj.id)
-      console.log(component)
-      console.log(obj)
 
       // console.log(component['id'+component.w])
-      console.log(component.id1)
-
       const moveComp = {
         discipline_id: evt.itemId,
         semester_num: obj.x + 1,
         row: obj.y + 1,
       }
       if (component.x == obj.x && component.y == obj.y && component.disc_id == evt.itemId){
-
       }else {
         updateComponent(component.id1, moveComp)
       }
@@ -185,6 +173,8 @@ async function logger(evt) {
         }
       }
       removeObjectById(items[component.disc_id], component.id)
+      keyGrid.value += 1
+      console.log(keyGrid.value)
 
     } else if (evt[1].gridstackNode.w < component.w){
 
@@ -203,6 +193,8 @@ async function logger(evt) {
       }
 
       removeObjectById(items[component.disc_id], component.id)
+      keyGrid.value += 1
+      console.log(keyGrid.value)
 
     }
   }
@@ -216,6 +208,8 @@ async function logger(evt) {
 function freCompLogger(evt){
   console.log(evt)
   if (evt[0].type === 'dropped'){
+    keyGrid.value += 1
+    componentKey.value += 1
 
     const result = findObjectById(evt[2].id)
     deleteComponent(result)
@@ -674,6 +668,7 @@ function deleteItem(event) {
           </div>
           <div style="width: 100%">
             <Gridstack
+              :key='keyGrid'
               ref="childComponentRef"
               gs-current-row="item.rows"
               :grid-items="items[item.id]"
