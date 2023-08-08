@@ -14,6 +14,10 @@ const props = defineProps({
     required: false,
     default: () => [],
   },
+  update: {
+    type: Object,
+    required: true,
+  },
 })
 
 const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete', 'change'])
@@ -30,6 +34,7 @@ watch(props, (newValue, oldValue) => {
   nextTick(() => {
     grid.load(grid.getGridItems())
   })
+  console.log("grid.load(grid.getGridItems())")
 })
 
 onMounted(() => {
@@ -135,29 +140,39 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent })
       @mouseover="mouseover(component.id)"
       @mouseleave="mouseleave"
     >
-      <VMenu
-        activator="parent"
-        location="top"
-      >
-        <template #activator="{ props }">
-          <VBtn
-            v-show="hoveredWidget === component.id"
-            v-bind="props"
-            class="grid-stack-item__edit-btn"
-            density="compact"
-            icon="mdi-dots-horizontal"
-          />
-        </template>
+      <VBtn
+        v-show="hoveredWidget === component.id"
+        v-bind="props"
+        class="grid-stack-item__edit-btn"
+        density="compact"
+        icon="mdi-trash-can"
+        @click="deleteGridComponent(component)"
+      />
 
-        <VList style='width: 40%' >
-          <VListItem @click="deleteGridComponent(component)">
-            Remove
-          </VListItem>
-          <VListItem @click="editWidget(component)">
-            Edit
-          </VListItem>
-        </VList>
-      </VMenu>
+      <!--      <VMenu -->
+      <!--        activator="parent" -->
+      <!--        location="top" -->
+      <!--      > -->
+      <!--        <template #activator="{ props }"> -->
+      <!--          <VBtn -->
+      <!--            v-show="hoveredWidget === component.id" -->
+      <!--            v-bind="props" -->
+      <!--            class="grid-stack-item__edit-btn" -->
+      <!--            density="compact" -->
+      <!--            icon="mdi-dots-horizontal" -->
+      <!--          /> -->
+      <!--        </template> -->
+      <!--        <VCol style='max-width: 150px'> -->
+      <!--          <VList> -->
+      <!--            <VListItem @click="deleteGridComponent(component)"> -->
+      <!--              Remove -->
+      <!--            </VListItem> -->
+      <!--            <VListItem @click="editWidget(component)"> -->
+      <!--              Edit -->
+      <!--            </VListItem> -->
+      <!--          </VList> -->
+      <!--        </VCol> -->
+      <!--      </VMenu> -->
 
 
       <div class="justify-center rounded-lg grid-stack-item-content text-center d-flex flex-column">

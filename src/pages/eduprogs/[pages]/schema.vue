@@ -87,7 +87,6 @@ function lastID(evt) {
 async function logger(evt) {
   console.log(evt)
   if (evt[0].type === 'dropped') {
-    keyGrid.value += 1
     const result = FreeCompItems.value.find(item => item.id === evt[2].id)
 
     console.log(FreeCompItems.value)
@@ -108,7 +107,7 @@ async function logger(evt) {
         row: evt[2].y + 1,
       }
 
-      await updateComponent(component.id1, moveComp)
+      await updateComponent(component.comp_id1, moveComp)
 
     } else if (result !== undefined) {
       credits_semestr.value.discipline_id = evt.itemId,
@@ -137,18 +136,13 @@ async function logger(evt) {
       }
       if (component.x == obj.x && component.y == obj.y && component.disc_id == evt.itemId){
       }else {
-        updateComponent(component.id1, moveComp)
+        updateComponent(component.comp_id1, moveComp)
       }
     })
   }
   else if (evt[0].type === 'resizestop') {
-    console.log('NO Безобразие',evt)
-    console.log(evt.itemId)
-    console.log(evt[1].gridstackNode)
-    const component = items[evt.itemId].find(item => item.id === evt[1].gridstackNode.id)
-    console.log(component)
-    console.log(evt[1].gridstackNode.w > 1)
-    console.log(evt[1].gridstackNode.w < component.w)
+    let component = items[evt.itemId].find(item => item.id === evt[1].gridstackNode.id)
+    let respon = []
 
     let side = null
 
@@ -163,38 +157,76 @@ async function logger(evt) {
       const n = evt[1].gridstackNode.w - component.w
 
       for (let i = 0; i < n; i++){
-        console.log('asdfsadfsadfsadfasdfsdfsd')
         try {
-          await eduProgsStore.expandSchemecomp(component.id1,side)
+          respon = await eduProgsStore.expandSchemecomp(component.comp_id1,side)
+          console.log(respon)
+
         } catch (error){
           mistake.value.type = true
           mistake.value.massege = error.response.data.error
-          console.log(error.response.data.error)
+          console.log(component.w)
         }
       }
-      removeObjectById(items[component.disc_id], component.id)
-      keyGrid.value += 1
-      console.log(keyGrid.value)
+
+      const groupedObjects = []
+
+      for (const obj of respon) {
+        const { eduprogcomp_id, ...rest } = obj
+
+        if (!groupedObjects[eduprogcomp_id]) {
+          groupedObjects[eduprogcomp_id] = {
+            eduprogcomp_id,
+            items: [rest],
+          }
+        } else {
+          groupedObjects[eduprogcomp_id].items.push(rest)
+        }
+      }
+      console.log(component.w)
+      console.log(respon)
+
+      if (respon.length === 0){
+        keyGrid.value += 1
+
+        return
+      }
+
+      component.w = groupedObjects[component.eduprogcomp.id].items.length
+
+      component = addExtractedFieldsToObject(groupedObjects[component.eduprogcomp.id].items, fields, component)
+
 
     } else if (evt[1].gridstackNode.w < component.w){
 
       const n = component.w -evt[1].gridstackNode.w
 
+      if (side === 'LEFT'){
+        side = 'RIGHT'
+      }else{
+        side = 'LEFT'
+      }
       for (let i = 0; i < n; i++){
+        respon = await eduProgsStore.shrinkSchemecomp(component.comp_id1,side)
+      }
+      component = deleteProperties(component)
+      const groupedObjects = []
 
-        if (side === 'LEFT'){
-          side = 'RIGHT'
-        }else{
-          side = 'LEFT'
+      for (const obj of respon) {
+        const { eduprogcomp_id, ...rest } = obj
+
+        if (!groupedObjects[eduprogcomp_id]) {
+          groupedObjects[eduprogcomp_id] = {
+            eduprogcomp_id,
+            items: [rest],
+          }
+        } else {
+          groupedObjects[eduprogcomp_id].items.push(rest)
         }
-        console.log(side)
-
-        await eduProgsStore.shrinkSchemecomp(component.id1,side)
       }
 
-      removeObjectById(items[component.disc_id], component.id)
-      keyGrid.value += 1
-      console.log(keyGrid.value)
+      component.w = groupedObjects[component.eduprogcomp.id].items.length
+
+      component = addExtractedFieldsToObject(groupedObjects[component.eduprogcomp.id].items, fields, component)
 
     }
   }
@@ -206,8 +238,8 @@ async function logger(evt) {
 }
 
 function freCompLogger(evt){
-  console.log(evt)
   if (evt[0].type === 'dropped'){
+    console.log(evt)
     keyGrid.value += 1
     componentKey.value += 1
 
@@ -216,6 +248,19 @@ function freCompLogger(evt){
 
   }
   else {}
+}
+
+function deleteProperties(obj) {
+  for (const key in obj) {
+    if (key.startsWith("credits_per_semester")) {
+      delete obj[key]
+    }
+    if (key.startsWith("comp_id")) {
+      delete obj[key]
+    }
+  }
+
+  return obj
 }
 
 function findObjectById(id) {
@@ -285,20 +330,30 @@ function initGrid() {
         disc_id: item.items[0].discipline_id,
       }
       console.log(widget)
+      console.log(item.items)
       addExtractedFieldsToObject(item.items, fields, widget)
       items[item.items[0].discipline_id].unshift(widget)
       disciplines.value.forEach((item, index) => childComponentRef.value[index].createWidget)
+    } else {
+      console.log(item)
     }
   })
+  console.log(items)
 }
 
-const fields = ["credits_per_semester", "id"]
+const fields = ["credits_per_semester", "comp_id"]
 
 function addExtractedFieldsToObject(array, fields, targetObject) {
+  let namFild = ""
   array.forEach((obj, index) => {
     const extractedFields = {}
     fields.forEach(field => {
-      extractedFields[`${field}${index + 1}`] = obj[field]
+      if (field === "comp_id" ){
+        namFild = "id"
+      }else {
+        namFild = field
+      }
+      extractedFields[`${field}${index + 1}`] = obj[namFild]
     })
     Object.assign(targetObject, extractedFields)
   })
@@ -359,9 +414,9 @@ async function deleteDiscipline(id) {
 
 async function deleteComponent(component) {
 
-  if (component.id1 === undefined || null || 0) {
+  if (component.comp_id1 === undefined || null || 0) {
   } else {
-    await eduProgsStore.deleteComponentFromSheme(component.id1)
+    await eduProgsStore.deleteComponentFromSheme(component.comp_id1)
     await eduProgsStore.fetchScheme(route.params.pages)
     await eduProgsStore.fetchFreeCompSheme(eduprogId)
     freeCompSheme.value = eduProgsStore.freeCompSheme
@@ -668,11 +723,12 @@ function deleteItem(event) {
           </div>
           <div style="width: 100%">
             <Gridstack
-              :key='keyGrid'
+              :key="keyGrid"
               ref="childComponentRef"
               gs-current-row="item.rows"
               :grid-items="items[item.id]"
               :components="eduprogComponents"
+              :update="keyGrid"
               @added="event => logger({ ...event, itemId: item.id })"
               @resizestop="event => logger({ ...event, itemId: item.id })"
               @dropped="event => logger({ ...event, itemId: item.id })"
