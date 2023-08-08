@@ -165,6 +165,9 @@ async function logger(evt) {
           mistake.value.type = true
           mistake.value.massege = error.response.data.error
           console.log(component.w)
+          console.log(evt[1].gridstackNode.w - 1)
+          component.w = evt[1].gridstackNode.w - 2
+          component.w = evt[1].gridstackNode.w - 1
         }
       }
 

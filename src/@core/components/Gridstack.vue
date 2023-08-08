@@ -139,6 +139,7 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent })
       :gs-w="component.w"
       @mouseover="mouseover(component.id)"
       @mouseleave="mouseleave"
+      @click="editWidget"
     >
       <VBtn
         v-show="hoveredWidget === component.id"
