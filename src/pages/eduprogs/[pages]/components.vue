@@ -106,6 +106,10 @@
       :key="'block-' + index"
       :block="block"
       @saveBlockName="saveBlockName"
+      @remove="remove"
+      @update='changeOrderVB'
+      @dragstop="event => changeOrderVB({ ...event, blokNum: block.block_num})"
+      @dropped="event => changeOrderVB({ ...event, blokNum: block.block_num})"
     ></VBComponentsGridStack>
 
     <!-- <tbody
@@ -440,6 +444,7 @@ import { editData } from '@/api/http/apiService'
 import { storeToRefs } from 'pinia'
 import ComponentsGridStack from '@core/components/ComponentsGridStack.vue'
 import VBComponentsGridStack from '@core/components/VBComponentsGridStack.vue'
+import { arrow } from '@floating-ui/dom'
 onMounted(async () => {
   await eduProgsStore.findEduProgById(route.params.pages)
   await eduProgsStore.fetchVBblock(route.params.pages)
@@ -714,6 +719,18 @@ const saveBlockName = async block => {
 const changeOrder = async (compId, position) => {
   await eduProgsStore.replaceCompAfter(compId, position)
   await eduProgsStore.findEduProgById(route.params.pages)
+}
+const changeOrderVB = async evt => {
+  console.log(evt)
+  if (evt[0].type === 'dragstop'){
+    await eduProgsStore.replaceCompAfterVB(evt[1].gridstackNode.id,evt.blokNum,evt[1].gridstackNode.y)
+    await eduProgsStore.findEduProgById(route.params.pages)
+  }else if (evt[0].type === 'dropped') {
+    await eduProgsStore.replaceCompAfterVB(evt[2].id,evt.blokNum,evt[2].y)
+    await eduProgsStore.findEduProgById(route.params.pages)
+  }
+  await eduProgsStore.fetchVBblock(route.params.pages)
+  VBblock.value = eduProgsStore.getVBblock
 }
 </script>
 

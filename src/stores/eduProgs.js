@@ -98,6 +98,8 @@ export const useEduProgsStore = defineStore({
       return response
     },
     async editComponent(id, payload) {
+      console.log(payload)
+      console.log(id)
       await editData('eduprogs/comps/' + id, payload)
     },
     async deleteComponent(payload) {
@@ -298,6 +300,10 @@ export const useEduProgsStore = defineStore({
     async replaceCompAfter(eduId, putAfterId) {
       console.log('replace')
       await editData(`/eduprogs/comps/replace?edcompId=${eduId}&putAfter=${putAfterId}`)
+    },
+    async replaceCompAfterVB(edcompId,blockNum,putAfter) {
+      console.log('replace')
+      await editData(`/eduprogs/comps/replaceVB?edcompId=${edcompId}&blockNum=${blockNum}&putAfter=${putAfter}`)
     },
   },
 })

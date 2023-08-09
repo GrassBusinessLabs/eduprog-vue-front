@@ -43,7 +43,7 @@
           <VBtn
             icon="mdi-close-thick"
             size="x-small"
-            @click="cancel(block)"
+            @click="cancelB(block)"
           />
         </span>
       </th>
@@ -79,9 +79,9 @@
               </span>
               <span v-if="editIndex.id === component.id">
                 <VTextField
+                  v-model="editIndex.name"
                   :error="compError.name"
                   class="pa-0"
-                  v-model="editIndex.value.name"
                   variant="underlined"
                   @keyup.enter="saveComponent(component)"
                 />
@@ -91,9 +91,9 @@
               <span v-if="editIndex.id !== component.id"> {{ component.credits }}</span>
               <span v-if="editIndex.id === component.id">
                 <VTextField
+                  v-model="editIndex.credits"
                   :error="compError.credits"
                   class="pa-0"
-                  v-model="editIndex.value.credits"
                   variant="underlined"
                   type="number"
                   min="1"
@@ -107,8 +107,8 @@
               </span>
               <span v-if="editIndex.id === component.id">
                 <VSelect
+                  v-model="editIndex.control_type"
                   class="pa-0"
-                  v-model="editIndex.value.control_type"
                   variant="underlined"
                   :items="control_types"
                   @keyup.enter="saveComponent(component)"
@@ -160,6 +160,16 @@
 <script setup>
 import { useEduProgsStore } from '@/stores/eduProgs.js'
 import { GridStack } from 'gridstack'
+import { nextTick, reactive, ref, watch } from 'vue'
+import { useRoute } from 'vue-router'
+const route = useRoute()
+const props = defineProps({
+  block: {
+    type: Object,
+    required: true,
+  },
+})
+const emit = defineEmits(['saveBlockName','update','dropped','dragstop','remove'])
 let grid
 const gridref = ref(null)
 onMounted(() => {
@@ -174,29 +184,43 @@ onMounted(() => {
     },
     gridref.value,
   )
+  grid.on('dropped', function (event, previousWidget, newWidget) {
+    emit('dropped', [event, previousWidget, newWidget])
+  })
+  grid.on('dragstop', function (event, element) {
+    emit('dragstop', [event, element])
+  })
 })
 
 const eduProgsStore = useEduProgsStore()
 const editIndexName = ref({})
 const editIndex = ref({})
-const props = defineProps({
-  block: {
-    type: Object,
-    required: true,
-  },
-})
-const emit = defineEmits(['saveBlockName'])
 const rulesVB = ref({
   length: [v => v.length <= 99 || 'Максимум 100 символів', v => v.length >= 1 || 'Мінімум 1 символ'],
 })
+watch(props, (newValue, oldValue) => {
+  nextTick(() => {
+    grid.load(grid.getGridItems())
+  })
+})
+const compError = reactive({
+  status: false,
+  message: '',
+  credits: false,
+  name: false,
+})
+const isLoading = ref(false)
+
 const edit = component => {
   editIndex.value = JSON.parse(JSON.stringify(component))
+  console.log(editIndex.value)
 }
 
 function editBlock(item) {
   editIndexName.value = JSON.parse(JSON.stringify(item))
 }
-function cancel(item) {
+
+function cancelB(item) {
   editIndexName.value.block_num = null
 }
 
@@ -207,6 +231,54 @@ const saveBlockName = async block => {
   emit('saveBlockName', editIndexName.value)
   editIndexName.value.block_num = null
 }
+function remove(comp) {
+  emit('remove', comp)
+}
+const cancel = comp => {
+  editIndex.value.id = 0
+  editIndex.value = {}
+}
+const saveComponent = async comp => {
+  if (!editIndex.value.name.length) {
+    compError.message = 'Назва компоненту не може бути порожньою'
+    compError.status = true
+    compError.name = true
+    
+    return
+  }
+  isLoading.value = true
+  try {
+
+    console.log(editIndex.value)
+    await eduProgsStore.editComponent(comp.id, editIndex.value)
+    await eduProgsStore.fetchCreditsInfo(route.params.pages)
+    await eduProgsStore.findEduProgById(route.params.pages)
+    comp = editIndex.value
+    editIndex.value = {}
+    compError.name = false
+    compError.credits = false
+  } catch (error) {
+    console.log(error.response.data.error)
+    const errMessage = error.response.data.error
+    switch (errMessage) {
+    case 'eduprog component with this name already exists':
+      compError.message = 'Компонент з такою назвою вже існує'
+      compError.name = true
+      break
+    case 'too much credits':
+      compError.message = 'Забагато кредитів'
+      compError.credits = true
+      break
+    }
+    if (!compError.message.length) {
+      compError.message = 'Щось пішло не так'
+    }
+    compError.status = true
+  }
+  emit('update','update')
+  isLoading.value = false
+}
+
 // async function closeEdit(e) {
 //   if (
 //     (e && e.target.closest('.active-comp-block')) ||
