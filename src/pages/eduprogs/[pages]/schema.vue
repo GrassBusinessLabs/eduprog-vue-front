@@ -5,6 +5,7 @@ import { reactive, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import Gridstack from '@core/components/Gridstack.vue'
 import GridstackForComponents from '@core/components/GridstackForComponents.vue'
+import { it } from 'vuetify/locale'
 
 const searchTerm = ref('')
 const route = useRoute()
@@ -73,7 +74,6 @@ onMounted(async () => {
   await eduProgsStore.fetchFreeCompSheme(eduprogId)
   freeCompSheme.value = eduProgsStore.freeCompSheme
 
-  console.log('SHEMA',scheme.value)
 
   initCopmGrid()
 
@@ -85,12 +85,8 @@ function lastID(evt) {
 }
 
 async function logger(evt) {
-  console.log(evt)
   if (evt[0].type === 'dropped') {
     const result = FreeCompItems.value.find(item => item.id === evt[2].id)
-
-    console.log(FreeCompItems.value)
-
     if (result === undefined) {
       const component = items[last_ID.value].find(item => item.id === evt[2].id)
 
@@ -106,9 +102,11 @@ async function logger(evt) {
         semester_num: evt[2].x + 1,
         row: evt[2].y + 1,
       }
-
       await updateComponent(component.comp_id1, moveComp)
 
+      if (evt.itemId !== component.disc_id){
+        removeObjectById(items[component.disc_id], component.id)
+      }
     } else if (result !== undefined) {
       credits_semestr.value.discipline_id = evt.itemId,
       credits_semestr.value.row = evt[2].y + 1,
@@ -159,13 +157,10 @@ async function logger(evt) {
       for (let i = 0; i < n; i++){
         try {
           respon = await eduProgsStore.expandSchemecomp(component.comp_id1,side)
-          console.log(respon)
 
         } catch (error){
           mistake.value.type = true
           mistake.value.massege = error.response.data.error
-          console.log(component.w)
-          console.log(evt[1].gridstackNode.w - 1)
           component.w = evt[1].gridstackNode.w - 2
           component.w = evt[1].gridstackNode.w - 1
         }
@@ -185,8 +180,6 @@ async function logger(evt) {
           groupedObjects[eduprogcomp_id].items.push(rest)
         }
       }
-      console.log(component.w)
-      console.log(respon)
 
       if (respon.length === 0){
         keyGrid.value += 1
@@ -236,13 +229,12 @@ async function logger(evt) {
   await eduProgsStore.fetchScheme(route.params.pages)
   scheme.value = eduProgsStore.scheme
   componentKey.value += 1
-  initGrid()
   childFreeCompRef.value.updateGridComp()
+  initGrid()
 }
 
 function freCompLogger(evt){
   if (evt[0].type === 'dropped'){
-    console.log(evt)
     keyGrid.value += 1
     componentKey.value += 1
 
@@ -282,8 +274,6 @@ function findObjectById(id) {
 
 
 async function updateComponent(id, moveComp) {
-  console.log(moveComp)
-  console.log(id)
 
   await eduProgsStore.moveComponentInScheme(id, moveComp)
 
@@ -311,8 +301,6 @@ function initCopmGrid() {
       FreeCompItems.value.push(widget)
     }
   })
-  console.log(FreeCompItems.value)
-  console.log(childFreeCompRef.value)
   FreeCompItems.value.forEach((item, index) => childFreeCompRef.value.createFreeWidget())
 }
 const newScheme = ref()
@@ -322,7 +310,6 @@ function initGrid() {
   newScheme.value.forEach(item => {
     const widgetIndex = items[item.items[0].discipline_id].findIndex(w =>  w.eduprogcomp.id === item.eduprogcomp_id)
     if (widgetIndex === -1) {
-      console.log(item)
       const widget = {
         w: item.items.length,
         x: item.items[0].semester_num - 1,
@@ -332,16 +319,12 @@ function initGrid() {
         eduprogcomp: item.items[0].eduprogcomp,
         disc_id: item.items[0].discipline_id,
       }
-      console.log(widget)
-      console.log(item.items)
       addExtractedFieldsToObject(item.items, fields, widget)
       items[item.items[0].discipline_id].unshift(widget)
       disciplines.value.forEach((item, index) => childComponentRef.value[index].createWidget)
     } else {
-      console.log(item)
     }
   })
-  console.log(items)
 }
 
 const fields = ["credits_per_semester", "comp_id"]
@@ -433,10 +416,6 @@ async function deleteComponent(component) {
 }
 
 async function createCompToSheme() {
-  console.log('credits_semestr', credits_semestr.value)
-  console.log(free_comp_id.value)
-
-  console.log(credits_semestr.value)
 
   await eduProgsStore.setComponentToScheme(credits_semestr.value)
 
@@ -445,13 +424,11 @@ async function createCompToSheme() {
 
   await eduProgsStore.fetchScheme(eduprogId)
   scheme.value = eduProgsStore.scheme
-  console.log('childComponentRef.value', childComponentRef.value)
+
   childComponentRef.value[del_index.value].deleteGridComponent(free_comp_id.value)
-  console.log(FreeCompItems.value)
 
   removeObjectById(FreeCompItems.value, free_comp_id.value.id)
 
-  console.log(FreeCompItems.value)
   childFreeCompRef.value.updateGridComp()
   initGrid()
   initCopmGrid()
@@ -505,7 +482,6 @@ function cancelNewDiscipline() {
 }
 
 function deleteItem(event) {
-  console.log(event)
 }
 </script>
 

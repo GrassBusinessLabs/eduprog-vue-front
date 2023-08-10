@@ -127,6 +127,7 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent })
   <div
     ref="gridref"
     class="grid-stack grid-schema"
+    @click="editWidget"
   >
     <div
       v-for="(component, index) in props.gridItems"
@@ -139,7 +140,6 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent })
       :gs-w="component.w"
       @mouseover="mouseover(component.id)"
       @mouseleave="mouseleave"
-      @click="editWidget"
     >
       <VBtn
         v-show="hoveredWidget === component.id"
