@@ -163,6 +163,7 @@ import { GridStack } from 'gridstack'
 import { nextTick, reactive, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 const route = useRoute()
+const control_types = ref(['залік', 'іспит'])
 const props = defineProps({
   block: {
     type: Object,
