@@ -96,7 +96,8 @@
                   class="pa-0"
                   variant="underlined"
                   type="number"
-                  min="1"
+                  min="3"
+                  :rules="rulesVB.min_num"
                   @keyup.enter="saveComponent(component)"
                 />
               </span>
@@ -198,6 +199,7 @@ const editIndexName = ref({})
 const editIndex = ref({})
 const rulesVB = ref({
   length: [v => v.length <= 99 || 'Максимум 100 символів', v => v.length >= 1 || 'Мінімум 1 символ'],
+  min_num: [v => v >= 3 || 'Мінімум 3 кредити'],
 })
 watch(props, (newValue, oldValue) => {
   nextTick(() => {
@@ -245,6 +247,10 @@ const saveComponent = async comp => {
     compError.status = true
     compError.name = true
     
+    return
+  }
+  if (editIndex.value.credits <= 2){
+
     return
   }
   isLoading.value = true

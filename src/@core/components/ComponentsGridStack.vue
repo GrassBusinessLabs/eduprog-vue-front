@@ -30,6 +30,9 @@ let grid
 const gridref = ref(null)
 const control_types = ref(['залік', 'іспит'])
 
+const rules = ref({
+  min_num: [v => v >= 3 || 'Мінімум 3 кредити'],
+})
 watch(props, (newValue, oldValue) => {
   nextTick(() => {
     grid.load(grid.getGridItems())
@@ -51,6 +54,11 @@ const saveComponent = async comp => {
     compError.message = 'Назва компоненту не може бути порожньою'
     compError.status = true
     compError.name = true
+
+    return
+  }
+  if (editIndex.value.credits <= 2){
+
     return
   }
   isLoading.value = true
@@ -158,7 +166,8 @@ onMounted(() => {
               v-model="editIndex.value.credits"
               variant="underlined"
               type="number"
-              min="1"
+              min="3"
+              :rules='rules.min_num'
               @keyup.enter="saveComponent(component)"
             />
           </span>

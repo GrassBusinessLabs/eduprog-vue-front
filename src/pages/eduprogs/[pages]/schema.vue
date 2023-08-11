@@ -106,6 +106,15 @@ async function logger(evt) {
 
       if (evt.itemId !== component.disc_id){
         removeObjectById(items[component.disc_id], component.id)
+        console.log(items)
+        console.log(component)
+        console.log(component.disc_id)
+        console.log(evt.itemId)
+        component.disc_id = evt.itemId
+        console.log(component)
+        items[evt.itemId].unshift(component)
+        console.log(items)
+        disciplines.value.forEach((item, index) => childComponentRef.value[index].createWidget)
       }
     } else if (result !== undefined) {
       credits_semestr.value.discipline_id = evt.itemId,
@@ -230,7 +239,6 @@ async function logger(evt) {
   scheme.value = eduProgsStore.scheme
   componentKey.value += 1
   childFreeCompRef.value.updateGridComp()
-  initGrid()
 }
 
 function freCompLogger(evt){
@@ -305,10 +313,12 @@ function initCopmGrid() {
 }
 const newScheme = ref()
 
-function initGrid() {
+async function initGrid() {
+  await eduProgsStore.fetchScheme(eduprogId)
+  scheme.value = eduProgsStore.scheme
   newScheme.value = groupByEduprogcompId()
   newScheme.value.forEach(item => {
-    const widgetIndex = items[item.items[0].discipline_id].findIndex(w =>  w.eduprogcomp.id === item.eduprogcomp_id)
+    const widgetIndex = items[item.items[0].discipline_id].findIndex(w => w.eduprogcomp.id === item.eduprogcomp_id)
     if (widgetIndex === -1) {
       const widget = {
         w: item.items.length,
@@ -323,6 +333,7 @@ function initGrid() {
       items[item.items[0].discipline_id].unshift(widget)
       disciplines.value.forEach((item, index) => childComponentRef.value[index].createWidget)
     } else {
+      disciplines.value.forEach((item, index) => childComponentRef.value[index].createWidget)
     }
   })
 }
@@ -339,7 +350,7 @@ function addExtractedFieldsToObject(array, fields, targetObject) {
       }else {
         namFild = field
       }
-      extractedFields[`${field}${index + 1}`] = obj[namFild]
+      extractedFields[`${field}${index + 1}`] = Number(obj[namFild].toFixed(1))
     })
     Object.assign(targetObject, extractedFields)
   })

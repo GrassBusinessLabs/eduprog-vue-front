@@ -34,6 +34,7 @@ watch(props, (newValue, oldValue) => {
   nextTick(() => {
     grid.load(grid.getGridItems())
   })
+  console.log(props.gridItems)
   console.log("grid.load(grid.getGridItems())")
 })
 
@@ -117,6 +118,8 @@ const getGridNodes = () => {
 
 function editWidget(component) {
   console.log(grid.getGridItems())
+  grid.load(grid.getGridItems())
+  console.log(props.gridItems)
 }
 
 

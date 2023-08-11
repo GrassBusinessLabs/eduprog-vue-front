@@ -4,9 +4,9 @@
     <thead class="thead-light">
       <tr>
         <th class="text-center">
-          <h3>Основний компонент ОП</h3>
+          <h3 >Основний компонент ОП</h3>
         </th>
-        <th />
+        <th style="width: 9%" />
       </tr>
     </thead>
   </VTable>
@@ -293,7 +293,7 @@
               <VTextField
                 v-model="newComponent.credits"
                 type="number"
-                min="1"
+                min="3"
                 label="Кількість кредитів"
                 :rules="rulesComp.credits"
                 :error="hasError"
@@ -354,7 +354,7 @@
               <VTextField
                 v-model="newComponent.credits"
                 type="number"
-                min="1"
+                min="3"
                 label="Кількість кредитів"
                 :rules="rulesComp.credits"
                 :error="hasError"
@@ -462,7 +462,7 @@ const dialogCreate = ref(false)
 const dialogCreateSelective = ref(false)
 const newComponent = reactive({
   name: '',
-  credits: 0,
+  credits: 3,
   control_type: '',
   type: '',
   sub_type: 'н/д',
@@ -508,7 +508,7 @@ const NameError = ref(false)
 const errorName = ref('')
 const reset = () => {
   newComponent.name = ''
-  newComponent.credits = 0
+  newComponent.credits = 3
   newComponent.control_type = ''
   newComponent.block_name = ''
   newComponent.block_num = ''
