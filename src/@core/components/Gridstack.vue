@@ -34,8 +34,6 @@ watch(props, (newValue, oldValue) => {
   nextTick(() => {
     grid.load(grid.getGridItems())
   })
-  console.log(props.gridItems)
-  console.log("grid.load(grid.getGridItems())")
 })
 
 onMounted(() => {
@@ -48,12 +46,13 @@ onMounted(() => {
       maxRow: GRID_MAX_ROW,
       acceptWidgets: '.grid-stack-item',
       resizable: {
-        handles: 'e,w' },
+        handles: 'e,w',
+      },
     },
     gridref.value,
   )
 
-  grid.on('added', function (event, items) {
+  grid.on('added', function(event, items) {
     emit('added', [event, items])
 
     const extraArray = grid.getGridItems().filter(object => !props.gridItems.find(firstObject => firstObject.id === object.gridstackNode.id))
@@ -64,7 +63,7 @@ onMounted(() => {
 
   })
 
-  grid.on('dragstart', function (event, items) {
+  grid.on('dragstart', function(event, items) {
     emit('dragstart', [event, items])
   })
 
@@ -72,14 +71,14 @@ onMounted(() => {
     emit('dragstop', [event, element])
   })
 
-  grid.on('change', function (event, items) {
+  grid.on('change', function(event, items) {
     emit('change', [event, items])
   })
 
-  grid.on('resizestop', function (event, items) {
+  grid.on('resizestop', function(event, items) {
     emit('resizestop', [event, items])
   })
-  grid.on('dropped', function (event, previousWidget, newWidget) {
+  grid.on('dropped', function(event, previousWidget, newWidget) {
     emit('dropped', [event, previousWidget, newWidget])
   })
 })
@@ -100,9 +99,7 @@ function deleteGridComponent(component) {
 }
 
 const createWidget = () => {
-  nextTick(() => {
-    grid.load(grid.getGridItems())
-  })
+  grid.load(grid.getGridItems())
 }
 
 const isAreaEmpty = () => {
@@ -128,29 +125,29 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent })
 
 <template>
   <div
-    ref="gridref"
-    class="grid-stack grid-schema"
-    @click="editWidget"
+    ref='gridref'
+    class='grid-stack grid-schema'
+    @click='editWidget'
   >
     <div
-      v-for="(component, index) in props.gridItems"
+      v-for='(component, index) in props.gridItems'
       :key="'component' + index"
-      class="grid-stack-item rounded-lg"
-      :gs-id="component.id"
-      :gs-x="component.x"
-      :gs-y="component.y"
-      :gs-h="component.h"
-      :gs-w="component.w"
-      @mouseover="mouseover(component.id)"
-      @mouseleave="mouseleave"
+      class='grid-stack-item rounded-lg'
+      :gs-id='component.id'
+      :gs-x='component.x'
+      :gs-y='component.y'
+      :gs-h='component.h'
+      :gs-w='component.w'
+      @mouseover='mouseover(component.id)'
+      @mouseleave='mouseleave'
     >
       <VBtn
-        v-show="hoveredWidget === component.id"
-        v-bind="props"
-        class="grid-stack-item__edit-btn"
-        density="compact"
-        icon="mdi-trash-can"
-        @click="deleteGridComponent(component)"
+        v-show='hoveredWidget === component.id'
+        v-bind='props'
+        class='grid-stack-item__edit-btn'
+        density='compact'
+        icon='mdi-trash-can'
+        @click='deleteGridComponent(component)'
       />
 
       <!--      <VMenu -->
@@ -179,33 +176,33 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent })
       <!--      </VMenu> -->
 
 
-      <div class="justify-center rounded-lg grid-stack-item-content text-center d-flex flex-column">
-        <span class="text-body-2 mb-1">
+      <div class='justify-center rounded-lg grid-stack-item-content text-center d-flex flex-column'>
+        <span class='text-body-2 mb-1'>
           {{ component.eduprogcomp.name }}
         </span>
-        <div class="d-flex justify-space-around text-body-2 w-100">
-          <span v-if="component.credits_per_semester1">
+        <div class='d-flex justify-space-around text-body-2 w-100'>
+          <span v-if='component.credits_per_semester1'>
             {{ component.credits_per_semester1 }}
           </span>
-          <span v-if="component.credits_per_semester2">
+          <span v-if='component.credits_per_semester2'>
             {{ component.credits_per_semester2 }}
           </span>
-          <span v-if="component.credits_per_semester3">
+          <span v-if='component.credits_per_semester3'>
             {{ component.credits_per_semester3 }}
           </span>
-          <span v-if="component.credits_per_semester4">
+          <span v-if='component.credits_per_semester4'>
             {{ component.credits_per_semester4 }}
           </span>
-          <span v-if="component.credits_per_semester5">
+          <span v-if='component.credits_per_semester5'>
             {{ component.credits_per_semester5 }}
           </span>
-          <span v-if="component.credits_per_semester6">
+          <span v-if='component.credits_per_semester6'>
             {{ component.credits_per_semester6 }}
           </span>
-          <span v-if="component.credits_per_semester7">
+          <span v-if='component.credits_per_semester7'>
             {{ component.credits_per_semester7 }}
           </span>
-          <span v-if="component.credits_per_semester8">
+          <span v-if='component.credits_per_semester8'>
             {{ component.credits_per_semester8 }}
           </span>
         </div>
@@ -228,6 +225,7 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent })
 .v-field__field {
   align-items: center;
 }
+
 .v-field__prepend-inner {
   align-items: center;
 }
