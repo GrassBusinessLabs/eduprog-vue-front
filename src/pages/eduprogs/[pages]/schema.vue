@@ -22,6 +22,8 @@ const mistake = ref({
   massege: '',
 })
 
+const update = ref(0)
+
 const editIndex = ref(null)
 const originalData = ref(null)
 
@@ -91,6 +93,7 @@ async function logger(evt) {
       const component = items[last_ID.value].find(item => item.id === evt[2].id)
       console.log(component)
       console.log(evt)
+      component.x = evt[2].x
       const moveComp = {
         discipline_id: evt.itemId,
         semester_num: evt[2].x + 1,
@@ -103,7 +106,9 @@ async function logger(evt) {
         component.disc_id = evt.itemId
         items[evt.itemId].unshift(component)
         disciplines.value.forEach((item, index) => childComponentRef.value[index].createWidget)
-        keyGrid.value += 1
+        // keyGrid.value += 1
+        update.value += 1
+        console.log(component)
         await initGrid()
       }
     } else if (result !== undefined) {
@@ -708,7 +713,7 @@ function deleteItem(event) {
               gs-current-row="item.rows"
               :grid-items="items[item.id]"
               :components="eduprogComponents"
-              :update="keyGrid"
+              :update="update"
               @added="event => logger({ ...event, itemId: item.id })"
               @resizestop="event => logger({ ...event, itemId: item.id })"
               @dropped="event => logger({ ...event, itemId: item.id })"

@@ -117,6 +117,7 @@ function editWidget(component) {
   console.log(grid.getGridItems())
   grid.load(grid.getGridItems())
   console.log(props.gridItems)
+  console.log(props.update)
 }
 
 
@@ -130,24 +131,24 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent })
     @click='editWidget'
   >
     <div
-      v-for='(component, index) in props.gridItems'
-      :key="'component' + index"
+      v-for='item in props.gridItems'
+      :key="item"
       class='grid-stack-item rounded-lg'
-      :gs-id='component.id'
-      :gs-x='component.x'
-      :gs-y='component.y'
-      :gs-h='component.h'
-      :gs-w='component.w'
-      @mouseover='mouseover(component.id)'
+      :gs-id='item.id'
+      :gs-x='item.x'
+      :gs-y='item.y'
+      :gs-h='item.h'
+      :gs-w='item.w'
+      @mouseover='mouseover(item.id)'
       @mouseleave='mouseleave'
     >
       <VBtn
-        v-show='hoveredWidget === component.id'
+        v-show='hoveredWidget === item.id'
         v-bind='props'
         class='grid-stack-item__edit-btn'
         density='compact'
         icon='mdi-trash-can'
-        @click='deleteGridComponent(component)'
+        @click='deleteGridComponent(item)'
       />
 
       <!--      <VMenu -->
@@ -178,32 +179,32 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent })
 
       <div class='justify-center rounded-lg grid-stack-item-content text-center d-flex flex-column'>
         <span class='text-body-2 mb-1'>
-          {{ component.eduprogcomp.name }}
+          {{ item.eduprogcomp.name }}
         </span>
         <div class='d-flex justify-space-around text-body-2 w-100'>
-          <span v-if='component.credits_per_semester1'>
-            {{ component.credits_per_semester1 }}
+          <span v-if='item.credits_per_semester1'>
+            {{ item.credits_per_semester1 }}
           </span>
-          <span v-if='component.credits_per_semester2'>
-            {{ component.credits_per_semester2 }}
+          <span v-if='item.credits_per_semester2'>
+            {{ item.credits_per_semester2 }}
           </span>
-          <span v-if='component.credits_per_semester3'>
-            {{ component.credits_per_semester3 }}
+          <span v-if='item.credits_per_semester3'>
+            {{ item.credits_per_semester3 }}
           </span>
-          <span v-if='component.credits_per_semester4'>
-            {{ component.credits_per_semester4 }}
+          <span v-if='item.credits_per_semester4'>
+            {{ item.credits_per_semester4 }}
           </span>
-          <span v-if='component.credits_per_semester5'>
-            {{ component.credits_per_semester5 }}
+          <span v-if='item.credits_per_semester5'>
+            {{ item.credits_per_semester5 }}
           </span>
-          <span v-if='component.credits_per_semester6'>
-            {{ component.credits_per_semester6 }}
+          <span v-if='item.credits_per_semester6'>
+            {{ item.credits_per_semester6 }}
           </span>
-          <span v-if='component.credits_per_semester7'>
-            {{ component.credits_per_semester7 }}
+          <span v-if='item.credits_per_semester7'>
+            {{ item.credits_per_semester7 }}
           </span>
-          <span v-if='component.credits_per_semester8'>
-            {{ component.credits_per_semester8 }}
+          <span v-if='item.credits_per_semester8'>
+            {{ item.credits_per_semester8 }}
           </span>
         </div>
       </div>
