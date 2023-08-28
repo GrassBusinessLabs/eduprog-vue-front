@@ -101,11 +101,12 @@ async function logger(evt) {
       }
       await updateComponent(component.comp_id1, moveComp)
 
-      if (evt.itemId !== component.disc_id){
+      if (evt.itemId !== component.disc_id) {
         removeObjectById(items[component.disc_id], component.id)
         component.disc_id = evt.itemId
         items[evt.itemId].unshift(component)
         disciplines.value.forEach((item, index) => childComponentRef.value[index].createWidget)
+
         // keyGrid.value += 1
         update.value += 1
         console.log(component)
@@ -146,20 +147,37 @@ async function logger(evt) {
 
     let side = null
 
-    if (evt[1].gridstackNode.x == component.x) {
+    if (evt[1].gridstackNode.x === component.x) {
       side = 'RIGHT'
     } else {
       side = 'LEFT'
     }
 
     if (evt[1].gridstackNode.w > component.w) {
-
-      const n = evt[1].gridstackNode.w - component.w
-
-      for (let i = 0; i < n; i++) {
+      console.log('MORE')
+      console.log(side)
+      const sum = evt[1].gridstackNode.w + evt[1].gridstackNode.x
+      if (side === 'RIGHT') {
+        console.log(evt[1].gridstackNode)
+        console.log(component)
+        const w = component.w
         try {
-          respon = await eduProgsStore.expandSchemecomp(component.comp_id1, side)
-
+          respon = await eduProgsStore.shrinkExpandSchemecomp(component.eduprogcomp_id, sum, null)
+          console.log(respon)
+        } catch (error) {
+          mistake.value.type = true
+          mistake.value.massege = error.response.data.error
+          component.w = evt[1].gridstackNode.w - 2
+          component.w = evt[1].gridstackNode.w - 1
+        }
+      } else {
+        console.log(evt[1].gridstackNode)
+        console.log(component)
+        try {
+          respon = await eduProgsStore.shrinkExpandSchemecomp(component.eduprogcomp_id, evt[1].gridstackNode.x + 1, null)
+          console.log(respon)
+          component.x = evt[1].gridstackNode.x
+          component.w = evt[1].gridstackNode.w
         } catch (error) {
           mistake.value.type = true
           mistake.value.massege = error.response.data.error
@@ -192,19 +210,21 @@ async function logger(evt) {
       component.w = groupedObjects[component.eduprogcomp.id].items.length
 
       component = addExtractedFieldsToObject(groupedObjects[component.eduprogcomp.id].items, fields, component)
+      console.log(component)
 
 
     } else if (evt[1].gridstackNode.w < component.w) {
-
-      const n = component.w - evt[1].gridstackNode.w
-
+      console.log('SMALLL')
+      const sum = evt[1].gridstackNode.w + evt[1].gridstackNode.x
       if (side === 'LEFT') {
         side = 'RIGHT'
       } else {
         side = 'LEFT'
       }
-      for (let i = 0; i < n; i++) {
-        respon = await eduProgsStore.shrinkSchemecomp(component.comp_id1, side)
+      if (side === 'RIGHT') {
+        respon = await eduProgsStore.shrinkExpandSchemecomp(component.eduprogcomp_id, sum, side)
+      } else {
+        respon = await eduProgsStore.shrinkExpandSchemecomp(component.eduprogcomp_id, evt[1].gridstackNode.x + 1, side)
       }
       component = deleteProperties(component)
       const groupedObjects = []
@@ -228,7 +248,6 @@ async function logger(evt) {
 
     }
   }
-  await eduProgsStore.fetchScheme(route.params.pages)
   scheme.value = eduProgsStore.scheme
   componentKey.value += 1
   childFreeCompRef.value.updateGridComp()
@@ -269,7 +288,6 @@ function findObjectById(id) {
       }
     }
   }
-
   return null
 }
 
@@ -281,7 +299,9 @@ async function updateComponent(id, moveComp) {
   childFreeCompRef.value.updateGridComp()
 }
 
-function initCopmGrid() {
+async function initCopmGrid() {
+  await eduProgsStore.fetchFreeCompSheme(eduprogId)
+  freeCompSheme.value = eduProgsStore.freeCompSheme
   freeCompSheme.value.forEach((item, index) => {
     const existingWidget = FreeCompItems.value.find(widget => widget.eduprogcomp_id === item.id)
     if (existingWidget) {
@@ -320,9 +340,11 @@ async function initGrid() {
         y: item.items[0].row - 1,
         h: 1,
         id: uuidv4(),
+        eduprogcomp_id: item.eduprogcomp_id,
         eduprogcomp: item.items[0].eduprogcomp,
         disc_id: item.items[0].discipline_id,
       }
+      console.log(item)
       addExtractedFieldsToObject(item.items, fields, widget)
       items[item.items[0].discipline_id].unshift(widget)
       disciplines.value.forEach((item, index) => childComponentRef.value[index].createWidget)
@@ -390,18 +412,12 @@ async function deleteDiscipline(id) {
   await eduProgsStore.deleteDiscipline(id)
   await eduProgsStore.fetchDisciplines(route.params.pages)
 
-  await eduProgsStore.fetchScheme(eduprogId)
-  scheme.value = eduProgsStore.scheme
-
-  await eduProgsStore.fetchFreeCompSheme(eduprogId)
-  freeCompSheme.value = eduProgsStore.freeCompSheme
-
   disciplines.value = eduProgsStore.getDisciplines
 
   // items.splice(id, 1)
 
-  initGrid()
-  initCopmGrid()
+  await initGrid()
+  await initCopmGrid()
 }
 
 async function deleteComponent(component) {
@@ -409,15 +425,11 @@ async function deleteComponent(component) {
   if (component.comp_id1 === undefined || null || 0) {
   } else {
     await eduProgsStore.deleteComponentFromSheme(component.comp_id1)
-    await eduProgsStore.fetchScheme(route.params.pages)
-    await eduProgsStore.fetchFreeCompSheme(eduprogId)
-    freeCompSheme.value = eduProgsStore.freeCompSheme
-    scheme.value = eduProgsStore.scheme
 
     removeObjectById(items[component.disc_id], component.id)
 
-    initCopmGrid()
-    initGrid()
+    await initCopmGrid()
+    await initGrid()
   }
 }
 
@@ -425,19 +437,13 @@ async function createCompToSheme() {
 
   await eduProgsStore.setComponentToScheme(credits_semestr.value)
 
-  await eduProgsStore.fetchFreeCompSheme(eduprogId)
-  freeCompSheme.value = eduProgsStore.freeCompSheme
-
-  await eduProgsStore.fetchScheme(eduprogId)
-  scheme.value = eduProgsStore.scheme
-
   childComponentRef.value[del_index.value].deleteGridComponent(free_comp_id.value)
 
   removeObjectById(FreeCompItems.value, free_comp_id.value.id)
 
   childFreeCompRef.value.updateGridComp()
-  initGrid()
-  initCopmGrid()
+  await initGrid()
+  await initCopmGrid()
 }
 
 function removeObjectById(arr, id) {

@@ -148,6 +148,18 @@ export const useEduProgsStore = defineStore({
     async shrinkSchemecomp(payload,side) {
       return await  deleteData('/eduprogs/scheme/shrink/'+payload+'?shrinkTo='+side)
     },
+
+    async shrinkExpandSchemecomp(eduprogcompId,semNum,direction) {
+
+      if (direction === null){
+        console.log('sdfsdfsd')
+        return await postData(`/eduprogs/scheme/expandOrShrink?eduprogcompId=${eduprogcompId}&semNum=${semNum}`)
+      } else {
+        console.log('kl;kl;kl')
+        return await postData(`/eduprogs/scheme/expandOrShrink?eduprogcompId=${eduprogcompId}&semNum=${semNum}&direction=${direction}`)
+      }
+    },
+
     async updateComponentInScheme(id, payload) {
       const response = await editData('/eduprogs/scheme/' + id, payload)
     },
