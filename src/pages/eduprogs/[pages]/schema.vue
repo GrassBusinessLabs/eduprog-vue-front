@@ -89,10 +89,7 @@ async function logger(evt) {
   if (evt[0].type === 'dropped') {
     const result = FreeCompItems.value.find(item => item.id === evt[2].id)
     if (result === undefined) {
-      console.log(items[last_ID.value])
       const component = items[last_ID.value].find(item => item.id === evt[2].id)
-      console.log(component)
-      console.log(evt)
       component.x = evt[2].x
       const moveComp = {
         discipline_id: evt.itemId,
@@ -109,16 +106,15 @@ async function logger(evt) {
 
         // keyGrid.value += 1
         update.value += 1
-        console.log(component)
         await initGrid()
       }
     } else if (result !== undefined) {
       credits_semestr.value.discipline_id = evt.itemId,
-      credits_semestr.value.row = evt[2].y + 1,
-      credits_semestr.value.semester_num = evt[2].x + 1,
-      credits_semestr.value.eduprog_id = Number(eduprogId),
-      credits_semestr.value.eduprogcomp_id = result.eduprogcomp_id,
-      credits_semestr.value.credits_per_semester = result.free_credit
+        credits_semestr.value.row = evt[2].y + 1,
+        credits_semestr.value.semester_num = evt[2].x + 1,
+        credits_semestr.value.eduprog_id = Number(eduprogId),
+        credits_semestr.value.eduprogcomp_id = result.eduprogcomp_id,
+        credits_semestr.value.credits_per_semester = result.free_credit
       free_comp_id.value = evt[2]
       del_index.value = disciplines.value.findIndex(item => item.id === evt.itemId)
 
@@ -152,37 +148,31 @@ async function logger(evt) {
     } else {
       side = 'LEFT'
     }
+    let sum = evt[1].gridstackNode.w + evt[1].gridstackNode.x
 
     if (evt[1].gridstackNode.w > component.w) {
-      console.log('MORE')
-      console.log(side)
-      const sum = evt[1].gridstackNode.w + evt[1].gridstackNode.x
+
       if (side === 'RIGHT') {
-        console.log(evt[1].gridstackNode)
-        console.log(component)
         const w = component.w
         try {
           respon = await eduProgsStore.shrinkExpandSchemecomp(component.eduprogcomp_id, sum, null)
-          console.log(respon)
         } catch (error) {
           mistake.value.type = true
           mistake.value.massege = error.response.data.error
-          component.w = evt[1].gridstackNode.w - 2
-          component.w = evt[1].gridstackNode.w - 1
+          const w = Math.floor(component.eduprogcomp.credits / 3)
+          sum = w + evt[1].gridstackNode.x
+          respon = await eduProgsStore.shrinkExpandSchemecomp(component.eduprogcomp_id, sum, null)
+          component.w = w
         }
       } else {
-        console.log(evt[1].gridstackNode)
-        console.log(component)
         try {
           respon = await eduProgsStore.shrinkExpandSchemecomp(component.eduprogcomp_id, evt[1].gridstackNode.x + 1, null)
-          console.log(respon)
+
           component.x = evt[1].gridstackNode.x
           component.w = evt[1].gridstackNode.w
         } catch (error) {
           mistake.value.type = true
           mistake.value.massege = error.response.data.error
-          component.w = evt[1].gridstackNode.w - 2
-          component.w = evt[1].gridstackNode.w - 1
         }
       }
 
@@ -210,12 +200,9 @@ async function logger(evt) {
       component.w = groupedObjects[component.eduprogcomp.id].items.length
 
       component = addExtractedFieldsToObject(groupedObjects[component.eduprogcomp.id].items, fields, component)
-      console.log(component)
 
 
     } else if (evt[1].gridstackNode.w < component.w) {
-      console.log('SMALLL')
-      const sum = evt[1].gridstackNode.w + evt[1].gridstackNode.x
       if (side === 'LEFT') {
         side = 'RIGHT'
       } else {
@@ -288,6 +275,7 @@ function findObjectById(id) {
       }
     }
   }
+
   return null
 }
 
@@ -344,7 +332,6 @@ async function initGrid() {
         eduprogcomp: item.items[0].eduprogcomp,
         disc_id: item.items[0].discipline_id,
       }
-      console.log(item)
       addExtractedFieldsToObject(item.items, fields, widget)
       items[item.items[0].discipline_id].unshift(widget)
       disciplines.value.forEach((item, index) => childComponentRef.value[index].createWidget)
@@ -352,7 +339,6 @@ async function initGrid() {
       disciplines.value.forEach((item, index) => childComponentRef.value[index].createWidget)
     }
   })
-  console.log(items)
 }
 
 const fields = ['credits_per_semester', 'comp_id']
@@ -498,21 +484,21 @@ function deleteItem(event) {
 </script>
 
 <template>
-  <div class="text-center">
+  <div class='text-center'>
     <VSnackbar
-      v-model="mistake.type"
+      v-model='mistake.type'
       multi-line
-      location="top"
-      :timeout="3000"
-      color="error"
+      location='top'
+      :timeout='3000'
+      color='error'
     >
       {{ mistake.massege }}
 
       <template #actions>
         <VBtn
-          color="red"
-          variant="text"
-          @click="mistake.type = false"
+          color='red'
+          variant='text'
+          @click='mistake.type = false'
         >
           Close
         </VBtn>
@@ -522,21 +508,21 @@ function deleteItem(event) {
 
 
   <VDialog
-    v-model="dialogCreate"
+    v-model='dialogCreate'
     persistent
-    max-width="600px"
+    max-width='600px'
   >
     <VCard>
       <VCardTitle>
-        <span class="text-h5">Створення нової Категорії</span>
+        <span class='text-h5'>Створення нової Категорії</span>
       </VCardTitle>
       <VCardText>
         <VContainer>
           <VRow>
-            <VCol cols="12">
+            <VCol cols='12'>
               <VTextField
-                v-model="newDiscipline.name"
-                label="Назва категорії "
+                v-model='newDiscipline.name'
+                label='Назва категорії '
                 required
               />
             </VCol>
@@ -546,17 +532,17 @@ function deleteItem(event) {
       <VCardActions>
         <VSpacer />
         <VBtn
-          color="blue darken-1"
+          color='blue darken-1'
           text
-          @click="cancelNewDiscipline"
+          @click='cancelNewDiscipline'
         >
           Закрити
         </VBtn>
         <VBtn
           text
-          :disabled="!newDiscipline.name"
-          @click="createNewDiscipline"
-          @keyup.enter="createNewDiscipline"
+          :disabled='!newDiscipline.name'
+          @click='createNewDiscipline'
+          @keyup.enter='createNewDiscipline'
         >
           Створити
         </VBtn>
@@ -565,172 +551,172 @@ function deleteItem(event) {
   </VDialog>
 
   <VRow>
-    <VCol cols="2">
+    <VCol cols='2'>
       <VCard
-        :key="componentKey"
-        title="Усі компоненти"
-        class="mb-5"
-        style="max-width: 200px"
+        :key='componentKey'
+        title='Усі компоненти'
+        class='mb-5'
+        style='max-width: 200px'
       >
         <VTextField
-          v-model="searchTerm"
-          style="margin: 5%; margin-top: -5%"
-          append-icon="mdi-magnify"
-          label="Пошук"
+          v-model='searchTerm'
+          style='margin: 5%; margin-top: -5%'
+          append-icon='mdi-magnify'
+          label='Пошук'
           single-line
           hide-details
-          variant="underlined"
+          variant='underlined'
         />
 
         <GridstackForComponents
-          ref="childFreeCompRef"
-          :search-term="searchTerm"
-          :components="FreeCompItems"
-          @added="event => freCompLogger({ ...event})"
-          @resizestop="event => freCompLogger({ ...event})"
-          @dropped="event => freCompLogger({ ...event})"
-          @dragstart="event => freCompLogger({ ...event})"
-          @dragstop="event => freCompLogger({ ...event})"
-          @change="event => freCompLogger({ ...event})"
+          ref='childFreeCompRef'
+          :search-term='searchTerm'
+          :components='FreeCompItems'
+          @added='event => freCompLogger({ ...event})'
+          @resizestop='event => freCompLogger({ ...event})'
+          @dropped='event => freCompLogger({ ...event})'
+          @dragstart='event => freCompLogger({ ...event})'
+          @dragstop='event => freCompLogger({ ...event})'
+          @change='event => freCompLogger({ ...event})'
         />
       </VCard>
     </VCol>
-    <VCol cols="10">
+    <VCol cols='10'>
       <VTable>
         <thead>
-          <tr>
-            <th
-              rowspan="2"
-              class="text-center"
-            >
-              <p>Категорії</p>
-              <VBtn
-                icon="mdi-plus"
-                size="x-small"
-                @click="createDiscipline"
-              />
-            </th>
-            <th
-              colspan="2"
-              class="text-center"
-            >
-              1 курс
-            </th>
-            <th
-              colspan="2"
-              class="text-center"
-            >
-              2 курс
-            </th>
-            <th
-              colspan="2"
-              class="text-center"
-            >
-              3 курс
-            </th>
-            <th
-              colspan="2"
-              class="text-center"
-            >
-              4 курс
-            </th>
-          </tr>
+        <tr>
+          <th
+            rowspan='2'
+            class='text-center'
+          >
+            <p>Категорії</p>
+            <VBtn
+              icon='mdi-plus'
+              size='x-small'
+              @click='createDiscipline'
+            />
+          </th>
+          <th
+            colspan='2'
+            class='text-center'
+          >
+            1 курс
+          </th>
+          <th
+            colspan='2'
+            class='text-center'
+          >
+            2 курс
+          </th>
+          <th
+            colspan='2'
+            class='text-center'
+          >
+            3 курс
+          </th>
+          <th
+            colspan='2'
+            class='text-center'
+          >
+            4 курс
+          </th>
+        </tr>
 
-          <tr>
-            <th class="text-center">
-              1 семестр
-            </th>
-            <th class="text-center">
-              2 семестр
-            </th>
-            <th class="text-center">
-              3 семестр
-            </th>
-            <th class="text-center">
-              4 семестр
-            </th>
-            <th class="text-center">
-              5 семестр
-            </th>
-            <th class="text-center">
-              6 семестр
-            </th>
-            <th class="text-center">
-              7 семестр
-            </th>
-            <th class="text-center">
-              8 семестр
-            </th>
-          </tr>
+        <tr>
+          <th class='text-center'>
+            1 семестр
+          </th>
+          <th class='text-center'>
+            2 семестр
+          </th>
+          <th class='text-center'>
+            3 семестр
+          </th>
+          <th class='text-center'>
+            4 семестр
+          </th>
+          <th class='text-center'>
+            5 семестр
+          </th>
+          <th class='text-center'>
+            6 семестр
+          </th>
+          <th class='text-center'>
+            7 семестр
+          </th>
+          <th class='text-center'>
+            8 семестр
+          </th>
+        </tr>
         </thead>
       </VTable>
 
-      <div style="width: 100%">
+      <div style='width: 100%'>
         <div
-          v-for="item in disciplines"
-          :key="item.id"
-          class="discipline-block"
+          v-for='item in disciplines'
+          :key='item.id'
+          class='discipline-block'
         >
-          <div style="width: 12%">
-            <div style="text-align: center">
-              <span v-if="editIndex !== item.id">{{ item.name }}</span>
-              <span v-if="editIndex === item.id">
+          <div style='width: 12%'>
+            <div style='text-align: center'>
+              <span v-if='editIndex !== item.id'>{{ item.name }}</span>
+              <span v-if='editIndex === item.id'>
                 <VTextField
-                  v-model="item.name"
-                  class="my-3"
+                  v-model='item.name'
+                  class='my-3'
                 />
               </span>
             </div>
-            <div style="text-align: center; margin-top: 5%; margin-bottom: 5%">
-              <span v-if="editIndex !== item.id">
-                <div style="margin-bottom: 2%">
+            <div style='text-align: center; margin-top: 5%; margin-bottom: 5%'>
+              <span v-if='editIndex !== item.id'>
+                <div style='margin-bottom: 2%'>
                   <VBtn
-                    icon="mdi-pencil"
-                    size="x-small"
-                    style="margin-right: 2%"
-                    @click="edit(item)"
+                    icon='mdi-pencil'
+                    size='x-small'
+                    style='margin-right: 2%'
+                    @click='edit(item)'
                   />
                   <VBtn
-                    icon="mdi-trash-can"
-                    size="x-small"
-                    @click="deleteDiscipline(item.id)"
+                    icon='mdi-trash-can'
+                    size='x-small'
+                    @click='deleteDiscipline(item.id)'
                   />
                 </div>
               </span>
               <span v-else>
                 <VBtn
-                  icon="mdi-check-bold"
-                  size="x-small"
-                  style="margin-right: 2%"
-                  @click="save(item)"
+                  icon='mdi-check-bold'
+                  size='x-small'
+                  style='margin-right: 2%'
+                  @click='save(item)'
                 />
                 <VBtn
-                  icon="mdi-close-thick"
-                  size="x-small"
-                  @click="cancel(item)"
+                  icon='mdi-close-thick'
+                  size='x-small'
+                  @click='cancel(item)'
                 />
               </span>
             </div>
           </div>
-          <div style="width: 100%">
+          <div style='width: 100%'>
             <Gridstack
-              :key="keyGrid"
-              ref="childComponentRef"
-              gs-current-row="item.rows"
-              :grid-items="items[item.id]"
-              :components="eduprogComponents"
-              :update="update"
-              @added="event => logger({ ...event, itemId: item.id })"
-              @resizestop="event => logger({ ...event, itemId: item.id })"
-              @dropped="event => logger({ ...event, itemId: item.id })"
-              @dragstart="event => lastID({ ...event, itemId: item.id })"
-              @dragstop="event => logger({ ...event, itemId: item.id })"
-              @change="event => logger({ ...event, itemId: item.id })"
-              @delete="deleteItem"
-              @delComp="deleteComponent"
-              @createComp="createCompToSheme"
+              :key='keyGrid'
+              ref='childComponentRef'
+              gs-current-row='item.rows'
+              :grid-items='items[item.id]'
+              :components='eduprogComponents'
+              :update='update'
+              @added='event => logger({ ...event, itemId: item.id })'
+              @resizestop='event => logger({ ...event, itemId: item.id })'
+              @dropped='event => logger({ ...event, itemId: item.id })'
+              @dragstart='event => lastID({ ...event, itemId: item.id })'
+              @dragstop='event => logger({ ...event, itemId: item.id })'
+              @change='event => logger({ ...event, itemId: item.id })'
+              @delete='deleteItem'
+              @delComp='deleteComponent'
+              @createComp='createCompToSheme'
             />
-            <hr style="transform: scaleY(0.3)">
+            <hr style='transform: scaleY(0.3)'>
           </div>
         </div>
       </div>

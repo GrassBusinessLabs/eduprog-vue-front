@@ -132,13 +132,14 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent })
   >
     <div
       v-for='item in props.gridItems'
-      :key="item"
+      :key='item.w'
       class='grid-stack-item rounded-lg'
       :gs-id='item.id'
       :gs-x='item.x'
       :gs-y='item.y'
       :gs-h='item.h'
       :gs-w='item.w'
+      :gs-max-w='Math.floor(item.eduprogcomp.credits/3)'
       @mouseover='mouseover(item.id)'
       @mouseleave='mouseleave'
     >
