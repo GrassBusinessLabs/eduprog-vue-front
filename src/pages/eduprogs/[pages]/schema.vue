@@ -565,7 +565,7 @@ function deleteItem(event) {
         :key="componentKey"
         class="mb-5"
       >
-        <VCardTitle style='white-space: '>
+        <VCardTitle>
           Усі компоненти
         </VCardTitle>
         <VTextField
