@@ -152,10 +152,8 @@ export const useEduProgsStore = defineStore({
     async shrinkExpandSchemecomp(eduprogcompId,semNum,direction) {
 
       if (direction === null){
-        console.log('sdfsdfsd')
         return await postData(`/eduprogs/scheme/expandOrShrink?eduprogcompId=${eduprogcompId}&semNum=${semNum}`)
       } else {
-        console.log('kl;kl;kl')
         return await postData(`/eduprogs/scheme/expandOrShrink?eduprogcompId=${eduprogcompId}&semNum=${semNum}&direction=${direction}`)
       }
     },

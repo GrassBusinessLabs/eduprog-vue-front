@@ -24,7 +24,6 @@ const emit = defineEmits(['added', 'dragstart', 'resizestop', 'delete', 'change'
 
 const GRID_COLUMN = 8
 const GRID_MIN_ROW = 1
-const GRID_MAX_ROW = 5
 
 let grid
 const gridref = ref(null)
@@ -43,8 +42,8 @@ onMounted(() => {
       float: false,
       column: GRID_COLUMN,
       minRow: GRID_MIN_ROW,
-      maxRow: GRID_MAX_ROW,
       acceptWidgets: '.grid-stack-item',
+      disableOneColumnMode: true,
       resizable: {
         handles: 'e,w',
       },
@@ -120,6 +119,14 @@ function editWidget(component) {
   console.log(props.update)
 }
 
+function maxRow(credits){
+  const sum = credits/3
+  if ( sum <= 8){
+    return sum
+  }else {
+    return 8
+  }
+}
 
 defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent })
 </script>
@@ -139,7 +146,7 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent })
       :gs-y='item.y'
       :gs-h='item.h'
       :gs-w='item.w'
-      :gs-max-w='Math.floor(item.eduprogcomp.credits/3)'
+      :gs-max-w='maxRow(item.eduprogcomp.credits)'
       @mouseover='mouseover(item.id)'
       @mouseleave='mouseleave'
     >
