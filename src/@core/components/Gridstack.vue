@@ -113,10 +113,7 @@ const getGridNodes = () => {
 }
 
 function editWidget(component) {
-  console.log(grid.getGridItems())
   grid.load(grid.getGridItems())
-  console.log(props.gridItems)
-  console.log(props.update)
 }
 
 function maxRow(credits){

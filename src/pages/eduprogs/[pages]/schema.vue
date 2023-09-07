@@ -168,10 +168,10 @@ async function logger(evt) {
         }
       } else {
         try {
-          respon = await eduProgsStore.shrinkExpandSchemecomp(component.eduprogcomp_id, evt[1].gridstackNode.x + 1, null)
-
           component.x = evt[1].gridstackNode.x
           component.w = evt[1].gridstackNode.w
+          respon = await eduProgsStore.shrinkExpandSchemecomp(component.eduprogcomp_id, evt[1].gridstackNode.x + 1, null)
+
         } catch (error) {
           mistake.value.type = true
           mistake.value.massege = error.response.data.error
@@ -211,12 +211,10 @@ async function logger(evt) {
         side = 'LEFT'
       }
       if (side === 'RIGHT') {
-        console.log(sum)
-        console.log(side)
+        component.x = evt[1].gridstackNode.x
+        component.w = evt[1].gridstackNode.w
         respon = await eduProgsStore.shrinkExpandSchemecomp(component.eduprogcomp_id, evt[1].gridstackNode.x + 1, side)
       } else {
-        console.log(side)
-        console.log(evt[1].gridstackNode.x + 1)
         respon = await eduProgsStore.shrinkExpandSchemecomp(component.eduprogcomp_id, sum, side)
       }
       component = deleteProperties(component)
