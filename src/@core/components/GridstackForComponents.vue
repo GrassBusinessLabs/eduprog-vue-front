@@ -172,4 +172,11 @@ defineExpose({ createFreeWidget, updateGridComp, gridItem })
   height: 70%;
   border: 1px solid rgb(202, 202, 202);
 }
+.grid-stack-item-content {
+  cursor: grab;
+}
+
+:active {
+  cursor: grabbing;
+}
 </style>

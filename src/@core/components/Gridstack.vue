@@ -116,11 +116,11 @@ function editWidget(component) {
   grid.load(grid.getGridItems())
 }
 
-function maxRow(credits){
-  const sum = credits/3
-  if ( sum <= 8){
+function maxRow(credits) {
+  const sum = credits / 3
+  if (sum <= 8) {
     return sum
-  }else {
+  } else {
     return 8
   }
 }
@@ -130,30 +130,30 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent })
 
 <template>
   <div
-    ref='gridref'
-    class='grid-stack grid-schema'
-    @click='editWidget'
+    ref="gridref"
+    class="grid-stack grid-schema"
+    @click="editWidget"
   >
     <div
-      v-for='item in props.gridItems'
-      :key='item.w'
-      class='grid-stack-item rounded-lg'
-      :gs-id='item.id'
-      :gs-x='item.x'
-      :gs-y='item.y'
-      :gs-h='item.h'
-      :gs-w='item.w'
-      :gs-max-w='maxRow(item.eduprogcomp.credits)'
-      @mouseover='mouseover(item.id)'
-      @mouseleave='mouseleave'
+      v-for="item in props.gridItems"
+      :key="item.w"
+      class="grid-stack-item rounded-lg"
+      :gs-id="item.id"
+      :gs-x="item.x"
+      :gs-y="item.y"
+      :gs-h="item.h"
+      :gs-w="item.w"
+      :gs-max-w="maxRow(item.eduprogcomp.credits)"
+      @mouseover="mouseover(item.id)"
+      @mouseleave="mouseleave"
     >
       <VBtn
-        v-show='hoveredWidget === item.id'
-        v-bind='props'
-        class='grid-stack-item__edit-btn'
-        density='compact'
-        icon='mdi-trash-can'
-        @click='deleteGridComponent(item)'
+        v-show="hoveredWidget === item.id"
+        v-bind="props"
+        class="grid-stack-item__edit-btn"
+        density="compact"
+        icon="mdi-trash-can"
+        @click="deleteGridComponent(item)"
       />
 
       <!--      <VMenu -->
@@ -182,33 +182,39 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent })
       <!--      </VMenu> -->
 
 
-      <div class='justify-center rounded-lg grid-stack-item-content text-center d-flex flex-column'>
-        <span class='text-body-2 mb-1'>
+      <div class="justify-center rounded-lg grid-stack-item-content text-center d-flex flex-column">
+        <span class="text-body-2 mb-1">
           {{ item.eduprogcomp.name }}
+          <VTooltip
+            activator="parent"
+            location="top"
+          >
+            {{ item.eduprogcomp.name }}
+          </VTooltip>
         </span>
-        <div class='d-flex justify-space-around text-body-2 w-100'>
-          <span v-if='item.credits_per_semester1'>
+        <div class="d-flex justify-space-around text-body-2 w-100">
+          <span v-if="item.credits_per_semester1">
             {{ item.credits_per_semester1 }}
           </span>
-          <span v-if='item.credits_per_semester2'>
+          <span v-if="item.credits_per_semester2">
             {{ item.credits_per_semester2 }}
           </span>
-          <span v-if='item.credits_per_semester3'>
+          <span v-if="item.credits_per_semester3">
             {{ item.credits_per_semester3 }}
           </span>
-          <span v-if='item.credits_per_semester4'>
+          <span v-if="item.credits_per_semester4">
             {{ item.credits_per_semester4 }}
           </span>
-          <span v-if='item.credits_per_semester5'>
+          <span v-if="item.credits_per_semester5">
             {{ item.credits_per_semester5 }}
           </span>
-          <span v-if='item.credits_per_semester6'>
+          <span v-if="item.credits_per_semester6">
             {{ item.credits_per_semester6 }}
           </span>
-          <span v-if='item.credits_per_semester7'>
+          <span v-if="item.credits_per_semester7">
             {{ item.credits_per_semester7 }}
           </span>
-          <span v-if='item.credits_per_semester8'>
+          <span v-if="item.credits_per_semester8">
             {{ item.credits_per_semester8 }}
           </span>
         </div>
@@ -221,6 +227,14 @@ defineExpose({ createWidget, isAreaEmpty, getGridNodes, deleteGridComponent })
 .grid-schema .grid-stack-item-content {
   height: 80%;
   border: 1px solid rgb(202, 202, 202);
+}
+
+.grid-stack-item-content {
+  cursor: grab;
+}
+
+:active {
+  cursor: grabbing;
 }
 
 .grid-schema .grid-stack-item__select {
