@@ -149,8 +149,14 @@ defineExpose({ createFreeWidget, updateGridComp, gridItem })
         class="grid-stack-item-content rounded-lg d-flex pa-4 align-center"
         style="overflow: hidden"
       >
-        <div>
+        <div class='textStyle'>
           {{ component.name }}
+          <VTooltip
+            activator='parent'
+            location='top'
+          >
+            {{ component.name }}
+          </VTooltip>
         </div>
         <VSpacer />
         <div>
@@ -174,6 +180,11 @@ defineExpose({ createFreeWidget, updateGridComp, gridItem })
 }
 .grid-stack-item-content {
   cursor: grab;
+}
+.textStyle{
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 :active {

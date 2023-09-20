@@ -335,6 +335,7 @@ async function initGrid() {
         eduprogcomp_id: item.eduprogcomp_id,
         eduprogcomp: item.items[0].eduprogcomp,
         disc_id: item.items[0].discipline_id,
+        name: item.items[0].eduprogcomp.name,
       }
       addExtractedFieldsToObject(item.items, fields, widget)
       items[item.items[0].discipline_id].unshift(widget)
@@ -666,7 +667,7 @@ function deleteItem(event) {
           class="discipline-block"
         >
           <div style="width: 12%">
-            <div style="text-align: center">
+            <div style="text-align: center" class='category-style-text'>
               <span v-if="editIndex !== item.id">{{ item.name }}</span>
               <span v-if="editIndex === item.id">
                 <VTextField
@@ -737,6 +738,10 @@ function deleteItem(event) {
   display: flex;
   background: #fff;
   width: 100%;
+}
+.category-style-text{
+  word-wrap: break-word;
+  padding-left: 5px;
 }
 </style>
 
